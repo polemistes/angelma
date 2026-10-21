@@ -11,6 +11,7 @@ use Angelma\Controllers\Admin\ImagesController;
 use Angelma\Controllers\Admin\PagesController;
 use Angelma\Controllers\Admin\PostsController;
 use Angelma\Controllers\Admin\RowsController;
+use Angelma\Controllers\Admin\UsersController;
 use Angelma\Controllers\AuthController;
 use Angelma\Controllers\BlogController;
 use Angelma\Controllers\SiteController;
@@ -69,6 +70,12 @@ return static function (Router $r): void {
     $r->get('/admin/comments', [CommentsController::class, 'index']);
     $r->post('/admin/comments/{id}/approve', [CommentsController::class, 'approve']);
     $r->post('/admin/comments/{id}/delete', [CommentsController::class, 'delete']);
+
+    $r->get('/admin/users', [UsersController::class, 'index']);
+    $r->post('/admin/users', [UsersController::class, 'create']);
+    $r->get('/admin/users/{id}', [UsersController::class, 'edit']);
+    $r->post('/admin/users/{id}', [UsersController::class, 'update']);
+    $r->post('/admin/users/{id}/delete', [UsersController::class, 'delete']);
 
     // Public blogs.
     $r->get('/blog/{blog}', [BlogController::class, 'index']);

@@ -67,3 +67,5 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Logged-in commenters do not enter a name: their display name is used.
 - Comment actions are `POST /admin/comments/{id}/approve` and `POST /admin/comments/{id}/delete`, used both from `/admin/comments` and from the post page (a hidden `return` field decides where to go back). Delete is allowed for moderators and for the comment's own (logged-in) author.
 - `/admin/comments` shows all pending comments (oldest first) and the 50 newest approved ones.
+- Users: created with `POST /admin/users`, deleted with `POST /admin/users/{id}/delete`. Usernames follow the installer's rules; new users must have a password of at least 10 characters.
+- An administrator cannot delete their own account (to avoid locking themselves out mid-session); a deactivated user's open session ends on their next request.

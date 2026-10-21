@@ -731,7 +731,7 @@ Tick when done and committed.
 - [x] 4.3 Blog box
 - [x] 5.1 Comment submission
 - [x] 5.2 Moderation
-- [ ] 5.3 Users
+- [x] 5.3 Users
 - [ ] 6.1 Settings
 - [ ] 6.2 Backup
 - [ ] 6.3 Build and install test
