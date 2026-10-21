@@ -8,6 +8,7 @@ use League\CommonMark\Environment\Environment;
 use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\Extension\CommonMark\Node\Block\Heading;
+use League\CommonMark\Extension\CommonMark\Node\Inline\Image;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 use League\CommonMark\MarkdownConverter;
 use League\CommonMark\Node\Block\Paragraph;
@@ -18,7 +19,8 @@ use League\CommonMark\Parser\MarkdownParser;
 /**
  * Markdown to HTML. Raw HTML is stripped, unsafe links are removed, headings are kept
  * between h2 and h4 (h1 belongs to the page), and links to other sites get
- * rel="noopener".
+ * rel="noopener". Links and images starting with / point into the site, so they get
+ * the subfolder in front when the site lives in one (write [About](/about)).
  */
 final class Markdown
 {
@@ -74,14 +76,19 @@ final class Markdown
         return self::$converter;
     }
 
-    /** @internal Event listener: clamp heading levels and mark external links. */
+    /** @internal Event listener: clamp heading levels, fix site links, mark external links. */
     public static function adjust(DocumentParsedEvent $event): void
     {
         foreach ($event->getDocument()->iterator() as $node) {
             if ($node instanceof Heading) {
                 $node->setLevel(max(2, min(4, $node->getLevel())));
-            } elseif ($node instanceof Link && self::isExternal($node->getUrl())) {
-                $node->data->set('attributes/rel', 'noopener');
+            } elseif ($node instanceof Link || $node instanceof Image) {
+                $url = $node->getUrl();
+                if (App::$base !== '' && str_starts_with($url, '/') && !str_starts_with($url, '//')) {
+                    $node->setUrl(App::$base . $url);
+                } elseif ($node instanceof Link && self::isExternal($url)) {
+                    $node->data->set('attributes/rel', 'noopener');
+                }
             }
         }
     }

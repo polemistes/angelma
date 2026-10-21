@@ -10,6 +10,12 @@
         return meta ? meta.getAttribute('content') : '';
     }
 
+    // The site's subfolder ('' at the web root), for addresses built in JavaScript.
+    function basePath() {
+        var meta = document.querySelector('meta[name="base-path"]');
+        return meta ? meta.getAttribute('content') : '';
+    }
+
     // Forms with data-confirm ask before submitting (every delete button).
     document.addEventListener('submit', function (event) {
         var form = event.target;
@@ -77,7 +83,7 @@
                 var body = new FormData();
                 body.append('markdown', area.value);
                 body.append('_csrf', csrfToken());
-                fetch('/admin/preview', { method: 'POST', body: body, credentials: 'same-origin' })
+                fetch(basePath() + '/admin/preview', { method: 'POST', body: body, credentials: 'same-origin' })
                     .then(function (response) {
                         return response.ok ? response.text() : Promise.reject(response.status);
                     })

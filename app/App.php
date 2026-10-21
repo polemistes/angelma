@@ -31,6 +31,12 @@ final class App
 
     public static string $root = '';
 
+    /**
+     * URL path of the site, without a trailing slash: '' when the site is at the web
+     * root, '/folder' when it lives in a subfolder. Detected from the script's URL.
+     */
+    public static string $base = '';
+
     /** @var array<string, mixed> contents of data/config.php */
     public static array $config = [];
 
@@ -49,6 +55,8 @@ final class App
             $config = require $configFile;
             self::$config = is_array($config) ? $config : [];
         }
+
+        self::$base = self::detectBase(self::$config['base_path'] ?? null, (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
 
         date_default_timezone_set('UTC');
         mb_internal_encoding('UTF-8');
@@ -73,6 +81,24 @@ final class App
             }
             echo self::debug() ? (string) $e : t('error_500_title') . "\n";
         });
+    }
+
+    /**
+     * The site's URL path from the running script: /folder/index.php and
+     * /folder/install/index.php both give '/folder'. A base_path in config.php wins.
+     */
+    public static function detectBase(mixed $configured, string $scriptName): string
+    {
+        if (is_string($configured)) {
+            $base = $configured;
+        } else {
+            $base = (string) preg_replace('#/(install/)?index\.php$#', '', $scriptName);
+            if ($base === $scriptName) {
+                $base = '';
+            }
+        }
+        $base = '/' . trim($base, '/');
+        return $base === '/' || !preg_match('#^[A-Za-z0-9._~/-]*$#', $base) ? '' : $base;
     }
 
     public static function debug(): bool
@@ -149,7 +175,7 @@ final class App
         session_name('angelma');
         session_set_cookie_params([
             'lifetime' => 0,
-            'path' => '/',
+            'path' => self::$base . '/',
             'secure' => $request->isHttps(),
             'httponly' => true,
             'samesite' => 'Lax',
@@ -186,7 +212,7 @@ final class App
     {
         if (!self::installed()) {
             if (!preg_match('#^/(install|assets)(/|$)#', $request->path)) {
-                return Response::redirect('/install/', 302);
+                return Response::redirect(url('/install/'), 302);
             }
         } else {
             self::startSession($request);

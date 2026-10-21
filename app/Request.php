@@ -31,9 +31,13 @@ final class Request
     public static function fromGlobals(): self
     {
         $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
-        $path = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $path = rawurldecode((string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH));
+        $base = App::$base;
+        if ($base !== '' && ($path === $base || str_starts_with($path, $base . '/'))) {
+            $path = substr($path, strlen($base));
+        }
 
-        return new self($method, self::normalizePath(rawurldecode($path)), $_GET, $_POST, $_FILES, $_SERVER);
+        return new self($method, self::normalizePath($path), $_GET, $_POST, $_FILES, $_SERVER);
     }
 
     public static function normalizePath(string $path): string
@@ -108,7 +112,7 @@ final class Request
         return (string) ($this->server[$key] ?? '');
     }
 
-    /** Path plus query string, used as a return address after login. */
+    /** Path inside the site plus query string, used as a return address after login. */
     public function fullPath(): string
     {
         $qs = http_build_query($this->query);

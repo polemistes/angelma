@@ -28,6 +28,7 @@ $items = [
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <meta name="csrf-token" content="<?= e(Auth::csrfToken()) ?>">
+<meta name="base-path" content="<?= e(App::$base) ?>">
 <title><?= e(($title ?? t('nav_dashboard')) . ' - ' . App::setting('site_title') . ' ' . t('admin_suffix')) ?></title>
 <link rel="stylesheet" href="<?= e(url('/assets/admin.css', ['v' => $version])) ?>">
 <script src="<?= e(url('/assets/admin.js', ['v' => $version])) ?>" defer></script>

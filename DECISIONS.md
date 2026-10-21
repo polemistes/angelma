@@ -2,7 +2,7 @@
 
 Choices made where `PLAN.md` was ambiguous or silent. One line each.
 
-- The site is assumed to live at the web root (as on Domeneshop's `www/`); URLs are root-relative and no base-path detection is done.
+- ~~The site is assumed to live at the web root.~~ Changed in 1.1.0 at the owner's request: the site may live at the web root or in a subfolder (see below).
 - `robots.txt` is served directly by `.htaccess` as well, otherwise it would fall through to `index.php` and give 404.
 - Composer `platform.php` is pinned to 8.2.0 so the committed `vendor/` works on any PHP 8.2+ host; PHPUnit 11.5 is used.
 - `dev/router.php` serves static files itself (instead of returning false) so the security headers are set on them too, as Apache does.
@@ -79,3 +79,4 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Apache is not installed on the development machine, so the `.htaccess` files were checked by reading and through the `dev/router.php` emulation only; the first real Apache run will be on the host.
 - Review pass (step 6.4): static files (CSS, JS, images) also get the Content-Security-Policy, from `.htaccess` for those file types only so PHP pages do not get it twice. The scheme `<style>` block is now printed with `e()` (it contains no characters `e()` changes), so `raw()` is used only for Markdown and the admin's raw embed HTML.
 - Review pass: verified with a 145-check role matrix (anonymous, user, two editors, admin) over every row of section 7, a CSRF check of all 34 POST routes, headless-browser checks of all admin JavaScript, and layouts at 360, 700 and 1400 px.
+- Subfolder support (1.1.0, requested by the owner after 1.0.0): the site's URL path is detected from the script's URL (`/folder/index.php` or `/folder/install/index.php` → `/folder`), or set with `'base_path' => '/folder'` in `data/config.php`. `url()` adds it to every link, incoming paths are read without it, the session cookie is limited to it, and admin.js reads it from `<meta name="base-path">`. Markdown links and images starting with `/` get the folder in front, so content written as `[About](/about)` keeps working when the site moves between the root and a subfolder. `dev/router.php` emulates a subfolder with `ANGELMA_BASE=/folder`.

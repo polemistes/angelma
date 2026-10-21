@@ -5,13 +5,30 @@ declare(strict_types=1);
 /*
  * Router for the PHP built-in server. Reproduces the rules of the .htaccess files
  * so local behaviour matches Apache. Start with dev/server.sh. To serve an extracted
- * release zip instead of this repository, set ANGELMA_ROOT to its folder.
+ * release zip instead of this repository, set ANGELMA_ROOT to its folder; to serve the
+ * site from a subfolder, set ANGELMA_BASE, e.g. ANGELMA_BASE=/site.
  */
 
 // ANGELMA_ROOT lets the router serve another copy, e.g. an extracted release zip.
 $root = getenv('ANGELMA_ROOT') ?: dirname(__DIR__);
 $path = rawurldecode((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 $path = '/' . ltrim(str_replace('\\', '/', $path), '/');
+
+// ANGELMA_BASE=/folder serves the site from a subfolder, as when it is extracted into
+// www/folder/ on the host. Everything outside the folder is 404.
+$base = rtrim((string) getenv('ANGELMA_BASE'), '/');
+if ($base !== '') {
+    if ($path === $base) {
+        header('Location: ' . $base . '/', true, 301);
+        exit;
+    }
+    if (!str_starts_with($path, $base . '/')) {
+        http_response_code(404);
+        echo "404 Not Found (the site is in $base/)\n";
+        exit;
+    }
+    $path = substr($path, strlen($base));
+}
 
 $securityHeaders = static function (): void {
     header('X-Content-Type-Options: nosniff');
@@ -50,7 +67,7 @@ $direct = preg_match('#^/(assets|uploads|install)(/|$)#', $path) === 1 || $path 
 
 if ($direct && is_dir($file)) {
     if (!str_ends_with($path, '/')) {
-        header('Location: ' . $path . '/', true, 301);
+        header('Location: ' . $base . $path . '/', true, 301);
         exit;
     }
     $file .= 'index.php';
@@ -62,7 +79,7 @@ if ($direct && is_dir($file)) {
 if ($direct && is_file($file)) {
     $securityHeaders();
     if (str_ends_with($file, '.php')) {
-        $_SERVER['SCRIPT_NAME'] = substr($file, strlen($root));
+        $_SERVER['SCRIPT_NAME'] = $base . substr($file, strlen($root));
         $_SERVER['SCRIPT_FILENAME'] = $file;
         chdir(dirname($file));
         require $file;
@@ -100,7 +117,7 @@ if ($direct && is_file($file)) {
 
 // Everything else goes to the front controller.
 $securityHeaders();
-$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['SCRIPT_NAME'] = $base . '/index.php';
 $_SERVER['SCRIPT_FILENAME'] = $root . '/index.php';
 chdir($root);
 require $root . '/index.php';

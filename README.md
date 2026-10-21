@@ -5,9 +5,10 @@ pages; each page is a stack of rows, and each row holds boxes with text, an imag
 or an embedded video or map. It runs on ordinary shared web hosting with PHP and SQLite,
 and needs no console, Composer or Node on the server.
 
-To install, upload the release archive to your web host, extract it into the web root,
-open the site in a browser and follow the installer. The steps for Domeneshop are below;
-other hosts with Apache and PHP 8.2 or newer work the same way.
+To install, upload the release archive to your web host, extract it into the web root
+(or into a subfolder of it), open the site in a browser and follow the installer. The
+steps for Domeneshop are below; other hosts with Apache and PHP 8.2 or newer work the
+same way.
 
 ## Installing on Domeneshop
 
@@ -19,6 +20,9 @@ program such as FileZilla (or the file manager in the control panel, if you pref
 
 2. **Put the files in `www/`.** Your website lives in the folder called `www` on the web
    hotel. It should be empty (remove any placeholder page that is there).
+   *Want the site in a subfolder instead, such as `https://www.example.no/club/`?* Then
+   create the folder `www/club/` and put the files there instead of directly in `www/`;
+   everywhere below, read `www/club/` for `www/` and add `/club` to the addresses.
    - If you can extract zip files on the server (for example in the control panel's file
      manager), upload the zip into `www/` and extract it there, so that `index.php`,
      `app/`, `install/` and the other files end up directly inside `www/`.
@@ -51,6 +55,16 @@ program such as FileZilla (or the file manager in the control panel, if you pref
   zip back in place by FTP.
 - **Your data** is in `www/data/` (the database and settings) and `www/uploads/` (images).
   These folders are protected from the web; never delete them.
+- **Links in your texts:** write links to your own pages starting with a slash, like
+  `[About us](/about)`. Angelma adds the subfolder if the site lives in one, so the links
+  keep working if you move the site.
+- **Building the site on your own computer first:** you can install Angelma on your own
+  computer (with Apache, or with `dev/server.sh` from the source code), build the site
+  there, and then copy the whole folder, including `data/` and `uploads/`, to the web
+  hotel by FTP. Stop the local server while copying, leave out `data/sessions/*` and
+  `data/error.log`, delete `install/` on the web hotel, and make `data/`,
+  `data/sessions/` and `uploads/` writable there. The site may be in a different
+  subfolder (or none) on your computer than on the web hotel.
 - **Moving or reinstalling:** the installer only runs while `data/installed.lock` does not
   exist. To start over completely, delete everything in `data/` except `.htaccess` and
   the `sessions` folder, and everything in `uploads/` except `.htaccess` and `index.html`.
@@ -62,6 +76,7 @@ Requirements: PHP 8.2 or newer with `pdo_sqlite`, `gd` and `mbstring`, and Compo
 
 ```
 dev/server.sh          # local server on http://localhost:8080 (emulates .htaccess)
+                       # ANGELMA_BASE=/site dev/server.sh would serve it from /site/ instead
 dev/reset.sh           # delete the local database, config and uploads to test the installer
 vendor/bin/phpunit     # run the tests
 dev/build.sh           # build dist/angelma-<version>.zip

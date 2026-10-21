@@ -48,13 +48,14 @@ function t(string $key, array $params = []): string
 }
 
 /**
- * Site-relative URL with an optional query string.
+ * URL of a path inside the site, with an optional query string. Paths in the code
+ * are written from the site root ('/admin'); the subfolder, if any, is added here.
  *
  * @param array<string, string|int> $query
  */
 function url(string $path = '/', array $query = []): string
 {
-    $path = '/' . ltrim($path, '/');
+    $path = App::$base . '/' . ltrim($path, '/');
     $query = array_filter($query, static fn ($v): bool => $v !== null && $v !== '');
     return $path . ($query !== [] ? '?' . http_build_query($query) : '');
 }
