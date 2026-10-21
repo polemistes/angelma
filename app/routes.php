@@ -69,6 +69,7 @@ return static function (Router $r): void {
     $r->get('/blog/{blog}', [BlogController::class, 'index']);
     $r->get('/blog/{blog}/feed', [BlogController::class, 'feed']);
     $r->get('/blog/{blog}/{post}', [BlogController::class, 'post']);
+    $r->post('/blog/{blog}/{post}/comment', [BlogController::class, 'comment']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);

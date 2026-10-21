@@ -584,3 +584,93 @@ pre {
 .muted-text {
     color: var(--caption);
 }
+
+/* Comments */
+
+.comments {
+    max-width: 46rem;
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--box-border);
+}
+
+.comments h2 {
+    margin-top: 0;
+}
+
+.comment-list {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+}
+
+.comment {
+    padding: .9rem 1rem;
+    margin-bottom: .75rem;
+    background: var(--box-bg);
+    border: 1px solid var(--box-border);
+    border-radius: var(--radius);
+}
+
+.comment-pending {
+    border-style: dashed;
+    border-left: 4px solid var(--link);
+}
+
+.comment-meta {
+    margin: 0 0 .35rem;
+    color: var(--caption);
+    font-size: .9rem;
+}
+
+.comment-meta strong {
+    color: var(--text);
+}
+
+.comment-badge {
+    display: inline-block;
+    margin-left: .35rem;
+    padding: 0 .45rem;
+    border-radius: 10px;
+    background: var(--menu-bg);
+    color: var(--menu-text);
+    font-size: .75rem;
+}
+
+.comment-body {
+    overflow-wrap: anywhere;
+}
+
+.comment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .6rem;
+}
+
+.comment-actions form {
+    margin: 0;
+}
+
+.button.small {
+    padding: .2rem .6rem;
+    font-size: .85rem;
+}
+
+.comment-form h3 {
+    margin-top: 0;
+}
+
+.comment-as,
+.comment-hint,
+.comments-note {
+    color: var(--caption);
+}
+
+.hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}

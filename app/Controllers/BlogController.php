@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Angelma\Controllers;
 
 use Angelma\App;
+use Angelma\Auth;
 use Angelma\Markdown;
 use Angelma\Repos\Blogs;
+use Angelma\Repos\Comments;
 use Angelma\Repos\Posts;
 use Angelma\Request;
 use Angelma\Response;
@@ -18,6 +20,14 @@ final class BlogController
 {
     public const PER_PAGE = 10;
     public const FEED_SIZE = 20;
+
+    // Comment spam controls (PLAN.md section 6.7).
+    public const COMMENT_MIN_SECONDS = 3;
+    public const COMMENT_MAX_PER_WINDOW = 5;
+    public const COMMENT_WINDOW_SECONDS = 600;
+    public const COMMENT_MAX_LENGTH = 4000;
+    public const COMMENT_MAX_URLS = 2;
+    public const COMMENT_MAX_NAME = 60;
 
     public function index(Request $request, string $blogSlug): Response
     {
@@ -41,22 +51,144 @@ final class BlogController
         ]);
     }
 
-    /** One published post. Drafts are not public. */
+    /** One published post with its comments. Drafts are not public. */
     public function post(Request $request, string $blogSlug, string $postSlug): Response
+    {
+        [$blog, $post] = self::publishedPost($blogSlug, $postSlug);
+        return $this->showPost($blog, $post);
+    }
+
+    /** POST target of the comment form. */
+    public function comment(Request $request, string $blogSlug, string $postSlug): Response
+    {
+        [$blog, $post] = self::publishedPost($blogSlug, $postSlug);
+        $user = Auth::user();
+        $mode = (string) $post['comments_mode'];
+        if ($mode === 'closed' || ($mode === 'users' && $user === null)) {
+            abort(403);
+        }
+
+        $postUrl = '/blog/' . $blog['slug'] . '/' . $post['slug'];
+        $input = ['author_name' => $request->str('author_name'), 'body' => trim($request->input('body'))];
+        $comments = new Comments();
+
+        // Bots: the honeypot must stay empty and the form must be at least 3 seconds old.
+        if ($request->str('website') !== '' || !self::formAgeOk($request->str('form_time'))) {
+            return $this->showPost($blog, $post, $input, ['form' => t('comment_rejected')], 422);
+        }
+
+        $ipHash = $request->ipHash();
+        $since = gmdate('Y-m-d\TH:i:s\Z', time() - self::COMMENT_WINDOW_SECONDS);
+        if ($comments->countSince($ipHash, $since) >= self::COMMENT_MAX_PER_WINDOW) {
+            return $this->showPost($blog, $post, $input, ['form' => t('comment_too_many')], 429);
+        }
+
+        $errors = [];
+        if ($user === null) {
+            if ($input['author_name'] === '' || mb_strlen($input['author_name']) > self::COMMENT_MAX_NAME) {
+                $errors['author_name'] = t('comment_error_name', ['max' => self::COMMENT_MAX_NAME]);
+            }
+            if (self::countUrls($input['body']) > self::COMMENT_MAX_URLS) {
+                $errors['body'] = t('comment_error_urls', ['max' => self::COMMENT_MAX_URLS]);
+            }
+        }
+        if ($input['body'] === '') {
+            $errors['body'] = t('comment_error_empty');
+        } elseif (mb_strlen($input['body']) > self::COMMENT_MAX_LENGTH) {
+            $errors['body'] = t('comment_error_long', ['max' => self::COMMENT_MAX_LENGTH]);
+        }
+        if ($errors !== []) {
+            return $this->showPost($blog, $post, $input, $errors, 422);
+        }
+
+        $pending = $user === null && App::setting('moderate_anonymous', '1') === '1';
+        $id = $comments->create([
+            'post_id' => (int) $post['id'],
+            'user_id' => $user === null ? null : (int) $user['id'],
+            'author_name' => $user === null ? $input['author_name'] : (string) $user['display_name'],
+            'body' => $input['body'],
+            'status' => $pending ? 'pending' : 'approved',
+            'ip_hash' => $ipHash,
+        ]);
+        flash('success', $pending ? t('comment_pending') : t('comment_published'));
+        return redirect($postUrl . '#comment-' . $id);
+    }
+
+    /**
+     * @param array<string, mixed> $blog
+     * @param array<string, mixed> $post
+     * @param array<string, string> $input
+     * @param array<string, string> $errors
+     */
+    private function showPost(array $blog, array $post, array $input = [], array $errors = [], int $status = 200): Response
+    {
+        $moderator = self::canModerate($post);
+        return view('site/post', [
+            'title' => (string) $post['title'],
+            'meta_description' => Markdown::firstParagraph((string) $post['body_markdown'], 160),
+            'blog' => $blog,
+            'post' => $post,
+            'comments' => (new Comments())->forPost((int) $post['id'], $moderator),
+            'moderator' => $moderator,
+            'user' => Auth::user(),
+            'input' => $input + ['author_name' => '', 'body' => ''],
+            'errors' => $errors,
+            'formTime' => self::formTime(),
+            'feed_url' => url('/blog/' . $blog['slug'] . '/feed'),
+            'feed_title' => (string) $blog['title'],
+        ], $status);
+    }
+
+    /**
+     * May the current user see pending comments of this post and moderate them?
+     * Admins, the post's author and the blog's owner may.
+     *
+     * @param array<string, mixed> $post
+     */
+    public static function canModerate(array $post): bool
+    {
+        return Auth::user() !== null && (Auth::isAdmin()
+            || Auth::id() === (int) $post['author_id']
+            || Auth::id() === (int) $post['blog_owner_id']);
+    }
+
+    /**
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>} blog and post, or 404
+     */
+    private static function publishedPost(string $blogSlug, string $postSlug): array
     {
         $blog = self::blog($blogSlug);
         $post = (new Posts())->findBySlug((int) $blog['id'], $postSlug);
         if ($post === null || $post['status'] !== 'published') {
             abort(404);
         }
-        return view('site/post', [
-            'title' => (string) $post['title'],
-            'meta_description' => Markdown::firstParagraph((string) $post['body_markdown'], 160),
-            'blog' => $blog,
-            'post' => $post,
-            'feed_url' => url('/blog/' . $blog['slug'] . '/feed'),
-            'feed_title' => (string) $blog['title'],
-        ]);
+        return [$blog, $post];
+    }
+
+    /** Signed time stamp for the comment form, so the 3 second rule cannot be faked. */
+    public static function formTime(?int $time = null): string
+    {
+        $time ??= time();
+        return $time . '.' . substr(hash_hmac('sha256', 'comment-form:' . $time, App::secret()), 0, 16);
+    }
+
+    public static function formAgeOk(string $value, ?int $now = null): bool
+    {
+        if (!preg_match('/^(\d+)\.([a-f0-9]{16})$/', $value, $m)) {
+            return false;
+        }
+        $time = (int) $m[1];
+        if (!hash_equals(substr(hash_hmac('sha256', 'comment-form:' . $time, App::secret()), 0, 16), $m[2])) {
+            return false;
+        }
+        $age = ($now ?? time()) - $time;
+        return $age >= self::COMMENT_MIN_SECONDS && $age <= 86400;
+    }
+
+    /** Number of links in a text: http(s):// addresses and www. names. */
+    public static function countUrls(string $text): int
+    {
+        return (int) preg_match_all('#(https?://|\bwww\.)\S+#i', $text);
     }
 
     /** RSS 2.0 feed of the newest published posts. */

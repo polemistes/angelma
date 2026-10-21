@@ -62,3 +62,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Tests run against an in-memory database set in `tests/bootstrap.php`, never against `data/`.
 - A blog box may show any blog, not only the editor's own: it only lists published (public) posts. The post count is limited to 1 to 20.
 - The blog box heading is the blog title, linking to the blog.
+- Comment spam controls: the honeypot field is `website`, hidden off-screen; the form time stamp is signed with the site secret (so it cannot be faked) and accepted when 3 seconds to 24 hours old. "URLs" are counted as `http(s)://...` and `www....`. Rejected bots get a generic message.
+- Pending comments are shown on the post page to admins, the post's author and the blog's owner (the owner may moderate them per section 7).
+- Logged-in commenters do not enter a name: their display name is used.
