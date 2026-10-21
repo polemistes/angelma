@@ -8,6 +8,11 @@ final class Pages extends Repo
 {
     protected const TABLE = 'pages';
 
+    /** First path segments a page slug may not use (PLAN.md section 5). */
+    public const RESERVED = [
+        'admin', 'blog', 'login', 'logout', 'install', 'uploads', 'assets', 'data', 'app', 'vendor', 'dev', 'tests',
+    ];
+
     /** @return array<string, mixed>|null */
     public function findBySlug(string $slug): ?array
     {

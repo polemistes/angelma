@@ -35,3 +35,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Dashboard counts show the whole site for administrators and only their own pages, images, blogs, posts and pending comments for editors.
 - A placeholder Account screen was added in step 2.2 so a `user` has somewhere to land; step 2.3 fills it in.
 - Account: one form for display name and password. The current password is required only when a new password is given. The session id is regenerated after a password change.
+- Page delete is `POST /admin/pages/{id}/delete` (section 5 lists no URL for it).
+- Page form: an empty slug is filled from the name and made unique (`-2`, `-3`; reserved words also count as taken). A typed slug is normalised with `slugify()` and refused with a message if reserved or taken. An empty title means the same as the name.
+- `show_in_menu` is not on the page form, because menu visibility is an administrator setting (section 7); it is edited in Settings (step 6.1).

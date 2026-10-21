@@ -167,8 +167,10 @@ textarea {
 input[type="number"] { max-width: 10rem; }
 textarea { min-height: 12rem; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9rem; }
 fieldset { border: 0; padding: 0; margin: 0 0 1rem; }
-.hint { display: block; font-size: .85rem; color: var(--muted); margin-top: .2rem; font-weight: normal; }
-.field-error { display: block; color: var(--danger); font-size: .9rem; margin-top: .2rem; }
+.hint,
+.form label > .hint { display: block; font-size: .85rem; color: var(--muted); margin: .2rem 0 0; font-weight: normal; }
+.field-error,
+.form label > .field-error { display: block; color: var(--danger); font-size: .9rem; margin: .2rem 0 0; font-weight: normal; }
 
 .button,
 button.button {
@@ -221,3 +223,12 @@ table.list td.actions-cell form { display: inline; }
     .admin-user { display: none; }
     .admin-main { padding: 1rem; }
 }
+
+/* Collapsible panels */
+
+details.panel > summary { cursor: pointer; list-style: none; }
+details.panel > summary::-webkit-details-marker { display: none; }
+details.panel > summary h2 { display: inline; margin: 0; }
+details.panel > summary::before { content: "▸ "; color: var(--muted); }
+details.panel[open] > summary::before { content: "▾ "; }
+details.panel[open] > summary { margin-bottom: 1rem; }

@@ -19,5 +19,39 @@
         }
     });
 
-    window.Angelma = { csrfToken: csrfToken };
+    // Slug filling: an input with data-slug-target fills that field from its text,
+    // until the slug field is edited by hand.
+    var slugMap = {
+        'æ': 'ae', 'ø': 'o', 'å': 'a', 'ä': 'a', 'ö': 'o', 'ü': 'u', 'ß': 'ss', 'é': 'e', 'è': 'e',
+        'ê': 'e', 'ë': 'e', 'á': 'a', 'à': 'a', 'â': 'a', 'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+        'ó': 'o', 'ò': 'o', 'ô': 'o', 'õ': 'o', 'ú': 'u', 'ù': 'u', 'û': 'u', 'ý': 'y', 'ñ': 'n',
+        'ç': 'c', 'ð': 'd', 'þ': 'th', 'œ': 'oe'
+    };
+
+    function slugify(text) {
+        return text.toLowerCase()
+            .replace(/[^\u0000-\u007f]/g, function (ch) { return slugMap[ch] || ch; })
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '')
+            .slice(0, 80)
+            .replace(/-+$/, '');
+    }
+
+    document.querySelectorAll('[data-slug-target]').forEach(function (source) {
+        var target = document.getElementById(source.getAttribute('data-slug-target'));
+        if (!target) {
+            return;
+        }
+        var manual = target.value !== '' && target.value !== slugify(source.value);
+        target.addEventListener('input', function () {
+            manual = target.value !== '';
+        });
+        source.addEventListener('input', function () {
+            if (!manual) {
+                target.value = slugify(source.value);
+            }
+        });
+    });
+
+    window.Angelma = { csrfToken: csrfToken, slugify: slugify };
 }());

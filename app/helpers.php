@@ -227,3 +227,9 @@ function image_url(string $filename, string $size = 'l'): string
     }
     return url('/uploads/' . $filename);
 }
+
+/** A slug is lowercase letters and digits in groups joined by single dashes. */
+function valid_slug(string $slug): bool
+{
+    return strlen($slug) <= 80 && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug) === 1;
+}
