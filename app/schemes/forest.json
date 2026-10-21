@@ -1,0 +1,17 @@
+{
+    "outside_bg": "#dfe6d8",
+    "page_bg": "#f6f8f2",
+    "text": "#2d3a2a",
+    "heading": "#1e2b1c",
+    "link": "#2f6b2a",
+    "link_hover": "#1d4a1a",
+    "menu_bg": "#2f4a2b",
+    "menu_text": "#eaf2e4",
+    "menu_active_bg": "#f6f8f2",
+    "menu_active_text": "#1e2b1c",
+    "box_bg": "#ffffff",
+    "box_border": "#cfdcc6",
+    "caption": "#627159",
+    "footer_bg": "#e6ecdf",
+    "footer_text": "#4b5a46"
+}

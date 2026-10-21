@@ -18,3 +18,8 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Usernames are stored and compared in lower case, so login is case-insensitive.
 - Deleting a user moves their pages, blogs, images and posts to the administrator who deletes them; their comments keep the author name but lose the user link.
 - Published posts are shown regardless of `published_at` being in the future (scheduled publishing is a later feature).
+- The `Schemes` class and the five scheme files were created in step 1.4 instead of 1.5, because the installer's site step needs the list of built-in schemes.
+- The installer logic lives in `app/Installer.php` (testable); `install/index.php` is only the page flow. It has its own `install/install.css` and `install/install.js` (no inline scripts, because of the CSP).
+- The installer stores only the password hash in the session between steps, never the plain password.
+- If `installed.lock` is missing but the database already contains users, the installer refuses to continue instead of overwriting the site.
+- Usernames: 3 to 40 letters, digits, dots, dashes or underscores. Display names: at most 80 characters.
