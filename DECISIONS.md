@@ -23,3 +23,9 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - The installer stores only the password hash in the session between steps, never the plain password.
 - If `installed.lock` is missing but the database already contains users, the installer refuses to continue instead of overwriting the site.
 - Usernames: 3 to 40 letters, digits, dots, dashes or underscores. Display names: at most 80 characters.
+- The page's `title` is used for `<title>` and as a visually hidden `<h1>`; visible headings come from the boxes (the installer's welcome box already has its own heading). This keeps one `<h1>` per page.
+- The home page is reachable both as `/` and as `/{its slug}`; the menu links to `/`.
+- Row alignment: a row's grid gets only as many 1/12-wide columns as its boxes use, so `justify-content` can place them left, centre or right. Empty rows are not shown publicly.
+- On narrow screens fixed heights are dropped for text boxes only (as the plan says); image, blog and embed boxes keep them.
+- `--page-width` is written into the same `<style>` block as the scheme colours. `app/Frame.php` gathers the data for the public page frame (settings, menu, logo, footer).
+- Scheme colours must be `#rgb` or `#rrggbb`; anything else falls back to the paper colour, so the custom scheme can never inject CSS.

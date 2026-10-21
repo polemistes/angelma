@@ -17,6 +17,10 @@ return [
     'error_500_text' => 'The server could not complete the request. Please try again later.',
     'back_to_home' => 'Go to the home page',
 
+    // Public site
+    'menu_label' => 'Main menu',
+    'powered_by' => 'Powered by Angelma',
+
     // Common form fields and validation
     'field_site_title' => 'Site title',
     'field_page_width' => 'Page width in pixels (600 to 1600)',

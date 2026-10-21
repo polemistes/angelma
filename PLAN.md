@@ -717,7 +717,7 @@ Tick when done and committed.
 - [x] 1.2 Bootstrap, helpers, router
 - [x] 1.3 Database and migrations
 - [x] 1.4 Installer
-- [ ] 1.5 Public page rendering, schemes, menu
+- [x] 1.5 Public page rendering, schemes, menu
 - [ ] 2.1 Login and sessions
 - [ ] 2.2 Admin layout and dashboard
 - [ ] 2.3 Account

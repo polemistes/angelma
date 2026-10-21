@@ -1,0 +1,328 @@
+/*
+ * Angelma public site styles. Colours come only from the scheme variables written
+ * into each page (--outside-bg, --page-bg, ...). See PLAN.md sections 6.2 and 6.9.
+ */
+
+:root {
+    --gap: 1.25rem;
+    --pad: 1.25rem;
+    --radius: 4px;
+    --col: calc((100% - 11 * var(--gap)) / 12);
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    margin: 0;
+    background: var(--outside-bg);
+    color: var(--text);
+    font: 1.0625rem/1.6 var(--font);
+}
+
+a {
+    color: var(--link);
+}
+
+a:hover,
+a:focus {
+    color: var(--link-hover);
+}
+
+img {
+    max-width: 100%;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* Page area */
+
+.site {
+    max-width: var(--page-width, 960px);
+    min-height: 100vh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--page-bg);
+}
+
+.site-header {
+    padding: 1.5rem var(--gap) 1.25rem;
+}
+
+.site-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: .75rem;
+    color: var(--heading);
+    text-decoration: none;
+}
+
+.site-brand:hover,
+.site-brand:focus {
+    color: var(--heading);
+}
+
+.site-logo {
+    display: block;
+    max-height: 64px;
+    width: auto;
+}
+
+.site-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.site-tagline {
+    margin: .35rem 0 0;
+    color: var(--caption);
+}
+
+/* Menu bar */
+
+.site-menu {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: space-between;
+    background: var(--menu-bg);
+    color: var(--menu-text);
+}
+
+.site-menu ul {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-menu a,
+.site-menu .menu-name,
+.site-menu button {
+    display: block;
+    padding: .7rem 1rem;
+    color: var(--menu-text);
+    text-decoration: none;
+}
+
+.site-menu a:hover,
+.site-menu a:focus {
+    color: var(--menu-text);
+    text-decoration: underline;
+}
+
+.site-menu a.active {
+    background: var(--menu-active-bg);
+    color: var(--menu-active-text);
+}
+
+.menu-user {
+    display: flex;
+    align-items: center;
+}
+
+.menu-user form {
+    margin: 0;
+}
+
+.site-menu button {
+    border: 0;
+    background: none;
+    font: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Content and rows */
+
+.site-content {
+    flex: 1;
+    padding: var(--gap);
+}
+
+.row {
+    display: grid;
+    gap: var(--gap);
+    margin-bottom: var(--gap);
+    grid-template-columns: repeat(12, var(--col));
+}
+
+.row.cols-1 { grid-template-columns: repeat(1, var(--col)); }
+.row.cols-2 { grid-template-columns: repeat(2, var(--col)); }
+.row.cols-3 { grid-template-columns: repeat(3, var(--col)); }
+.row.cols-4 { grid-template-columns: repeat(4, var(--col)); }
+.row.cols-5 { grid-template-columns: repeat(5, var(--col)); }
+.row.cols-6 { grid-template-columns: repeat(6, var(--col)); }
+.row.cols-7 { grid-template-columns: repeat(7, var(--col)); }
+.row.cols-8 { grid-template-columns: repeat(8, var(--col)); }
+.row.cols-9 { grid-template-columns: repeat(9, var(--col)); }
+.row.cols-10 { grid-template-columns: repeat(10, var(--col)); }
+.row.cols-11 { grid-template-columns: repeat(11, var(--col)); }
+.row.cols-12 { grid-template-columns: repeat(12, var(--col)); }
+
+.row.align-left { justify-content: start; }
+.row.align-center { justify-content: center; }
+.row.align-right { justify-content: end; }
+
+.w-3 { grid-column: span 3; }
+.w-4 { grid-column: span 4; }
+.w-6 { grid-column: span 6; }
+.w-8 { grid-column: span 8; }
+.w-9 { grid-column: span 9; }
+.w-12 { grid-column: span 12; }
+
+/* Boxes */
+
+.box {
+    min-width: 0;
+    padding: var(--pad);
+    background: var(--box-bg);
+    border: 1px solid var(--box-border);
+    border-radius: var(--radius);
+}
+
+.box.fixed {
+    height: var(--h);
+}
+
+.box-text.fixed,
+.box-blog.fixed {
+    overflow: hidden;
+}
+
+/* Text inside boxes, posts and the footer */
+
+.prose > :first-child {
+    margin-top: 0;
+}
+
+.prose > :last-child {
+    margin-bottom: 0;
+}
+
+h1, h2, h3, h4 {
+    color: var(--heading);
+    line-height: 1.25;
+    margin: 1.4em 0 .5em;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.6rem; }
+h3 { font-size: 1.3rem; }
+h4 { font-size: 1.1rem; }
+
+p, ul, ol, blockquote, pre {
+    margin: 0 0 1em;
+}
+
+blockquote {
+    margin-left: 0;
+    padding-left: 1rem;
+    border-left: 3px solid var(--box-border);
+    color: var(--caption);
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid var(--box-border);
+    margin: 1.5em 0;
+}
+
+code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .9em;
+}
+
+pre {
+    overflow-x: auto;
+    padding: .75rem 1rem;
+    border: 1px solid var(--box-border);
+    border-radius: var(--radius);
+}
+
+/* Messages */
+
+.flash {
+    padding: .6rem .9rem;
+    margin: 0 0 var(--gap);
+    border: 1px solid var(--box-border);
+    border-left: 4px solid var(--link);
+    background: var(--box-bg);
+}
+
+.flash-error {
+    border-left-color: #c0392b;
+}
+
+.message-page {
+    padding: 2rem 0;
+}
+
+.message-page h1 {
+    margin-top: 0;
+}
+
+/* Footer */
+
+.site-footer {
+    padding: 1.25rem var(--gap);
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    font-size: .95rem;
+}
+
+.site-footer a {
+    color: var(--footer-text);
+}
+
+.footer-text > :last-child {
+    margin-bottom: .5rem;
+}
+
+.powered-by {
+    margin: 0;
+    font-size: .8rem;
+    opacity: .8;
+}
+
+/* Narrow screens: every box full width, rows stack. */
+
+@media (max-width: 699.98px) {
+    :root {
+        --gap: 1rem;
+        --pad: 1rem;
+    }
+
+    .row,
+    .row[class*="cols-"] {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .box {
+        grid-column: 1 / -1;
+    }
+
+    .box-text.fixed {
+        height: auto;
+    }
+
+    .site-title {
+        font-size: 1.4rem;
+    }
+}

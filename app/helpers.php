@@ -212,3 +212,18 @@ function format_date(?string $utc, ?string $format = null): string
     }
     return $date->setTimezone($tz)->format($format ?? App::setting('date_format', 'j F Y'));
 }
+
+/**
+ * URL of an uploaded image in one of its sizes: 'l' (large, the stored file),
+ * 'm' (medium, 1000 px wide) or 's' (small, 400 px wide).
+ */
+function image_url(string $filename, string $size = 'l'): string
+{
+    if ($size === 'm' || $size === 's') {
+        $dot = strrpos($filename, '.');
+        if ($dot !== false) {
+            $filename = substr($filename, 0, $dot) . '-' . $size . substr($filename, $dot);
+        }
+    }
+    return url('/uploads/' . $filename);
+}
