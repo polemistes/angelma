@@ -1,7 +1,4 @@
-# Angelma web server rules (see PLAN.md section 8)
-
-Options -Indexes
-DirectoryIndex index.php
+# Angelma web server rules for Apache.
 
 # Protected file types, also when mod_rewrite is missing.
 <FilesMatch "(\.(sqlite|lock|md|json|sh|xml|dist)|^composer\..*)$">

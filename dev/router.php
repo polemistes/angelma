@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 /*
  * Router for the PHP built-in server. Reproduces the rules of the .htaccess files
- * so local behaviour matches Apache. Start with dev/server.sh.
+ * so local behaviour matches Apache. Start with dev/server.sh. To serve an extracted
+ * release zip instead of this repository, set ANGELMA_ROOT to its folder.
  */
 
-$root = dirname(__DIR__);
+// ANGELMA_ROOT lets the router serve another copy, e.g. an extracted release zip.
+$root = getenv('ANGELMA_ROOT') ?: dirname(__DIR__);
 $path = rawurldecode((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 $path = '/' . ltrim(str_replace('\\', '/', $path), '/');
 

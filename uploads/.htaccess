@@ -1,7 +1,5 @@
 # Uploaded files: never run scripts, serve images inline with long caching.
 
-Options -Indexes -ExecCGI
-
 <FilesMatch "\.(php|phtml|phar|pl|py|cgi|sh)$">
     <IfModule mod_authz_core.c>
         Require all denied

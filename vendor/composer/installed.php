@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'angelma/angelma',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => 'cf5c173ad6194b7795e6ba80e9a64ebb065de40d',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'angelma/angelma' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'cf5c173ad6194b7795e6ba80e9a64ebb065de40d',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
