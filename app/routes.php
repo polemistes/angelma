@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Angelma\Controllers\Admin\AccountController;
 use Angelma\Controllers\Admin\BlogsController;
 use Angelma\Controllers\Admin\BoxesController;
+use Angelma\Controllers\Admin\CommentsController;
 use Angelma\Controllers\Admin\DashboardController;
 use Angelma\Controllers\Admin\ImagesController;
 use Angelma\Controllers\Admin\PagesController;
@@ -64,6 +65,10 @@ return static function (Router $r): void {
     $r->get('/admin/posts/{id}', [PostsController::class, 'edit']);
     $r->post('/admin/posts/{id}', [PostsController::class, 'update']);
     $r->post('/admin/posts/{id}/delete', [PostsController::class, 'delete']);
+
+    $r->get('/admin/comments', [CommentsController::class, 'index']);
+    $r->post('/admin/comments/{id}/approve', [CommentsController::class, 'approve']);
+    $r->post('/admin/comments/{id}/delete', [CommentsController::class, 'delete']);
 
     // Public blogs.
     $r->get('/blog/{blog}', [BlogController::class, 'index']);

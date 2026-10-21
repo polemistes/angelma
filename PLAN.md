@@ -730,7 +730,7 @@ Tick when done and committed.
 - [x] 4.2 Posts
 - [x] 4.3 Blog box
 - [x] 5.1 Comment submission
-- [ ] 5.2 Moderation
+- [x] 5.2 Moderation
 - [ ] 5.3 Users
 - [ ] 6.1 Settings
 - [ ] 6.2 Backup

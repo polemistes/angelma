@@ -383,4 +383,14 @@ return [
     'comment_error_long' => 'A comment can have at most {max} characters.',
     'comment_pending' => 'Thank you. Your comment will appear after it has been approved.',
     'comment_published' => 'Your comment was published.',
+
+    // Comment moderation
+    'comment_approve' => 'Approve',
+    'comment_approved' => 'The comment was approved.',
+    'comment_deleted' => 'The comment was deleted.',
+    'comment_confirm_delete' => 'Delete this comment?',
+    'comments_pending_title' => 'Waiting for approval ({count})',
+    'comments_recent_title' => 'Recently approved',
+    'comment_guest' => 'Guest',
+    'comment_on' => 'on',
 ];

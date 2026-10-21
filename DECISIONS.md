@@ -65,3 +65,5 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Comment spam controls: the honeypot field is `website`, hidden off-screen; the form time stamp is signed with the site secret (so it cannot be faked) and accepted when 3 seconds to 24 hours old. "URLs" are counted as `http(s)://...` and `www....`. Rejected bots get a generic message.
 - Pending comments are shown on the post page to admins, the post's author and the blog's owner (the owner may moderate them per section 7).
 - Logged-in commenters do not enter a name: their display name is used.
+- Comment actions are `POST /admin/comments/{id}/approve` and `POST /admin/comments/{id}/delete`, used both from `/admin/comments` and from the post page (a hidden `return` field decides where to go back). Delete is allowed for moderators and for the comment's own (logged-in) author.
+- `/admin/comments` shows all pending comments (oldest first) and the 50 newest approved ones.

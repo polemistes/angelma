@@ -377,3 +377,10 @@ details.panel[open] > summary { margin-bottom: 1rem; }
 .picker-item { position: relative; }
 .form label.picker-item > span { font-weight: normal; margin: 0; }
 textarea.short { min-height: 5rem; font-family: inherit; font-size: inherit; }
+
+/* Comment moderation */
+
+.comment-admin-meta { margin: 0 0 .25rem; }
+.comment-admin-body { margin-bottom: .5rem; overflow-wrap: anywhere; }
+.comment-actions { display: flex; flex-wrap: wrap; gap: .4rem; }
+.comment-actions form { margin: 0; }

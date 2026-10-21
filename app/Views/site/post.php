@@ -37,6 +37,17 @@ $postPath = '/blog/' . $blog['slug'] . '/' . $post['slug'];
                         <?php endif ?>
                     </p>
                     <div class="comment-body"><?= nl2br(e($comment['body']), false) ?></div>
+                    <?php
+                    $own = $user !== null && $comment['user_id'] !== null && (int) $comment['user_id'] === (int) $user['id'];
+                    if ($moderator || $own) {
+                        echo partial('comment_actions', [
+                            'comment' => $comment,
+                            'canApprove' => $moderator,
+                            'canDelete' => true,
+                            'return' => $postPath,
+                        ]);
+                    }
+                    ?>
                 </li>
             <?php endforeach ?>
         </ol>
