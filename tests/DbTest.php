@@ -152,4 +152,21 @@ final class DbTest extends DbTestCase
         $this->assertSame(['Summer_beach.jpg'], array_column($images->all(null, 'r_b'), 'original_name'));
         $this->assertCount(2, $images->all(null, 'summer'));
     }
+
+    public function testCopyToMakesAConsistentCopy(): void
+    {
+        $dir = sys_get_temp_dir() . '/angelma-copy-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        try {
+            $db = \Angelma\Db::sqlite($dir . '/source.sqlite');
+            $db->migrate();
+            (new Settings($db))->set('site_title', 'Copied');
+            $db->copyTo($dir . '/copy.sqlite');
+            $copy = \Angelma\Db::sqlite($dir . '/copy.sqlite');
+            $this->assertSame('Copied', (new Settings($copy))->get('site_title'));
+            $this->assertSame('ok', $copy->value('PRAGMA integrity_check'));
+        } finally {
+            exec('rm -rf ' . escapeshellarg($dir));
+        }
+    }
 }

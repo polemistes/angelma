@@ -182,7 +182,20 @@ final class Db
      */
     public function copyTo(string $path): void
     {
-        $this->execute('VACUUM INTO ?', [$path]);
+        try {
+            $this->execute('VACUUM INTO ?', [$path]);
+        } catch (\PDOException) {
+            // SQLite before 3.27: copy the file while holding a write lock.
+            $file = (string) $this->value('SELECT file FROM pragma_database_list WHERE name = ?', ['main']);
+            $this->pdo->exec('BEGIN IMMEDIATE');
+            try {
+                if ($file === '' || !copy($file, $path)) {
+                    throw new \RuntimeException('Could not copy the database file.');
+                }
+            } finally {
+                $this->pdo->exec('COMMIT');
+            }
+        }
     }
 
     /** @param list<string> $names */

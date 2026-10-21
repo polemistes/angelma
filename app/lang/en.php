@@ -473,4 +473,11 @@ return [
     'color_caption' => 'Captions and small text',
     'color_footer_bg' => 'Footer background',
     'color_footer_text' => 'Footer text',
+
+    // Backup
+    'backup_intro' => 'Download a zip file with the database (all pages, posts, comments, users and settings) and all uploaded images. Keep it somewhere safe.',
+    'backup_download' => 'Download backup',
+    'backup_restore_hint' => 'To restore, put data/angelma.sqlite and the uploads folder from the zip back in place by FTP.',
+    'backup_no_zip' => 'This server has no zip support in PHP, so a backup file cannot be made here. Download the data/ and uploads/ folders by FTP instead.',
+    'backup_failed' => 'The backup could not be made. Details are in data/error.log.',
 ];

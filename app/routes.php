@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Angelma\Controllers\Admin\AccountController;
+use Angelma\Controllers\Admin\BackupController;
 use Angelma\Controllers\Admin\BlogsController;
 use Angelma\Controllers\Admin\BoxesController;
 use Angelma\Controllers\Admin\CommentsController;
@@ -82,6 +83,9 @@ return static function (Router $r): void {
     $r->post('/admin/settings', [SettingsController::class, 'save']);
     $r->post('/admin/settings/menu', [SettingsController::class, 'menu']);
     $r->post('/admin/settings/menu/{id}/move', [SettingsController::class, 'moveMenu']);
+
+    $r->get('/admin/backup', [BackupController::class, 'show']);
+    $r->post('/admin/backup', [BackupController::class, 'download']);
 
     // Public blogs.
     $r->get('/blog/{blog}', [BlogController::class, 'index']);

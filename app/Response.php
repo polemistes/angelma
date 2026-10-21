@@ -19,6 +19,24 @@ final class Response
     ) {
     }
 
+    /** File sent instead of the body; deleted after sending when $deleteFile is set. */
+    public ?string $file = null;
+    public bool $deleteFile = false;
+
+    /** A file download, streamed from disk. */
+    public static function download(string $path, string $filename, string $type, bool $deleteAfter = false): self
+    {
+        $response = new self('', 200, [
+            'Content-Type' => $type,
+            'Content-Disposition' => 'attachment; filename="' . str_replace(['"', "\r", "\n"], '', $filename) . '"',
+            'Content-Length' => (string) filesize($path),
+            'Cache-Control' => 'no-store',
+        ]);
+        $response->file = $path;
+        $response->deleteFile = $deleteAfter;
+        return $response;
+    }
+
     public static function redirect(string $location, int $status = 303): self
     {
         return new self('', $status, ['Location' => $location]);
@@ -56,6 +74,16 @@ final class Response
             foreach ($this->headers as $name => $value) {
                 header($name . ': ' . $value);
             }
+        }
+        if ($this->file !== null) {
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+            readfile($this->file);
+            if ($this->deleteFile) {
+                @unlink($this->file);
+            }
+            return;
         }
         echo $this->body;
     }
