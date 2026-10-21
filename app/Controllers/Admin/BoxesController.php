@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Angelma\Controllers\Admin;
 
+use Angelma\Auth;
+use Angelma\Embed;
+use Angelma\Markdown;
 use Angelma\Repos\Boxes;
 use Angelma\Repos\Pages;
 use Angelma\Request;
@@ -44,6 +47,105 @@ final class BoxesController
         (new Pages())->touch($pageId);
         flash('success', t('box_added'));
         return RowsController::back($pageId, $rowId);
+    }
+
+    public const MIN_HEIGHT = 50;
+    public const MAX_HEIGHT = 2000;
+    public const MAX_MARKDOWN = 50000;
+
+    public function edit(Request $request, int $id): Response
+    {
+        $box = self::load($id);
+        return $this->form($box, $box['content'], (string) ($box['height'] ?? ''), (int) $box['width']);
+    }
+
+    public function update(Request $request, int $id): Response
+    {
+        $box = self::load($id);
+        $boxes = new Boxes();
+        $errors = [];
+
+        $width = $request->int('width');
+        $free = 12 - $boxes->widthSum((int) $box['row_id'], $id);
+        if (!in_array($width, Boxes::WIDTHS, true)) {
+            $errors['width'] = t('box_error_type_width');
+        } elseif ($width > $free) {
+            $errors['width'] = t('box_error_too_wide', ['width' => $width, 'free' => $free]);
+        }
+
+        $heightText = $request->str('height');
+        $height = null;
+        if ($heightText !== '') {
+            if (!preg_match('/^\d+$/', $heightText) || (int) $heightText < self::MIN_HEIGHT || (int) $heightText > self::MAX_HEIGHT) {
+                $errors['height'] = t('box_error_height', ['min' => self::MIN_HEIGHT, 'max' => self::MAX_HEIGHT]);
+            } else {
+                $height = (int) $heightText;
+            }
+        }
+
+        $content = $box['content'];
+        switch ($box['type']) {
+            case 'text':
+                $content['markdown'] = $request->input('markdown');
+                if (mb_strlen($content['markdown']) > self::MAX_MARKDOWN) {
+                    $errors['markdown'] = t('box_error_markdown_long', ['max' => self::MAX_MARKDOWN]);
+                }
+                break;
+
+            case 'embed':
+                $content['url'] = $request->str('url');
+                if ($content['url'] !== '' && (!Embed::isHttpUrl($content['url']) || strlen($content['url']) > 2000)) {
+                    $errors['url'] = t('box_error_url');
+                }
+                if (array_key_exists('html', $request->post)) {
+                    // Raw HTML is for administrators only (PLAN.md section 6.6).
+                    if (!Auth::isAdmin()) {
+                        abort(403);
+                    }
+                    $content['html'] = trim($request->input('html'));
+                }
+                break;
+        }
+
+        if ($errors !== []) {
+            return $this->form($box, $content, $heightText, $width, $errors, 422);
+        }
+
+        $boxes->update($id, $width, $height, $content);
+        (new Pages())->touch((int) $box['page_id']);
+        flash('success', t('box_saved'));
+        return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+    }
+
+    /** Render Markdown for the live preview in the text box form (admin.js). */
+    public function preview(Request $request): Response
+    {
+        Auth::requireRole('editor');
+        return new Response(Markdown::render($request->input('markdown')), 200, [
+            'Content-Type' => 'text/html; charset=utf-8',
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $box
+     * @param array<string, mixed> $content
+     * @param array<string, string> $errors
+     */
+    private function form(array $box, array $content, string $height, int $width, array $errors = [], int $status = 200): Response
+    {
+        $page = (new Pages())->find((int) $box['page_id']);
+        $free = 12 - (new Boxes())->widthSum((int) $box['row_id'], (int) $box['id']);
+        return view('admin/box_edit', [
+            'title' => t('box_edit_title', ['type' => t('box_type_' . $box['type'])]),
+            'nav' => 'pages',
+            'box' => $box,
+            'page' => $page,
+            'content' => $content,
+            'height' => $height,
+            'width' => $width,
+            'widths' => array_values(array_filter(Boxes::WIDTHS, static fn (int $w): bool => $w <= $free)),
+            'errors' => $errors,
+        ], $status);
     }
 
     public function move(Request $request, int $id): Response

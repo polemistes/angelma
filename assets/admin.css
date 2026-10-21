@@ -274,3 +274,33 @@ details.panel[open] > summary { margin-bottom: 1rem; }
     .row-boxes { grid-template-columns: minmax(0, 1fr); }
     .layout-box[class*="w-"] { grid-column: 1 / -1 !important; }
 }
+
+/* Box form */
+
+.field-row { display: flex; flex-wrap: wrap; gap: 0 1.5rem; }
+.field-row > label { flex: 0 1 18rem; }
+.markdown-editor { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; }
+.markdown-editor textarea { max-width: none; min-height: 24rem; }
+.preview {
+    min-height: 24rem;
+    max-height: 40rem;
+    overflow: auto;
+    padding: .75rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: #fff;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+.prose > :first-child { margin-top: 0; }
+.prose h2 { font-size: 1.45rem; margin: 1.2em 0 .5em; }
+.prose h3 { font-size: 1.2rem; margin: 1.2em 0 .5em; }
+.prose h4 { font-size: 1.05rem; margin: 1.2em 0 .5em; }
+.prose blockquote { margin-left: 0; padding-left: 1rem; border-left: 3px solid var(--border); color: var(--muted); }
+.prose pre { overflow-x: auto; padding: .6rem .8rem; background: #f6f8fa; border-radius: 4px; }
+.prose img { max-width: 100%; }
+
+@media (max-width: 1000px) {
+    .markdown-editor { grid-template-columns: minmax(0, 1fr); }
+    .markdown-editor textarea, .preview { min-height: 14rem; }
+}

@@ -61,5 +61,35 @@
         });
     });
 
+    // Live Markdown preview: a textarea with data-preview-target posts its text to
+    // /admin/preview 500 ms after the last keystroke and shows the result.
+    document.querySelectorAll('textarea[data-preview-target]').forEach(function (area) {
+        var target = document.getElementById(area.getAttribute('data-preview-target'));
+        var timer = null;
+        var sequence = 0;
+        if (!target) {
+            return;
+        }
+        area.addEventListener('input', function () {
+            window.clearTimeout(timer);
+            timer = window.setTimeout(function () {
+                var mine = ++sequence;
+                var body = new FormData();
+                body.append('markdown', area.value);
+                body.append('_csrf', csrfToken());
+                fetch('/admin/preview', { method: 'POST', body: body, credentials: 'same-origin' })
+                    .then(function (response) {
+                        return response.ok ? response.text() : Promise.reject(response.status);
+                    })
+                    .then(function (html) {
+                        if (mine === sequence) {
+                            target.innerHTML = html;
+                        }
+                    })
+                    .catch(function () { /* keep the last preview */ });
+            }, 500);
+        });
+    });
+
     window.Angelma = { csrfToken: csrfToken, slugify: slugify };
 }());

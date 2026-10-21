@@ -41,3 +41,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Boxes within a row are moved with the same `direction=up|down` POST as rows; in the editor these show as left and right arrows.
 - New boxes start with empty default content for their type; the "Add box" width list only offers widths that still fit, and the server checks again.
 - The row alignment select submits on change via admin.js; a "Set" button is kept so it also works without JavaScript.
+- Fixed box heights must be between 50 and 2000 pixels; text boxes take at most 50,000 characters.
+- Embeds: besides the URL forms in section 6.6, `youtube.com/embed/...` and `m.youtube.com` are recognised. Iframes use `www.youtube.com` (the CSP host), aspect ratio 16:9 for video and 4:3 for maps, and fill the box when it has a fixed height. Only `http(s)` URLs are accepted; other recognised-nothing URLs become a plain link.
+- When an embed has both raw HTML and a URL, the HTML is shown. An editor saving an embed box keeps any HTML an administrator put there; posting the `html` field at all as a non-admin gives 403.

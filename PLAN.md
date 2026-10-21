@@ -723,7 +723,7 @@ Tick when done and committed.
 - [x] 2.3 Account
 - [x] 3.1 Pages list and settings
 - [x] 3.2 Layout editor: rows and boxes
-- [ ] 3.3 Box editing: text and embed
+- [x] 3.3 Box editing: text and embed
 - [ ] 3.4 Image library and upload
 - [ ] 3.5 Image box
 - [ ] 4.1 Blogs

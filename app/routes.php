@@ -38,8 +38,11 @@ return static function (Router $r): void {
     $r->post('/admin/rows/{id}/alignment', [RowsController::class, 'alignment']);
     $r->post('/admin/rows/{id}/boxes', [BoxesController::class, 'create']);
 
+    $r->get('/admin/boxes/{id}', [BoxesController::class, 'edit']);
+    $r->post('/admin/boxes/{id}', [BoxesController::class, 'update']);
     $r->post('/admin/boxes/{id}/move', [BoxesController::class, 'move']);
     $r->post('/admin/boxes/{id}/delete', [BoxesController::class, 'delete']);
+    $r->post('/admin/preview', [BoxesController::class, 'preview']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);

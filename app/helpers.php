@@ -125,7 +125,8 @@ function view(string $template, array $data = [], int $status = 200, ?string $la
     $layout ??= str_starts_with($template, 'admin/') ? 'admin' : 'site';
     $html = render($template, $data);
     if ($layout !== '') {
-        $html = render('layout/' . $layout, $data + ['content' => $html]);
+        // The layout's $content is the rendered screen, even if the data has a 'content' key.
+        $html = render('layout/' . $layout, ['content' => $html] + $data);
     }
     return new Response($html, $status);
 }
