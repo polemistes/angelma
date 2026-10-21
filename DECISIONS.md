@@ -12,3 +12,9 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - An unknown path gives 404; a known path with the wrong method (e.g. GET `/logout`) gives 405.
 - Sessions start only after installation; the session lifetime is the browser session, server-side garbage collection after 24 hours of inactivity.
 - The security headers other than CSP come from `.htaccess` (as section 8 says) and `dev/router.php`, not from PHP, to avoid duplicate headers.
+- Referential integrity is handled in the Repos (deletes run in transactions), not with SQL foreign-key constraints, so deletes follow the rules of section 6.12 exactly.
+- Table and column names follow section 4 exactly. Note for a later MySQL driver: `rows` and `key` are reserved words there and will need quoting.
+- Login attempts get their own repo, `Repos/LoginAttempts.php`, because all SQL must live in a repo. `Repos/Repo.php` is a small shared base class.
+- Usernames are stored and compared in lower case, so login is case-insensitive.
+- Deleting a user moves their pages, blogs, images and posts to the administrator who deletes them; their comments keep the author name but lose the user link.
+- Published posts are shown regardless of `published_at` being in the future (scheduled publishing is a later feature).
