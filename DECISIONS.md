@@ -38,3 +38,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Page delete is `POST /admin/pages/{id}/delete` (section 5 lists no URL for it).
 - Page form: an empty slug is filled from the name and made unique (`-2`, `-3`; reserved words also count as taken). A typed slug is normalised with `slugify()` and refused with a message if reserved or taken. An empty title means the same as the name.
 - `show_in_menu` is not on the page form, because menu visibility is an administrator setting (section 7); it is edited in Settings (step 6.1).
+- Boxes within a row are moved with the same `direction=up|down` POST as rows; in the editor these show as left and right arrows.
+- New boxes start with empty default content for their type; the "Add box" width list only offers widths that still fit, and the server checks again.
+- The row alignment select submits on change via admin.js; a "Set" button is kept so it also works without JavaScript.

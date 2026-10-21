@@ -19,6 +19,14 @@
         }
     });
 
+    // Selects with data-autosubmit submit their form when changed.
+    document.addEventListener('change', function (event) {
+        var el = event.target;
+        if (el.hasAttribute && el.hasAttribute('data-autosubmit') && el.form) {
+            el.form.submit();
+        }
+    });
+
     // Slug filling: an input with data-slug-target fills that field from its text,
     // until the slug field is edited by hand.
     var slugMap = {

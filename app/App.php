@@ -207,7 +207,7 @@ final class App
             if ($status === 404) {
                 return view('site/404', ['title' => t('error_404_title')], 404);
             }
-            $key = in_array($status, [403, 405], true) ? (string) $status : '500';
+            $key = in_array($status, [400, 403, 405], true) ? (string) $status : '500';
             return view('site/error', [
                 'title' => t('error_' . $key . '_title'),
                 'message' => t('error_' . $key . '_text'),

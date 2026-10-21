@@ -30,3 +30,5 @@
         </form>
     <?php endif ?>
 </details>
+
+<?= render('admin/layout_editor', ['page' => $page, 'rows' => $rows, 'boxes' => $boxes]) ?>

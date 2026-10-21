@@ -3,8 +3,10 @@
 declare(strict_types=1);
 
 use Angelma\Controllers\Admin\AccountController;
+use Angelma\Controllers\Admin\BoxesController;
 use Angelma\Controllers\Admin\DashboardController;
 use Angelma\Controllers\Admin\PagesController;
+use Angelma\Controllers\Admin\RowsController;
 use Angelma\Controllers\AuthController;
 use Angelma\Controllers\SiteController;
 use Angelma\Response;
@@ -29,6 +31,15 @@ return static function (Router $r): void {
     $r->get('/admin/pages/{id}', [PagesController::class, 'edit']);
     $r->post('/admin/pages/{id}', [PagesController::class, 'update']);
     $r->post('/admin/pages/{id}/delete', [PagesController::class, 'delete']);
+    $r->post('/admin/pages/{id}/rows', [RowsController::class, 'create']);
+
+    $r->post('/admin/rows/{id}/move', [RowsController::class, 'move']);
+    $r->post('/admin/rows/{id}/delete', [RowsController::class, 'delete']);
+    $r->post('/admin/rows/{id}/alignment', [RowsController::class, 'alignment']);
+    $r->post('/admin/rows/{id}/boxes', [BoxesController::class, 'create']);
+
+    $r->post('/admin/boxes/{id}/move', [BoxesController::class, 'move']);
+    $r->post('/admin/boxes/{id}/delete', [BoxesController::class, 'delete']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);

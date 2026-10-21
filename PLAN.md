@@ -722,7 +722,7 @@ Tick when done and committed.
 - [x] 2.2 Admin layout and dashboard
 - [x] 2.3 Account
 - [x] 3.1 Pages list and settings
-- [ ] 3.2 Layout editor: rows and boxes
+- [x] 3.2 Layout editor: rows and boxes
 - [ ] 3.3 Box editing: text and embed
 - [ ] 3.4 Image library and upload
 - [ ] 3.5 Image box
