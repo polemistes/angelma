@@ -34,3 +34,4 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - The admin navigation also has a "Dashboard" item for admins and editors (the plan's list does not name it, but `/admin` is the dashboard).
 - Dashboard counts show the whole site for administrators and only their own pages, images, blogs, posts and pending comments for editors.
 - A placeholder Account screen was added in step 2.2 so a `user` has somewhere to land; step 2.3 fills it in.
+- Account: one form for display name and password. The current password is required only when a new password is given. The session id is regenerated after a password change.

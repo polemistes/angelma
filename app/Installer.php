@@ -19,7 +19,7 @@ final class Installer
     public const MIN_PHP = '8.2.0';
     public const REQUIRED_EXTENSIONS = ['pdo_sqlite', 'gd', 'mbstring', 'json', 'session'];
     public const OPTIONAL_EXTENSIONS = ['pdo_mysql', 'zip'];
-    public const MIN_PASSWORD = 10;
+    public const MIN_PASSWORD = Auth::MIN_PASSWORD;
 
     public function __construct(private string $root)
     {

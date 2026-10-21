@@ -720,7 +720,7 @@ Tick when done and committed.
 - [x] 1.5 Public page rendering, schemes, menu
 - [x] 2.1 Login and sessions
 - [x] 2.2 Admin layout and dashboard
-- [ ] 2.3 Account
+- [x] 2.3 Account
 - [ ] 3.1 Pages list and settings
 - [ ] 3.2 Layout editor: rows and boxes
 - [ ] 3.3 Box editing: text and embed

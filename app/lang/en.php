@@ -120,4 +120,16 @@ return [
     'dashboard_no_pending' => 'No comments are waiting.',
     'dashboard_on_post' => 'on "{title}"',
     'dashboard_moderate' => 'Moderate comments',
+
+    // Account
+    'save' => 'Save',
+    'cancel' => 'Cancel',
+    'account_username' => 'Username: {username}',
+    'account_change_password' => 'Change password',
+    'account_password_hint' => 'Leave the password fields empty to keep your current password.',
+    'account_current_password' => 'Current password',
+    'account_new_password' => 'New password',
+    'account_wrong_current' => 'The current password is not correct.',
+    'account_saved' => 'Your account was saved.',
+    'account_password_saved' => 'Your account and new password were saved.',
 ];

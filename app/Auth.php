@@ -15,6 +15,7 @@ final class Auth
     /** Role levels: a higher level satisfies every lower requirement. */
     public const LEVELS = ['user' => 1, 'editor' => 2, 'admin' => 3];
 
+    public const MIN_PASSWORD = 10;
     public const MAX_FAILURES = 5;
     public const BLOCK_SECONDS = 900;
 

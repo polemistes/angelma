@@ -21,6 +21,7 @@ return static function (Router $r): void {
     // Admin.
     $r->get('/admin', [DashboardController::class, 'index']);
     $r->get('/admin/account', [AccountController::class, 'show']);
+    $r->post('/admin/account', [AccountController::class, 'save']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);
