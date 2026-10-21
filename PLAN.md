@@ -726,7 +726,7 @@ Tick when done and committed.
 - [x] 3.3 Box editing: text and embed
 - [x] 3.4 Image library and upload
 - [x] 3.5 Image box
-- [ ] 4.1 Blogs
+- [x] 4.1 Blogs
 - [ ] 4.2 Posts
 - [ ] 4.3 Blog box
 - [ ] 5.1 Comment submission

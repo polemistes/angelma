@@ -452,3 +452,76 @@ pre {
 .box-image.fixed .fit-contain img {
     object-fit: contain;
 }
+
+/* Blog pages */
+
+.blog-header h1,
+.post h1 {
+    margin-top: 0;
+}
+
+.blog-description {
+    color: var(--caption);
+}
+
+.post-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.post-summary {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--box-border);
+}
+
+.post-summary h2 {
+    margin: 0 0 .25rem;
+    font-size: 1.35rem;
+}
+
+.post-summary h2 a {
+    color: var(--heading);
+    text-decoration: none;
+}
+
+.post-summary h2 a:hover,
+.post-summary h2 a:focus {
+    color: var(--link-hover);
+    text-decoration: underline;
+}
+
+.post-meta {
+    margin: 0 0 .5rem;
+    color: var(--caption);
+    font-size: .9rem;
+}
+
+.post-excerpt {
+    margin: 0;
+}
+
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.pagination a,
+.pagination span {
+    padding: .3rem .7rem;
+    border: 1px solid var(--box-border);
+    border-radius: var(--radius);
+    text-decoration: none;
+}
+
+.pagination span[aria-current] {
+    background: var(--menu-bg);
+    border-color: var(--menu-bg);
+    color: var(--menu-text);
+}
+
+.feed-link {
+    font-size: .875rem;
+}

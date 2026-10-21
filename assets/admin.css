@@ -376,3 +376,4 @@ details.panel[open] > summary { margin-bottom: 1rem; }
 .picker-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .picker-item { position: relative; }
 .form label.picker-item > span { font-weight: normal; margin: 0; }
+textarea.short { min-height: 5rem; font-family: inherit; font-size: inherit; }

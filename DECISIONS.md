@@ -53,3 +53,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Uploading inside the image box form is a separate small form that posts to `/admin/images` with `box_id`; the new image is put into the box straight away.
 - Boxes in a row are top-aligned (`align-items: start`) rather than stretched to equal height, so a box without a fixed height really follows its content.
 - `sizes` for image boxes is the box's share of the page width, or the full viewport below 700 px.
+- Blog delete is `POST /admin/blogs/{id}/delete`; new blogs are created with `POST /admin/blogs`. The blog edit screen lists the blog's posts (drafts first).
+- Blog index entries show title, date, author and the first paragraph as plain text. Page numbers beyond the last page give 404.
+- RSS feed: `dc:creator` for the author, `atom:link rel="self"`, the full rendered post body as `description` (escaped), and site-relative links made absolute. Dates in the feed are UTC in RFC 822 form.
