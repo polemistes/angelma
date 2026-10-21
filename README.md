@@ -84,3 +84,9 @@ dev/build.sh           # build dist/angelma-<version>.zip
 
 `PLAN.md` is the specification and build order, and `DECISIONS.md` records the choices
 made where the plan left room.
+
+## Licence
+
+Angelma is free software, released under the GNU General Public License version 3
+(GPL-3.0). See the `LICENSE` file for the full text. The bundled library
+`league/commonmark` and its dependencies in `vendor/` keep their own licences.

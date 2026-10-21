@@ -2,7 +2,7 @@
     "name": "angelma/angelma",
     "description": "A small PHP content management system for shared web hosting.",
     "type": "project",
-    "license": "proprietary",
+    "license": "GPL-3.0-only",
     "require": {
         "php": ">=8.2",
         "ext-gd": "*",
