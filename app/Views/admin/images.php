@@ -31,8 +31,7 @@ use Angelma\Images;
                 </a>
                 <div class="image-meta">
                     <strong title="<?= e($image['original_name']) ?>"><?= e($image['original_name']) ?></strong>
-                    <span class="muted small"><?= (int) $image['width'] ?> × <?= (int) $image['height'] ?> px ·
-                        <?= e(Images::megabytes((int) $image['size'])) ?> MB<?php if ($showUploader): ?> · <?= e($image['uploader_name']) ?><?php endif ?></span>
+                    <span class="muted small"><?= e(t('image_meta', ['width' => (int) $image['width'], 'height' => (int) $image['height'], 'size' => Images::megabytes((int) $image['size'])])) ?><?php if ($showUploader): ?> · <?= e($image['uploader_name']) ?><?php endif ?></span>
                 </div>
                 <form method="post" action="<?= e(url('/admin/images/' . $image['id'] . '/alt')) ?>" class="alt-form">
                     <?= csrf_field() ?>

@@ -69,7 +69,7 @@ $rowCount = count($rows);
                     <div class="layout-box w-<?= (int) $box['width'] ?>"<?= $j === 0 && $start > 1 ? ' style="grid-column:' . (int) $start . ' / span ' . (int) $box['width'] . '"' : '' ?>>
                         <div class="box-head">
                             <strong><?= e(t('box_type_' . $box['type'])) ?></strong>
-                            <span class="muted small"><?= e(t('box_width_of', ['width' => (int) $box['width']])) ?><?php if ($box['height'] !== null): ?>, <?= (int) $box['height'] ?> px<?php endif ?></span>
+                            <span class="muted small"><?= e(t('box_width_of', ['width' => (int) $box['width']])) ?><?php if ($box['height'] !== null): ?>, <?= e(t('box_height_value', ['height' => (int) $box['height']])) ?><?php endif ?></span>
                         </div>
                         <div class="box-preview"><?= partial('box_summary', ['box' => $box]) ?></div>
                         <div class="actions">

@@ -84,6 +84,11 @@ if ($direct && is_file($file)) {
     ];
     $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
     header('Content-Type: ' . ($types[$ext] ?? 'application/octet-stream'));
+    if (isset($types[$ext])) {
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' data: https:; frame-src https://www.youtube.com "
+            . "https://player.vimeo.com https://www.google.com https://www.openstreetmap.org; style-src 'self' 'unsafe-inline'; "
+            . "script-src 'self'");
+    }
     header('Content-Length: ' . filesize($file));
     if (str_starts_with($path, '/uploads/') && in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'webp'], true)) {
         header('Content-Disposition: inline');

@@ -94,7 +94,7 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         <fieldset>
             <legend><?= e(t('box_image_fit')) ?></legend>
             <?php foreach (['cover', 'contain'] as $fit): ?>
-                <label class="check"><input type="radio" name="fit" value="<?= $fit ?>"<?= ($content['fit'] ?? 'cover') === $fit ? ' checked' : '' ?>>
+                <label class="check"><input type="radio" name="fit" value="<?= e($fit) ?>"<?= ($content['fit'] ?? 'cover') === $fit ? ' checked' : '' ?>>
                     <span><?= e(t('box_image_fit_' . $fit)) ?></span></label>
             <?php endforeach ?>
             <span class="hint"><?= e(t('box_image_fit_hint')) ?></span>

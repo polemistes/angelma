@@ -21,7 +21,7 @@ $version = require \Angelma\App::$root . '/app/version.php';
 <link rel="alternate" type="application/rss+xml" title="<?= e($feed_title ?? '') ?>" href="<?= e($feed_url) ?>">
 <?php endif ?>
 <link rel="stylesheet" href="<?= e(url('/assets/site.css', ['v' => $version])) ?>">
-<style><?= raw($frame['scheme_css']) ?>:root{--page-width:<?= (int) $frame['page_width'] ?>px}</style>
+<style><?= e($frame['scheme_css']) ?>:root{--page-width:<?= (int) $frame['page_width'] ?>px}</style>
 </head>
 <body>
 <div class="site">

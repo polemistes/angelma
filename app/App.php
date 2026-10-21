@@ -71,7 +71,7 @@ final class App
                 http_response_code(500);
                 header('Content-Type: text/plain; charset=utf-8');
             }
-            echo self::debug() ? (string) $e : "500 Internal Server Error\n";
+            echo self::debug() ? (string) $e : t('error_500_title') . "\n";
         });
     }
 
@@ -219,7 +219,7 @@ final class App
             ], $status);
         } catch (\Throwable $e) {
             error_log((string) $e);
-            return Response::text($status . ' ' . ($status === 404 ? 'Not Found' : 'Error') . "\n", $status);
+            return Response::text($status . ' ' . t($status === 404 ? 'error_404_title' : 'error_500_title') . "\n", $status);
         }
     }
 }

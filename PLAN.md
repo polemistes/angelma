@@ -735,41 +735,41 @@ Tick when done and committed.
 - [x] 6.1 Settings
 - [x] 6.2 Backup
 - [x] 6.3 Build and install test
-- [ ] 6.4 Review pass
+- [x] 6.4 Review pass
 
 ---
 
 ## 13. Final checklist
 
 Security
-- [ ] Every POST route verifies the CSRF token; a request without one gets 403.
-- [ ] No SQL is built by string concatenation with user input.
-- [ ] Every template variable goes through `e()`; `raw()` is used only for rendered
+- [x] Every POST route verifies the CSRF token; a request without one gets 403.
+- [x] No SQL is built by string concatenation with user input.
+- [x] Every template variable goes through `e()`; `raw()` is used only for rendered
       Markdown and the admin raw HTML embed.
-- [ ] Uploaded files are re-encoded; a file with PHP content and an image extension is
+- [x] Uploaded files are re-encoded; a file with PHP content and an image extension is
       rejected; `uploads/.htaccess` blocks script execution.
-- [ ] `data/`, `app/`, `vendor/` return 403 through the web server.
-- [ ] Session cookie flags are set; session id regenerates on login.
-- [ ] Login rate limiting works for both username and IP.
-- [ ] Passwords are hashed with `password_hash` default algorithm.
-- [ ] Error pages in production show no paths, SQL or stack traces.
-- [ ] Security headers and CSP are present on every response.
+- [x] `data/`, `app/`, `vendor/` return 403 through the web server.
+- [x] Session cookie flags are set; session id regenerates on login.
+- [x] Login rate limiting works for both username and IP.
+- [x] Passwords are hashed with `password_hash` default algorithm.
+- [x] Error pages in production show no paths, SQL or stack traces.
+- [x] Security headers and CSP are present on every response.
 
 Permissions
-- [ ] Every row of the table in section 7 has been tried with each role.
-- [ ] Editors get 403 on another editor's page, blog, post, image and comments.
-- [ ] A `user` role cannot reach any admin screen except Account.
+- [x] Every row of the table in section 7 has been tried with each role.
+- [x] Editors get 403 on another editor's page, blog, post, image and comments.
+- [x] A `user` role cannot reach any admin screen except Account.
 
 Behaviour
-- [ ] Home page cannot be deleted; last admin cannot be removed.
-- [ ] Images in use cannot be deleted; blogs with posts cannot be deleted.
-- [ ] Row widths never exceed 12; alignment works for partial rows.
-- [ ] Site renders correctly at 360 px, 700 px and 1400 px widths.
-- [ ] RSS feed is valid; post dates display in the configured timezone.
-- [ ] Installer refuses to run twice; packaged zip installs cleanly.
+- [x] Home page cannot be deleted; last admin cannot be removed.
+- [x] Images in use cannot be deleted; blogs with posts cannot be deleted.
+- [x] Row widths never exceed 12; alignment works for partial rows.
+- [x] Site renders correctly at 360 px, 700 px and 1400 px widths.
+- [x] RSS feed is valid; post dates display in the configured timezone.
+- [x] Installer refuses to run twice; packaged zip installs cleanly.
 
 Quality
-- [ ] `vendor/bin/phpunit` passes.
-- [ ] No interface string is hard-coded outside `app/lang/en.php`.
-- [ ] `README.md` explains installation on Domeneshop in plain language.
-- [ ] `DECISIONS.md` lists every choice made outside this plan.
+- [x] `vendor/bin/phpunit` passes.
+- [x] No interface string is hard-coded outside `app/lang/en.php`.
+- [x] `README.md` explains installation on Domeneshop in plain language.
+- [x] `DECISIONS.md` lists every choice made outside this plan.
