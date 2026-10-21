@@ -714,7 +714,7 @@ early by accident.
 Tick when done and committed.
 
 - [x] 1.1 Repository and tooling
-- [ ] 1.2 Bootstrap, helpers, router
+- [x] 1.2 Bootstrap, helpers, router
 - [ ] 1.3 Database and migrations
 - [ ] 1.4 Installer
 - [ ] 1.5 Public page rendering, schemes, menu

@@ -16,7 +16,10 @@
     "autoload": {
         "psr-4": {
             "Angelma\\": "app/"
-        }
+        },
+        "files": [
+            "app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
