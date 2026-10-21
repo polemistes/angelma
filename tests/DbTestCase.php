@@ -17,15 +17,14 @@ abstract class DbTestCase extends TestCase
 
     protected function setUp(): void
     {
-        $this->db = Db::sqlite(':memory:');
-        $this->db->migrate();
+        $this->db = angelma_test_db();
         App::setDb($this->db);
         $_SESSION = [];
     }
 
     protected function tearDown(): void
     {
-        App::setDb(null);
+        App::setDb(angelma_test_db());
         $_SESSION = [];
     }
 

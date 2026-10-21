@@ -234,3 +234,25 @@ function valid_slug(string $slug): bool
 {
     return strlen($slug) <= 80 && preg_match('/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $slug) === 1;
 }
+
+/** A stored UTC timestamp as a datetime-local value (Y-m-d\TH:i) in the site's timezone. */
+function utc_to_local_input(?string $utc): string
+{
+    return $utc === null || $utc === '' ? '' : format_date($utc, 'Y-m-d\TH:i');
+}
+
+/** A datetime-local value in the site's timezone as a UTC timestamp, or null if invalid. */
+function local_input_to_utc(string $local): ?string
+{
+    try {
+        $tz = new DateTimeZone(App::setting('timezone', 'Europe/Oslo'));
+    } catch (Exception) {
+        $tz = new DateTimeZone('UTC');
+    }
+    $date = DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $local, $tz)
+        ?: DateTimeImmutable::createFromFormat('!Y-m-d\TH:i:s', $local, $tz);
+    if ($date === false) {
+        return null;
+    }
+    return $date->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d\TH:i:s\Z');
+}

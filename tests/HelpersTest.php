@@ -62,4 +62,14 @@ final class HelpersTest extends TestCase
     {
         $this->assertMatchesRegularExpression('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ$/', now());
     }
+
+    public function testLocalDateInputRoundTrip(): void
+    {
+        // Default timezone is Europe/Oslo (UTC+2 in summer, UTC+1 in winter).
+        $this->assertSame('2026-07-01T08:00:00Z', local_input_to_utc('2026-07-01T10:00'));
+        $this->assertSame('2026-12-01T09:00:00Z', local_input_to_utc('2026-12-01T10:00'));
+        $this->assertSame('2026-07-01T10:00', utc_to_local_input('2026-07-01T08:00:00Z'));
+        $this->assertNull(local_input_to_utc('not a date'));
+        $this->assertSame('1 July 2026', format_date('2026-06-30T23:30:00Z'));
+    }
 }

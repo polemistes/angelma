@@ -525,3 +525,16 @@ pre {
 .feed-link {
     font-size: .875rem;
 }
+
+.post {
+    max-width: 46rem;
+}
+
+.post-blog {
+    margin: 0 0 .25rem;
+    font-size: .9rem;
+}
+
+.post-body {
+    margin-top: 1.25rem;
+}

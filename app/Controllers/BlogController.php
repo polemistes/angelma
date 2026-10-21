@@ -41,6 +41,24 @@ final class BlogController
         ]);
     }
 
+    /** One published post. Drafts are not public. */
+    public function post(Request $request, string $blogSlug, string $postSlug): Response
+    {
+        $blog = self::blog($blogSlug);
+        $post = (new Posts())->findBySlug((int) $blog['id'], $postSlug);
+        if ($post === null || $post['status'] !== 'published') {
+            abort(404);
+        }
+        return view('site/post', [
+            'title' => (string) $post['title'],
+            'meta_description' => Markdown::firstParagraph((string) $post['body_markdown'], 160),
+            'blog' => $blog,
+            'post' => $post,
+            'feed_url' => url('/blog/' . $blog['slug'] . '/feed'),
+            'feed_title' => (string) $blog['title'],
+        ]);
+    }
+
     /** RSS 2.0 feed of the newest published posts. */
     public function feed(Request $request, string $blogSlug): Response
     {

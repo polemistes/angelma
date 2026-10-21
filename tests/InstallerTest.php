@@ -22,7 +22,7 @@ final class InstallerTest extends TestCase
 
     protected function tearDown(): void
     {
-        App::setDb(null);
+        App::setDb(angelma_test_db());
         exec('rm -rf ' . escapeshellarg($this->dir));
     }
 

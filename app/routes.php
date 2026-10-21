@@ -8,6 +8,7 @@ use Angelma\Controllers\Admin\BoxesController;
 use Angelma\Controllers\Admin\DashboardController;
 use Angelma\Controllers\Admin\ImagesController;
 use Angelma\Controllers\Admin\PagesController;
+use Angelma\Controllers\Admin\PostsController;
 use Angelma\Controllers\Admin\RowsController;
 use Angelma\Controllers\AuthController;
 use Angelma\Controllers\BlogController;
@@ -58,10 +59,16 @@ return static function (Router $r): void {
     $r->get('/admin/blogs/{id}', [BlogsController::class, 'edit']);
     $r->post('/admin/blogs/{id}', [BlogsController::class, 'update']);
     $r->post('/admin/blogs/{id}/delete', [BlogsController::class, 'delete']);
+    $r->get('/admin/blogs/{id}/posts/new', [PostsController::class, 'new']);
+    $r->post('/admin/blogs/{id}/posts/new', [PostsController::class, 'create']);
+    $r->get('/admin/posts/{id}', [PostsController::class, 'edit']);
+    $r->post('/admin/posts/{id}', [PostsController::class, 'update']);
+    $r->post('/admin/posts/{id}/delete', [PostsController::class, 'delete']);
 
     // Public blogs.
     $r->get('/blog/{blog}', [BlogController::class, 'index']);
     $r->get('/blog/{blog}/feed', [BlogController::class, 'feed']);
+    $r->get('/blog/{blog}/{post}', [BlogController::class, 'post']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);

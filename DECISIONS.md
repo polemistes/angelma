@@ -56,3 +56,7 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Blog delete is `POST /admin/blogs/{id}/delete`; new blogs are created with `POST /admin/blogs`. The blog edit screen lists the blog's posts (drafts first).
 - Blog index entries show title, date, author and the first paragraph as plain text. Page numbers beyond the last page give 404.
 - RSS feed: `dc:creator` for the author, `atom:link rel="self"`, the full rendered post body as `description` (escaped), and site-relative links made absolute. Dates in the feed are UTC in RFC 822 form.
+- Posts are created with `POST /admin/blogs/{id}/posts/new` and deleted with `POST /admin/posts/{id}/delete`. The post slug `feed` is reserved (it would clash with the feed URL).
+- The publish date is entered as local time in the site's timezone (`datetime-local`). Saving the form with the date unchanged keeps the stored value exactly; an empty date on a published post becomes "now" only if it has never been published. Unpublishing keeps the date.
+- New posts default to comments open to "anyone"; the post page's meta description is the first paragraph of the body.
+- Tests run against an in-memory database set in `tests/bootstrap.php`, never against `data/`.
