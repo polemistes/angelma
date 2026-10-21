@@ -1,0 +1,39 @@
+# Angelma web server rules (see PLAN.md section 8)
+
+Options -Indexes
+DirectoryIndex index.php
+
+# Protected file types, also when mod_rewrite is missing.
+<FilesMatch "(\.(sqlite|lock|md|json|sh|xml|dist)|^composer\..*)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Protected folders and file types.
+    RewriteRule ^(app|data|vendor|dev|tests)(/|$) - [F,L]
+    RewriteRule (^|/)composer\.[^/]*$ - [F,L]
+    RewriteRule \.(sqlite|lock|md|json|sh|xml|dist)$ - [F,L]
+
+    # Existing files under assets/, uploads/, install/ and robots.txt are served directly.
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^((assets|uploads|install)(/|$)|robots\.txt$) - [L]
+
+    # Everything else goes to the front controller.
+    RewriteRule ^index\.php$ - [L]
+    RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

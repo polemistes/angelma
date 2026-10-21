@@ -1,0 +1,10 @@
+/data/*
+!/data/.htaccess
+!/data/sessions/
+/data/sessions/*
+!/data/sessions/.gitkeep
+/uploads/*
+!/uploads/.htaccess
+!/uploads/index.html
+/dist/
+/.phpunit.cache/
