@@ -9,7 +9,7 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - `slugify()` follows the test case in step 1.2 (`Blåbærsyltetøy` → `blabaersyltetoy`): æ → ae, ø → o, å → a. Section 9's "ae oe aa" contradicts that example; the example wins.
 - `app/bootstrap.php` sets everything up; `index.php` then dispatches the request. This lets the installer include the bootstrap without dispatching.
 - Small extra core classes not in the folder list: `App` (state and request cycle), `Request`, `Response`, `HttpException`, and `app/routes.php` for the route table.
-- An unknown path gives 404; a known path with the wrong method (e.g. GET `/logout`) gives 405.
+- An unknown path gives 404; a path that only has routes for another method gives 405. GET `/logout` gives 404, because a GET for any single segment is looked up as a page slug.
 - Sessions start only after installation; the session lifetime is the browser session, server-side garbage collection after 24 hours of inactivity.
 - The security headers other than CSP come from `.htaccess` (as section 8 says) and `dev/router.php`, not from PHP, to avoid duplicate headers.
 - Referential integrity is handled in the Repos (deletes run in transactions), not with SQL foreign-key constraints, so deletes follow the rules of section 6.12 exactly.
@@ -29,3 +29,5 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - On narrow screens fixed heights are dropped for text boxes only (as the plan says); image, blog and embed boxes keep them.
 - `--page-width` is written into the same `<style>` block as the scheme colours. `app/Frame.php` gathers the data for the public page frame (settings, menu, logo, footer).
 - Scheme colours must be `#rgb` or `#rrggbb`; anything else falls back to the paper colour, so the custom scheme can never inject CSS.
+- Login rate limiting: while a key (username or IP hash) has 5 failures in the last 15 minutes, attempts for it are refused without checking the password and are not recorded. A successful login clears the username's failures, not the IP's.
+- After login, admins and editors go to the return address only when it is inside `/admin`, otherwise to `/admin`; users go back to the page they came from.

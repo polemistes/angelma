@@ -34,7 +34,7 @@ abstract class DbTestCase extends TestCase
         return (new \Angelma\Repos\Users($this->db))->create([
             'username' => $username,
             'display_name' => ucfirst($username),
-            'password_hash' => password_hash('correct horse', PASSWORD_DEFAULT),
+            'password_hash' => password_hash('correct horse', PASSWORD_BCRYPT, ['cost' => 4]),
             'role' => $role,
         ]);
     }

@@ -718,7 +718,7 @@ Tick when done and committed.
 - [x] 1.3 Database and migrations
 - [x] 1.4 Installer
 - [x] 1.5 Public page rendering, schemes, menu
-- [ ] 2.1 Login and sessions
+- [x] 2.1 Login and sessions
 - [ ] 2.2 Admin layout and dashboard
 - [ ] 2.3 Account
 - [ ] 3.1 Pages list and settings

@@ -45,6 +45,18 @@ $version = require \Angelma\App::$root . '/app/version.php';
                 <li><a href="<?= e((int) $item['id'] === $frame['home_page_id'] ? url('/') : url('/' . $item['slug'])) ?>"<?= $active ? ' class="active" aria-current="page"' : '' ?>><?= e($item['name']) ?></a></li>
             <?php endforeach ?>
         </ul>
+        <div class="menu-user">
+            <?php if ($frame['user'] !== null): ?>
+                <span class="menu-name"><?= e($frame['user']['display_name']) ?></span>
+                <form method="post" action="<?= e(url('/logout')) ?>">
+                    <?= csrf_field() ?>
+                    <button type="submit"><?= e(t('menu_logout')) ?></button>
+                </form>
+            <?php else: ?>
+                <?php $here = \Angelma\App::$request?->fullPath() ?? '/'; ?>
+                <a href="<?= e(url('/login', str_starts_with($here, '/login') ? [] : ['return' => $here])) ?>"><?= e(t('menu_login')) ?></a>
+            <?php endif ?>
+        </div>
     </nav>
 
     <main class="site-content" id="content">

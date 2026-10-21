@@ -20,6 +20,16 @@ return [
     // Public site
     'menu_label' => 'Main menu',
     'powered_by' => 'Powered by Angelma',
+    'menu_login' => 'Log in',
+    'menu_logout' => 'Log out',
+
+    // Login
+    'login_title' => 'Log in',
+    'login_button' => 'Log in',
+    'login_invalid' => 'Wrong username or password.',
+    'login_blocked' => 'Too many failed attempts. Try again in {minutes} minutes.',
+    'login_welcome' => 'Welcome, {name}.',
+    'logout_done' => 'You are logged out.',
 
     // Common form fields and validation
     'field_site_title' => 'Site title',
