@@ -192,6 +192,11 @@ final class App
             self::startSession($request);
             $request->user = Auth::user();
         }
+        // A POST larger than post_max_size arrives empty: say so instead of failing the CSRF check.
+        if ($request->method === 'POST' && $request->post === [] && $request->files === []
+            && (int) ($request->server['CONTENT_LENGTH'] ?? 0) > Images::iniBytes((string) ini_get('post_max_size'))) {
+            throw new HttpException(413);
+        }
         return self::router()->dispatch($request);
     }
 
@@ -207,7 +212,7 @@ final class App
             if ($status === 404) {
                 return view('site/404', ['title' => t('error_404_title')], 404);
             }
-            $key = in_array($status, [400, 403, 405], true) ? (string) $status : '500';
+            $key = in_array($status, [400, 403, 405, 413], true) ? (string) $status : '500';
             return view('site/error', [
                 'title' => t('error_' . $key . '_title'),
                 'message' => t('error_' . $key . '_text'),

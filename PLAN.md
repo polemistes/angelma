@@ -724,7 +724,7 @@ Tick when done and committed.
 - [x] 3.1 Pages list and settings
 - [x] 3.2 Layout editor: rows and boxes
 - [x] 3.3 Box editing: text and embed
-- [ ] 3.4 Image library and upload
+- [x] 3.4 Image library and upload
 - [ ] 3.5 Image box
 - [ ] 4.1 Blogs
 - [ ] 4.2 Posts

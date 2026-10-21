@@ -304,3 +304,39 @@ details.panel[open] > summary { margin-bottom: 1rem; }
     .markdown-editor { grid-template-columns: minmax(0, 1fr); }
     .markdown-editor textarea, .preview { min-height: 14rem; }
 }
+
+/* Image library */
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.image-card {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: .6rem;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+.image-card:target { outline: 2px solid var(--accent); }
+.image-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 16px 16px;
+    border-radius: 3px;
+    overflow: hidden;
+}
+.image-thumb img { max-height: 150px; width: auto; display: block; }
+.image-meta { display: flex; flex-direction: column; min-width: 0; }
+.image-meta strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.alt-form label { margin: 0 0 .35rem; }
+.alt-form label > span { font-weight: 600; font-size: .85rem; }
+.image-card form { margin: 0; }

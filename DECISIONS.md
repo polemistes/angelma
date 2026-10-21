@@ -44,3 +44,8 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Fixed box heights must be between 50 and 2000 pixels; text boxes take at most 50,000 characters.
 - Embeds: besides the URL forms in section 6.6, `youtube.com/embed/...` and `m.youtube.com` are recognised. Iframes use `www.youtube.com` (the CSP host), aspect ratio 16:9 for video and 4:3 for maps, and fill the box when it has a fixed height. Only `http(s)` URLs are accepted; other recognised-nothing URLs become a plain link.
 - When an embed has both raw HTML and a URL, the HTML is shown. An editor saving an embed box keeps any HTML an administrator put there; posting the `html` field at all as a non-admin gives 403.
+- Image upload accepts several files at once (`images[]`). Images over 40 megapixels are refused to protect the host's memory; PHP's memory limit is raised for big images when the host allows it.
+- JPEG orientation is read with `exif_read_data` when the `exif` extension exists, otherwise by reading the EXIF block directly (`exif` is not on the required list and is missing on the dev machine).
+- GIF and WebP uploads are re-encoded to JPEG on a white background (animation is lost); medium and small sizes are never enlarged beyond the original width.
+- Image routes not listed in section 5: `POST /admin/images` (upload), `POST /admin/images/{id}/alt`, `POST /admin/images/{id}/delete`.
+- A POST bigger than PHP's `post_max_size` gets a clear "Upload too large" page (413) instead of a CSRF error.

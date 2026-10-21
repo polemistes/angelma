@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Angelma\Controllers\Admin\AccountController;
 use Angelma\Controllers\Admin\BoxesController;
 use Angelma\Controllers\Admin\DashboardController;
+use Angelma\Controllers\Admin\ImagesController;
 use Angelma\Controllers\Admin\PagesController;
 use Angelma\Controllers\Admin\RowsController;
 use Angelma\Controllers\AuthController;
@@ -43,6 +44,11 @@ return static function (Router $r): void {
     $r->post('/admin/boxes/{id}/move', [BoxesController::class, 'move']);
     $r->post('/admin/boxes/{id}/delete', [BoxesController::class, 'delete']);
     $r->post('/admin/preview', [BoxesController::class, 'preview']);
+
+    $r->get('/admin/images', [ImagesController::class, 'index']);
+    $r->post('/admin/images', [ImagesController::class, 'upload']);
+    $r->post('/admin/images/{id}/alt', [ImagesController::class, 'alt']);
+    $r->post('/admin/images/{id}/delete', [ImagesController::class, 'delete']);
 
     // Public pages. The catch-all page route must stay last.
     $r->get('/', [SiteController::class, 'page']);
