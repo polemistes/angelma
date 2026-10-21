@@ -158,6 +158,7 @@ img {
 
 .row {
     display: grid;
+    align-items: start;
     gap: var(--gap);
     margin-bottom: var(--gap);
     grid-template-columns: repeat(12, var(--col));
@@ -412,4 +413,42 @@ pre {
 .embed-link {
     margin: 0;
     overflow-wrap: anywhere;
+}
+
+/* Image boxes */
+
+.image {
+    margin: 0;
+}
+
+.image img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.image figcaption {
+    margin-top: .5rem;
+    color: var(--caption);
+    font-size: .875rem;
+}
+
+.box-image.fixed .image {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.box-image.fixed .image img {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+}
+
+.box-image.fixed .fit-cover img {
+    object-fit: cover;
+}
+
+.box-image.fixed .fit-contain img {
+    object-fit: contain;
 }

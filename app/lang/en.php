@@ -266,4 +266,23 @@ return [
     'image_deleted' => 'The image "{name}" was deleted.',
     'image_in_use' => 'The image "{name}" is in use and cannot be deleted. It is used by: {pages}.',
     'image_used_logo' => 'the site logo',
+
+    // Image box
+    'box_image_choose' => 'Image',
+    'picker_search' => 'Search by file name',
+    'picker_search_placeholder' => 'File name',
+    'picker_none' => 'No images found.',
+    'box_image_alt' => 'Description (alt text)',
+    'box_image_alt_hint' => 'Describes the image for people who cannot see it. Empty uses the description from the image library.',
+    'box_image_caption' => 'Caption',
+    'box_image_caption_hint' => 'Optional text shown under the image.',
+    'box_image_fit' => 'With a fixed height',
+    'box_image_fit_cover' => 'Fill the box (crop the edges)',
+    'box_image_fit_contain' => 'Show the whole image (empty space around it)',
+    'box_image_fit_hint' => 'Only matters when the box has a fixed height.',
+    'box_image_upload' => 'Upload a new image into this box',
+    'box_image_upload_hint' => 'JPEG, PNG, GIF or WebP, at most {max} MB. It is added to the image library and put in this box.',
+    'box_error_image' => 'Choose one of your images.',
+    'box_error_300' => 'At most 300 characters.',
+    'image_uploaded_into_box' => 'The image "{name}" was uploaded and put in this box.',
 ];

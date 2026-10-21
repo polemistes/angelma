@@ -19,6 +19,7 @@ use Angelma\Response;
 final class ImagesController
 {
     public const MAX_ALT = 300;
+    public const PICKER_LIMIT = 60;
 
     public function index(Request $request): Response
     {
@@ -32,9 +33,24 @@ final class ImagesController
         ]);
     }
 
+    /** Image list for the picker in the image box form, searchable by file name. */
+    public function picker(Request $request): Response
+    {
+        Auth::requireRole('editor');
+        $images = (new ImagesRepo())->all(Auth::isAdmin() ? null : Auth::id(), $request->query('q'), self::PICKER_LIMIT);
+        return new Response(render('partials/image_picker_list', [
+            'images' => $images,
+            'selected' => $request->int('selected'),
+        ]));
+    }
+
     public function upload(Request $request): Response
     {
         Auth::requireRole('editor');
+        $boxId = $request->int('box_id');
+        if ($boxId > 0) {
+            return $this->uploadForBox($request, $boxId);
+        }
         $files = self::uploadedFiles($request->files['images'] ?? null);
         if ($files === []) {
             flash('error', t('image_error_no_file'));
@@ -54,6 +70,28 @@ final class ImagesController
             flash('success', t('image_uploaded', ['count' => $stored]));
         }
         return redirect('/admin/images');
+    }
+
+    /** Upload from the image box form: store the image and put it in the box. */
+    private function uploadForBox(Request $request, int $boxId): Response
+    {
+        $box = BoxesController::load($boxId);
+        $files = self::uploadedFiles($request->files['images'] ?? null);
+        if ($box['type'] !== 'image' || $files === []) {
+            flash('error', t('image_error_no_file'));
+            return redirect('/admin/boxes/' . $boxId);
+        }
+        try {
+            $image = self::storeOne($files[0]);
+        } catch (ImageException $e) {
+            flash('error', t('image_upload_failed', ['name' => (string) ($files[0]['name'] ?? ''), 'reason' => $e->getMessage()]));
+            return redirect('/admin/boxes/' . $boxId);
+        }
+        $content = $box['content'];
+        $content['image_id'] = (int) $image['id'];
+        (new Boxes())->update($boxId, (int) $box['width'], $box['height'] === null ? null : (int) $box['height'], $content);
+        flash('success', t('image_uploaded_into_box', ['name' => (string) $image['original_name']]));
+        return redirect('/admin/boxes/' . $boxId);
     }
 
     public function alt(Request $request, int $id): Response

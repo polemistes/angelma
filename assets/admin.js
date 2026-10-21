@@ -91,5 +91,56 @@
         });
     });
 
+    // Image picker in the image box form: search reloads the list from
+    // /admin/images/picker; choosing an image updates the "current" preview.
+    document.querySelectorAll('[data-picker]').forEach(function (picker) {
+        var list = picker.querySelector('[data-picker-list]');
+        var search = picker.querySelector('[data-picker-search]');
+        var preview = picker.querySelector('[data-picker-preview]');
+        var name = picker.querySelector('[data-picker-name]');
+        var selected = '';
+        var timer = null;
+        var checked = picker.querySelector('input[name="image_id"]:checked');
+        if (checked) {
+            selected = checked.value;
+        }
+
+        picker.addEventListener('change', function (event) {
+            var radio = event.target;
+            if (radio.name !== 'image_id') {
+                return;
+            }
+            selected = radio.value;
+            if (preview) {
+                preview.src = radio.getAttribute('data-src');
+                preview.hidden = false;
+            }
+            if (name) {
+                name.textContent = radio.getAttribute('data-name');
+                name.className = '';
+            }
+        });
+
+        if (search && list) {
+            // Enter in the search field must not submit the box form.
+            search.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            });
+            search.addEventListener('input', function () {
+                window.clearTimeout(timer);
+                timer = window.setTimeout(function () {
+                    var url = picker.getAttribute('data-picker') + '?q=' + encodeURIComponent(search.value)
+                        + '&selected=' + encodeURIComponent(selected);
+                    fetch(url, { credentials: 'same-origin' })
+                        .then(function (response) { return response.ok ? response.text() : Promise.reject(); })
+                        .then(function (html) { list.innerHTML = html; })
+                        .catch(function () { /* keep the list */ });
+                }, 300);
+            });
+        }
+    });
+
     window.Angelma = { csrfToken: csrfToken, slugify: slugify };
 }());

@@ -340,3 +340,39 @@ details.panel[open] > summary { margin-bottom: 1rem; }
 .alt-form label { margin: 0 0 .35rem; }
 .alt-form label > span { font-weight: 600; font-size: .85rem; }
 .image-card form { margin: 0; }
+
+/* Image picker */
+
+.picker { border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem 1rem 1rem; }
+.picker legend { padding: 0 .25rem; }
+.picker-current { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; }
+.picker-current img { max-height: 70px; width: auto; border-radius: 3px; }
+.picker-search { max-width: 24rem; }
+.picker-list { max-height: 22rem; overflow-y: auto; }
+.picker-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: .5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.picker-item {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    margin: 0 !important;
+    padding: .35rem;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: .8rem;
+}
+.picker-item:hover { background: #eef3fb; }
+.picker-item input { position: absolute; opacity: 0; }
+.picker-item:has(input:checked) { border-color: var(--accent); background: #eef3fb; }
+.picker-item:has(input:focus-visible) { outline: 2px solid var(--accent); }
+.picker-item img { height: 80px; width: 100%; object-fit: cover; border-radius: 3px; }
+.picker-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.picker-item { position: relative; }
+.form label.picker-item > span { font-weight: normal; margin: 0; }

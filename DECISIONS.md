@@ -49,3 +49,7 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - GIF and WebP uploads are re-encoded to JPEG on a white background (animation is lost); medium and small sizes are never enlarged beyond the original width.
 - Image routes not listed in section 5: `POST /admin/images` (upload), `POST /admin/images/{id}/alt`, `POST /admin/images/{id}/delete`.
 - A POST bigger than PHP's `post_max_size` gets a clear "Upload too large" page (413) instead of a CSRF error.
+- Image picker: the box form renders the newest 60 images as radio buttons (works without JavaScript); admin.js reloads the list from `/admin/images/picker?q=` when searching. The picker offers the same images as the library (admins all, editors their own), and the server only accepts those.
+- Uploading inside the image box form is a separate small form that posts to `/admin/images` with `box_id`; the new image is put into the box straight away.
+- Boxes in a row are top-aligned (`align-items: start`) rather than stretched to equal height, so a box without a fixed height really follows its content.
+- `sizes` for image boxes is the box's share of the page width, or the full viewport below 700 px.

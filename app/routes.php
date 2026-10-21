@@ -47,6 +47,7 @@ return static function (Router $r): void {
 
     $r->get('/admin/images', [ImagesController::class, 'index']);
     $r->post('/admin/images', [ImagesController::class, 'upload']);
+    $r->get('/admin/images/picker', [ImagesController::class, 'picker']);
     $r->post('/admin/images/{id}/alt', [ImagesController::class, 'alt']);
     $r->post('/admin/images/{id}/delete', [ImagesController::class, 'delete']);
 

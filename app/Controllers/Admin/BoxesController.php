@@ -8,6 +8,7 @@ use Angelma\Auth;
 use Angelma\Embed;
 use Angelma\Markdown;
 use Angelma\Repos\Boxes;
+use Angelma\Repos\Images as ImagesRepo;
 use Angelma\Repos\Pages;
 use Angelma\Request;
 use Angelma\Response;
@@ -92,6 +93,26 @@ final class BoxesController
                 }
                 break;
 
+            case 'image':
+                if (isset($request->post['image_id'])) {
+                    $imageId = $request->int('image_id');
+                    $image = (new ImagesRepo())->find($imageId);
+                    if ($image === null || !Auth::owns((int) $image['uploader_id'])) {
+                        $errors['image_id'] = t('box_error_image');
+                    } else {
+                        $content['image_id'] = $imageId;
+                    }
+                }
+                $content['alt'] = $request->str('alt');
+                $content['caption'] = $request->str('caption');
+                $content['fit'] = $request->str('fit') === 'contain' ? 'contain' : 'cover';
+                foreach (['alt', 'caption'] as $field) {
+                    if (mb_strlen($content[$field]) > 300) {
+                        $errors[$field] = t('box_error_300');
+                    }
+                }
+                break;
+
             case 'embed':
                 $content['url'] = $request->str('url');
                 if ($content['url'] !== '' && (!Embed::isHttpUrl($content['url']) || strlen($content['url']) > 2000)) {
@@ -135,7 +156,14 @@ final class BoxesController
     {
         $page = (new Pages())->find((int) $box['page_id']);
         $free = 12 - (new Boxes())->widthSum((int) $box['row_id'], (int) $box['id']);
-        return view('admin/box_edit', [
+        $extra = [];
+        if ($box['type'] === 'image') {
+            $repo = new ImagesRepo();
+            $extra['pickerImages'] = $repo->all(Auth::isAdmin() ? null : Auth::id(), '', ImagesController::PICKER_LIMIT);
+            $extra['selectedImage'] = !empty($content['image_id']) ? $repo->find((int) $content['image_id']) : null;
+            $extra['maxBytes'] = \Angelma\Images::maxUploadBytes();
+        }
+        return view('admin/box_edit', $extra + [
             'title' => t('box_edit_title', ['type' => t('box_type_' . $box['type'])]),
             'nav' => 'pages',
             'box' => $box,

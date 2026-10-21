@@ -55,6 +55,52 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         </div>
     <?php endif ?>
 
+    <?php if ($box['type'] === 'image'): ?>
+        <fieldset class="picker" data-picker="<?= e(url('/admin/images/picker')) ?>">
+            <legend><?= e(t('box_image_choose')) ?></legend>
+            <div class="picker-current">
+                <?php if ($selectedImage !== null): ?>
+                    <img src="<?= e(image_url((string) $selectedImage['filename'], 's')) ?>" alt="" data-picker-preview>
+                    <span data-picker-name><?= e($selectedImage['original_name']) ?></span>
+                <?php else: ?>
+                    <img src="" alt="" data-picker-preview hidden>
+                    <span data-picker-name class="muted"><?= e(t('box_no_image')) ?></span>
+                <?php endif ?>
+            </div>
+            <label class="picker-search">
+                <span><?= e(t('picker_search')) ?></span>
+                <input type="search" data-picker-search placeholder="<?= e(t('picker_search_placeholder')) ?>">
+            </label>
+            <div class="picker-list" data-picker-list>
+                <?= partial('image_picker_list', [
+                    'images' => $pickerImages,
+                    'selected' => (int) ($content['image_id'] ?? 0),
+                ]) ?>
+            </div>
+            <?= $err('image_id') ?>
+        </fieldset>
+        <label>
+            <span><?= e(t('box_image_alt')) ?></span>
+            <input type="text" name="alt" value="<?= e($content['alt'] ?? '') ?>" maxlength="300">
+            <span class="hint"><?= e(t('box_image_alt_hint')) ?></span>
+            <?= $err('alt') ?>
+        </label>
+        <label>
+            <span><?= e(t('box_image_caption')) ?></span>
+            <input type="text" name="caption" value="<?= e($content['caption'] ?? '') ?>" maxlength="300">
+            <span class="hint"><?= e(t('box_image_caption_hint')) ?></span>
+            <?= $err('caption') ?>
+        </label>
+        <fieldset>
+            <legend><?= e(t('box_image_fit')) ?></legend>
+            <?php foreach (['cover', 'contain'] as $fit): ?>
+                <label class="check"><input type="radio" name="fit" value="<?= $fit ?>"<?= ($content['fit'] ?? 'cover') === $fit ? ' checked' : '' ?>>
+                    <span><?= e(t('box_image_fit_' . $fit)) ?></span></label>
+            <?php endforeach ?>
+            <span class="hint"><?= e(t('box_image_fit_hint')) ?></span>
+        </fieldset>
+    <?php endif ?>
+
     <?php if ($box['type'] === 'embed'): ?>
         <label>
             <span><?= e(t('embed_url')) ?></span>
@@ -76,3 +122,17 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         <a class="button secondary" href="<?= e($back) ?>"><?= e(t('cancel')) ?></a>
     </p>
 </form>
+
+<?php if ($box['type'] === 'image'): ?>
+    <form method="post" action="<?= e(url('/admin/images')) ?>" enctype="multipart/form-data" class="form panel">
+        <?= csrf_field() ?>
+        <input type="hidden" name="box_id" value="<?= (int) $box['id'] ?>">
+        <h2><?= e(t('box_image_upload')) ?></h2>
+        <label>
+            <span><?= e(t('image_files')) ?></span>
+            <input type="file" name="images[]" accept="image/jpeg,image/png,image/gif,image/webp" required>
+            <span class="hint"><?= e(t('box_image_upload_hint', ['max' => \Angelma\Images::megabytes($maxBytes)])) ?></span>
+        </label>
+        <p class="actions"><button type="submit" class="button secondary"><?= e(t('image_upload_button')) ?></button></p>
+    </form>
+<?php endif ?>
