@@ -538,3 +538,49 @@ pre {
 .post-body {
     margin-top: 1.25rem;
 }
+
+/* Blog boxes */
+
+.blog-box-title {
+    margin: 0 0 .75rem;
+    font-size: 1.3rem;
+}
+
+.blog-box-title a {
+    color: var(--heading);
+    text-decoration: none;
+}
+
+.blog-box-posts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.blog-box-posts li {
+    padding: .6rem 0;
+    border-top: 1px solid var(--box-border);
+}
+
+.blog-box-post {
+    font-weight: 600;
+}
+
+.blog-box-posts .post-meta {
+    display: block;
+    margin: .1rem 0 0;
+}
+
+.blog-box-posts .post-excerpt {
+    margin-top: .35rem;
+    font-size: .95rem;
+}
+
+.blog-box-all {
+    margin: .75rem 0 0;
+    font-size: .95rem;
+}
+
+.muted-text {
+    color: var(--caption);
+}

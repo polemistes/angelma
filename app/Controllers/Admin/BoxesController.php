@@ -7,6 +7,7 @@ namespace Angelma\Controllers\Admin;
 use Angelma\Auth;
 use Angelma\Embed;
 use Angelma\Markdown;
+use Angelma\Repos\Blogs;
 use Angelma\Repos\Boxes;
 use Angelma\Repos\Images as ImagesRepo;
 use Angelma\Repos\Pages;
@@ -113,6 +114,20 @@ final class BoxesController
                 }
                 break;
 
+            case 'blog':
+                $blogId = $request->int('blog_id');
+                if ((new Blogs())->find($blogId) === null) {
+                    $errors['blog_id'] = t('box_error_blog');
+                } else {
+                    $content['blog_id'] = $blogId;
+                }
+                $content['count'] = $request->int('count', 5);
+                if ($content['count'] < 1 || $content['count'] > 20) {
+                    $errors['count'] = t('box_error_count');
+                }
+                $content['show_excerpts'] = $request->bool('show_excerpts') ? 1 : 0;
+                break;
+
             case 'embed':
                 $content['url'] = $request->str('url');
                 if ($content['url'] !== '' && (!Embed::isHttpUrl($content['url']) || strlen($content['url']) > 2000)) {
@@ -157,6 +172,9 @@ final class BoxesController
         $page = (new Pages())->find((int) $box['page_id']);
         $free = 12 - (new Boxes())->widthSum((int) $box['row_id'], (int) $box['id']);
         $extra = [];
+        if ($box['type'] === 'blog') {
+            $extra['blogs'] = (new Blogs())->all();
+        }
         if ($box['type'] === 'image') {
             $repo = new ImagesRepo();
             $extra['pickerImages'] = $repo->all(Auth::isAdmin() ? null : Auth::id(), '', ImagesController::PICKER_LIMIT);

@@ -60,3 +60,5 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - The publish date is entered as local time in the site's timezone (`datetime-local`). Saving the form with the date unchanged keeps the stored value exactly; an empty date on a published post becomes "now" only if it has never been published. Unpublishing keeps the date.
 - New posts default to comments open to "anyone"; the post page's meta description is the first paragraph of the body.
 - Tests run against an in-memory database set in `tests/bootstrap.php`, never against `data/`.
+- A blog box may show any blog, not only the editor's own: it only lists published (public) posts. The post count is limited to 1 to 20.
+- The blog box heading is the blog title, linking to the blog.

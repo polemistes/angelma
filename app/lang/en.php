@@ -351,4 +351,14 @@ return [
     'post_confirm_delete' => 'Delete the post "{title}" with all its comments?',
     'post_delete' => 'Delete this post',
     'post_back_to' => 'All posts in {blog}',
+
+    // Blog box
+    'blog_all_posts' => 'All posts',
+    'box_blog' => 'Blog',
+    'box_blog_choose' => 'Choose a blog',
+    'box_blog_none' => 'There is no blog yet. Create one first.',
+    'box_blog_count' => 'Number of newest posts to show (1 to 20)',
+    'box_blog_excerpts' => 'Show the first paragraph of each post',
+    'box_error_blog' => 'Choose a blog.',
+    'box_error_count' => 'Enter a number from 1 to 20.',
 ];

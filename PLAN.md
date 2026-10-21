@@ -728,7 +728,7 @@ Tick when done and committed.
 - [x] 3.5 Image box
 - [x] 4.1 Blogs
 - [x] 4.2 Posts
-- [ ] 4.3 Blog box
+- [x] 4.3 Blog box
 - [ ] 5.1 Comment submission
 - [ ] 5.2 Moderation
 - [ ] 5.3 Users

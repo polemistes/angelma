@@ -101,6 +101,31 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         </fieldset>
     <?php endif ?>
 
+    <?php if ($box['type'] === 'blog'): ?>
+        <?php if ($blogs === []): ?>
+            <p class="flash flash-warning"><?= e(t('box_blog_none')) ?> <a href="<?= e(url('/admin/blogs')) ?>#new-blog"><?= e(t('blogs_new')) ?></a></p>
+        <?php endif ?>
+        <label>
+            <span><?= e(t('box_blog')) ?></span>
+            <select name="blog_id" required>
+                <option value=""><?= e(t('box_blog_choose')) ?></option>
+                <?php foreach ($blogs as $b): ?>
+                    <option value="<?= (int) $b['id'] ?>"<?= (int) ($content['blog_id'] ?? 0) === (int) $b['id'] ? ' selected' : '' ?>><?= e($b['title']) ?></option>
+                <?php endforeach ?>
+            </select>
+            <?= $err('blog_id') ?>
+        </label>
+        <label>
+            <span><?= e(t('box_blog_count')) ?></span>
+            <input type="number" name="count" value="<?= (int) ($content['count'] ?? 5) ?>" min="1" max="20" required>
+            <?= $err('count') ?>
+        </label>
+        <label class="check">
+            <input type="checkbox" name="show_excerpts" value="1"<?= (int) ($content['show_excerpts'] ?? 1) === 1 ? ' checked' : '' ?>>
+            <span><?= e(t('box_blog_excerpts')) ?></span>
+        </label>
+    <?php endif ?>
+
     <?php if ($box['type'] === 'embed'): ?>
         <label>
             <span><?= e(t('embed_url')) ?></span>
