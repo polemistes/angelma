@@ -31,3 +31,6 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - Scheme colours must be `#rgb` or `#rrggbb`; anything else falls back to the paper colour, so the custom scheme can never inject CSS.
 - Login rate limiting: while a key (username or IP hash) has 5 failures in the last 15 minutes, attempts for it are refused without checking the password and are not recorded. A successful login clears the username's failures, not the IP's.
 - After login, admins and editors go to the return address only when it is inside `/admin`, otherwise to `/admin`; users go back to the page they came from.
+- The admin navigation also has a "Dashboard" item for admins and editors (the plan's list does not name it, but `/admin` is the dashboard).
+- Dashboard counts show the whole site for administrators and only their own pages, images, blogs, posts and pending comments for editors.
+- A placeholder Account screen was added in step 2.2 so a `user` has somewhere to land; step 2.3 fills it in.
