@@ -732,7 +732,7 @@ Tick when done and committed.
 - [x] 5.1 Comment submission
 - [x] 5.2 Moderation
 - [x] 5.3 Users
-- [ ] 6.1 Settings
+- [x] 6.1 Settings
 - [ ] 6.2 Backup
 - [ ] 6.3 Build and install test
 - [ ] 6.4 Review pass

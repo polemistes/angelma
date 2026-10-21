@@ -41,6 +41,7 @@ final class ImagesController
         return new Response(render('partials/image_picker_list', [
             'images' => $images,
             'selected' => $request->int('selected'),
+            'field' => $request->query('field'),
         ]));
     }
 

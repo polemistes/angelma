@@ -69,3 +69,7 @@ Choices made where `PLAN.md` was ambiguous or silent. One line each.
 - `/admin/comments` shows all pending comments (oldest first) and the 50 newest approved ones.
 - Users: created with `POST /admin/users`, deleted with `POST /admin/users/{id}/delete`. Usernames follow the installer's rules; new users must have a password of at least 10 characters.
 - An administrator cannot delete their own account (to avoid locking themselves out mid-session); a deactivated user's open session ends on their next request.
+- Settings: the menu table saves visibility with `POST /admin/settings/menu` and moves pages with `POST /admin/settings/menu/{id}/move`. Menu order counts every page, including hidden ones.
+- The settings preview box follows whichever scheme is chosen; for "Custom" it follows the colour inputs live. "Start from current scheme" copies the chosen built-in scheme into the custom inputs and selects "Custom" (in the browser with JavaScript; without it the server does the same and shows the form again unsaved).
+- The custom scheme is always saved with the settings form, so switching back to a built-in scheme keeps the custom colours for later.
+- The tagline may have at most 200 characters and the footer at most 10,000; the time zone list is PHP's list of identifiers.
