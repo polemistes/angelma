@@ -54,6 +54,14 @@ program such as FileZilla (or the file manager in the control panel, if you pref
   more boxes beside a tall one. Add a container to a row, then add rows and boxes inside
   it. Widths inside a container are shares of the container, and a container can hold
   containers two levels deep.
+- **Workbench and moving boxes:** the *Workbench* button on the Pages screen opens a
+  hidden page for boxes that are not on any page. Build and preview boxes and containers
+  there, then use *Move…* on any box to put it in a row on any page, or pick it from
+  "move here from the workbench" in a row. Deleting a container asks whether to keep its
+  boxes; kept boxes go to the workbench.
+- **Who can do what:** editors manage all content, that is pages, images, blogs and
+  comments. Administrators also manage users, settings, the menu and backups, and only
+  they may paste raw HTML into an embed box.
 - **Upgrading:** upload the files of the new version over the old ones, keeping your
   `data` and `uploads` folders, and open the site. Angelma updates its database by itself.
   Delete the `install` folder again afterwards.

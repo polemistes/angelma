@@ -263,7 +263,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/boxes/{id}/move`, `/admin/boxes/{id}/delete` | POST |
 | `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
 | `/admin/boxes/{id}/move-to` | GET: choose where to move a box; POST: move it (1.3.0) |
-| `/admin/boxes/{id}/delete` | also GET since 1.3.0: the confirmation screen with the keep-boxes choice for a container |
+| `/admin/boxes/{id}/delete` | also GET since 1.3.0: the confirmation screen with the keep-boxes choice for a container; POST with `keep=1` keeps the boxes |
 | `/admin/preview` | POST Markdown, returns rendered HTML (used by admin.js) |
 | `/admin/images` | library with upload form, delete, edit alt text |
 | `/admin/images/picker` | small list used inside the image box form |
@@ -856,7 +856,7 @@ Tick when done and committed.
 - [x] 8.1 Editors manage all content
 - [x] 9.1 Workbench page
 - [x] 9.2 Move a box
-- [ ] 9.3 Deleting a container with or without its boxes
+- [x] 9.3 Deleting a container with or without its boxes
 
 ---
 

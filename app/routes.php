@@ -51,6 +51,7 @@ return static function (Router $r): void {
     $r->get('/admin/boxes/{id}', [BoxesController::class, 'edit']);
     $r->post('/admin/boxes/{id}', [BoxesController::class, 'update']);
     $r->post('/admin/boxes/{id}/move', [BoxesController::class, 'move']);
+    $r->get('/admin/boxes/{id}/delete', [BoxesController::class, 'deleteForm']);
     $r->post('/admin/boxes/{id}/delete', [BoxesController::class, 'delete']);
     $r->post('/admin/boxes/{id}/rows', [RowsController::class, 'createInBox']);
     $r->get('/admin/boxes/{id}/move-to', [BoxesController::class, 'moveForm']);

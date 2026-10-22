@@ -114,6 +114,39 @@ final class Boxes extends Repo
         });
     }
 
+    /** Number of boxes inside a container box, at any depth. */
+    public function countInside(int $boxId): int
+    {
+        $count = 0;
+        foreach ((new Rows($this->db))->forBox($boxId) as $row) {
+            foreach ($this->forRow((int) $row['id']) as $box) {
+                $count += 1 + ($box['type'] === 'container' ? $this->countInside((int) $box['id']) : 0);
+            }
+        }
+        return $count;
+    }
+
+    /**
+     * Delete a container but keep its boxes: every box directly inside it moves to a new
+     * row of its own on the given page (the workbench), nested containers as whole units.
+     * Returns how many boxes were moved.
+     */
+    public function deleteKeepingContents(int $id, int $pageId): int
+    {
+        return (int) $this->db->transaction(function () use ($id, $pageId): int {
+            $rows = new Rows($this->db);
+            $moved = 0;
+            foreach ($rows->forBox($id) as $row) {
+                foreach ($this->forRow((int) $row['id']) as $box) {
+                    $this->moveTo((int) $box['id'], $rows->create($pageId, 'left'), (int) $box['width']);
+                    $moved++;
+                }
+            }
+            $this->delete($id);
+            return $moved;
+        });
+    }
+
     /** Number of boxes on a page, those inside containers included. */
     public function countForPage(int $pageId): int
     {

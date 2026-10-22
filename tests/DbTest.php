@@ -247,6 +247,35 @@ final class DbTest extends DbTestCase
         $this->assertTrue($boxes->isInside($rows->create($b, 'left', $deep), $container));
     }
 
+    public function testDeletingContainerKeepingContents(): void
+    {
+        $owner = $this->makeUser();
+        $pages = new Pages($this->db);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $pageId = $pages->create(['slug' => 'x', 'name' => 'X', 'title' => 'X', 'owner_id' => $owner]);
+        $workbench = $pages->create(['slug' => 'wb', 'name' => 'W', 'title' => 'W', 'owner_id' => $owner]);
+        $top = $rows->create($pageId);
+        $container = $boxes->create($top, 'container', 12, []);
+        $row1 = $rows->create($pageId, 'left', $container);
+        $a = $boxes->create($row1, 'text', 6, ['markdown' => 'A']);
+        $z = $boxes->create($row1, 'container', 6, []);
+        $b = $boxes->create($rows->create($pageId, 'left', $z), 'text', 12, ['markdown' => 'B']);
+        $c = $boxes->create($rows->create($pageId, 'left', $container), 'text', 12, ['markdown' => 'C']);
+        $this->assertSame(4, $boxes->countInside($container));
+        $this->assertSame(1, $boxes->countInside($z));
+
+        $this->assertSame(3, $boxes->deleteKeepingContents($container, $workbench));
+        $this->assertNull($boxes->find($container));
+        $this->assertSame([$top], array_column($rows->forPage($pageId), 'id'), 'only the empty top row is left on the page');
+        $kept = $boxes->topLevelForPage($workbench);
+        $this->assertSame([$a, $z, $c], array_column($kept, 'id'));
+        $this->assertSame([6, 6, 12], array_column($kept, 'width'));
+        $this->assertSame(3, count($rows->forPageByParent($workbench)[0]), 'one row per kept box');
+        $this->assertSame($workbench, $boxes->find($b)['page_id'], 'the nested container moved as a whole');
+        $this->assertSame([$b], array_column($boxes->forRow((int) $rows->forBox($z)[0]['id']), 'id'));
+    }
+
     public function testMenuMoveRenumbers(): void
     {
         $owner = $this->makeUser();

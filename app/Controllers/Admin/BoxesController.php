@@ -352,12 +352,36 @@ final class BoxesController
         ], $status);
     }
 
+    /** The confirmation screen for deleting a container: with or without its boxes (section 6.14). */
+    public function deleteForm(Request $request, int $id): Response
+    {
+        $box = self::load($id);
+        if ($box['type'] !== 'container') {
+            return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+        }
+        return view('admin/box_delete', [
+            'title' => t('box_delete_title'),
+            'nav' => 'pages',
+            'box' => $box,
+            'page' => (new Pages())->find((int) $box['page_id']),
+            'count' => (new Boxes())->countInside($id),
+        ]);
+    }
+
     public function delete(Request $request, int $id): Response
     {
         $box = self::load($id);
-        (new Boxes())->delete($id);
+        $boxes = new Boxes();
+        if ($box['type'] === 'container' && $request->bool('keep')) {
+            $workbench = Workbench::page();
+            $moved = $boxes->deleteKeepingContents($id, (int) $workbench['id']);
+            (new Pages())->touch((int) $workbench['id']);
+            flash('success', t('box_deleted_kept', ['count' => $moved]));
+        } else {
+            $boxes->delete($id);
+            flash('success', t('box_deleted'));
+        }
         (new Pages())->touch((int) $box['page_id']);
-        flash('success', t('box_deleted'));
         return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
     }
 

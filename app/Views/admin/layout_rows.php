@@ -105,11 +105,15 @@ $types = $depth < Boxes::MAX_DEPTH ? Boxes::TYPES : array_values(array_diff(Boxe
                         ]) ?>
                         <a class="button small" href="<?= e(url('/admin/boxes/' . $box['id'])) ?>"><?= e(t('edit')) ?></a>
                         <a class="button small secondary" href="<?= e(url('/admin/boxes/' . $box['id'] . '/move-to')) ?>"><?= e(t('box_move')) ?></a>
-                        <form method="post" action="<?= e(url('/admin/boxes/' . $box['id'] . '/delete')) ?>" class="inline"
-                              data-confirm="<?= e(t($isContainer ? 'box_confirm_delete_container' : 'box_confirm_delete')) ?>">
-                            <?= csrf_field() ?>
-                            <button type="submit" class="button small danger"><?= e(t('delete')) ?></button>
-                        </form>
+                        <?php if ($isContainer): ?>
+                            <a class="button small danger" href="<?= e(url('/admin/boxes/' . $box['id'] . '/delete')) ?>"><?= e(t('box_delete')) ?></a>
+                        <?php else: ?>
+                            <form method="post" action="<?= e(url('/admin/boxes/' . $box['id'] . '/delete')) ?>" class="inline"
+                                  data-confirm="<?= e(t('box_confirm_delete')) ?>">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="button small danger"><?= e(t('delete')) ?></button>
+                            </form>
+                        <?php endif ?>
                     </div>
                 </div>
             <?php endforeach ?>
