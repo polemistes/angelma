@@ -31,14 +31,20 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
             </select>
             <?= $err('width') ?>
         </label>
-        <label>
-            <span><?= e(t('box_height')) ?></span>
-            <input type="number" name="height" value="<?= e($height) ?>" min="<?= BoxesController::MIN_HEIGHT ?>"
-                   max="<?= BoxesController::MAX_HEIGHT ?>" placeholder="<?= e(t('box_height_auto')) ?>">
-            <span class="hint"><?= e(t('box_height_hint')) ?></span>
-            <?= $err('height') ?>
-        </label>
+        <?php if ($box['type'] !== 'container'): ?>
+            <label>
+                <span><?= e(t('box_height')) ?></span>
+                <input type="number" name="height" value="<?= e($height) ?>" min="<?= BoxesController::MIN_HEIGHT ?>"
+                       max="<?= BoxesController::MAX_HEIGHT ?>" placeholder="<?= e(t('box_height_auto')) ?>">
+                <span class="hint"><?= e(t('box_height_hint')) ?></span>
+                <?= $err('height') ?>
+            </label>
+        <?php endif ?>
     </div>
+
+    <?php if ($box['type'] === 'container'): ?>
+        <p class="hint"><?= e(t('box_container_edit_hint')) ?></p>
+    <?php endif ?>
 
     <?php if ($box['type'] === 'text'): ?>
         <div class="markdown-editor">

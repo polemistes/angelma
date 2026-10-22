@@ -4,7 +4,7 @@
  * @var array<string, mixed> $input
  * @var array<string, string> $errors
  * @var bool $isHome
- * @var list<array<string, mixed>> $rows
+ * @var array<int, list<array<string, mixed>>> $rowsByParent
  * @var array<int, list<array<string, mixed>>> $boxes
  */
 ?>
@@ -31,4 +31,4 @@
     <?php endif ?>
 </details>
 
-<?= render('admin/layout_editor', ['page' => $page, 'rows' => $rows, 'boxes' => $boxes]) ?>
+<?= render('admin/layout_editor', ['page' => $page, 'rowsByParent' => $rowsByParent, 'boxes' => $boxes]) ?>

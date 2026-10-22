@@ -23,6 +23,20 @@ final class RowsController
         return self::back($pageId, $rowId);
     }
 
+    /** Add a row inside a container box (PLAN.md section 6.13). */
+    public function createInBox(Request $request, int $boxId): Response
+    {
+        $box = BoxesController::load($boxId);
+        if ($box['type'] !== 'container') {
+            abort(404);
+        }
+        $pageId = (int) $box['page_id'];
+        $rowId = (new Rows())->create($pageId, 'left', $boxId);
+        (new Pages())->touch($pageId);
+        flash('success', t('row_added'));
+        return self::back($pageId, $rowId);
+    }
+
     public function move(Request $request, int $id): Response
     {
         $row = self::load($id);

@@ -11,6 +11,7 @@ use Angelma\Repos\Blogs;
 use Angelma\Repos\Boxes;
 use Angelma\Repos\Images as ImagesRepo;
 use Angelma\Repos\Pages;
+use Angelma\Repos\Rows;
 use Angelma\Request;
 use Angelma\Response;
 
@@ -25,6 +26,7 @@ final class BoxesController
         'image' => ['image_id' => 0, 'alt' => '', 'caption' => '', 'fit' => 'cover'],
         'blog' => ['blog_id' => 0, 'count' => 5, 'show_excerpts' => 1],
         'embed' => ['url' => '', 'html' => ''],
+        'container' => [],
     ];
 
     public function create(Request $request, int $rowId): Response
@@ -42,6 +44,11 @@ final class BoxesController
         $used = $boxes->widthSum($rowId);
         if ($used + $width > 12) {
             flash('error', t('box_error_too_wide', ['width' => $width, 'free' => 12 - $used]));
+            return RowsController::back($pageId, $rowId);
+        }
+        if ($type === 'container' && (new Rows())->depth($rowId) >= Boxes::MAX_DEPTH) {
+            // Containers nest at most two deep (PLAN.md section 6.13).
+            flash('error', t('box_error_container_depth'));
             return RowsController::back($pageId, $rowId);
         }
 
@@ -75,7 +82,8 @@ final class BoxesController
             $errors['width'] = t('box_error_too_wide', ['width' => $width, 'free' => $free]);
         }
 
-        $heightText = $request->str('height');
+        // A container has no fixed height of its own (PLAN.md section 6.13).
+        $heightText = $box['type'] === 'container' ? '' : $request->str('height');
         $height = null;
         if ($heightText !== '') {
             if (!preg_match('/^\d+$/', $heightText) || (int) $heightText < self::MIN_HEIGHT || (int) $heightText > self::MAX_HEIGHT) {

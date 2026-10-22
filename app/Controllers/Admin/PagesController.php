@@ -172,7 +172,7 @@ final class PagesController
             'input' => $input,
             'errors' => $errors,
             'isHome' => $pageId === (int) App::setting('home_page_id'),
-            'rows' => (new Rows())->forPage($pageId),
+            'rowsByParent' => (new Rows())->forPageByParent($pageId),
             'boxes' => (new Boxes())->forPage($pageId),
         ], $status);
     }

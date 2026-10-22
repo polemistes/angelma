@@ -50,6 +50,13 @@ program such as FileZilla (or the file manager in the control panel, if you pref
 
 ### Good to know
 
+- **Containers:** a *Container* box holds rows of boxes of its own, so you can stack two or
+  more boxes beside a tall one. Add a container to a row, then add rows and boxes inside
+  it. Widths inside a container are shares of the container, and a container can hold
+  containers two levels deep.
+- **Upgrading:** upload the files of the new version over the old ones, keeping your
+  `data` and `uploads` folders, and open the site. Angelma updates its database by itself.
+  Delete the `install` folder again afterwards.
 - **Page order:** the *Pages* list shows the pages in menu order. Administrators use the
   arrows in the list to move a page up or down; the same table is also under *Settings*,
   where pages can be hidden from the menu.
