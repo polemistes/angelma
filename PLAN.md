@@ -162,6 +162,10 @@ All tables have an integer primary key `id`. Timestamps are stored as UTC ISO 86
 | moderate_anonymous | 1 if anonymous comments wait for approval | 1 |
 | timezone | PHP timezone name for displaying dates | `Europe/Oslo` |
 | date_format | PHP date format for posts and comments | `j F Y` |
+| workbench_page_id | id of the workbench page (section 6.14), empty until first use | empty |
+| maintenance | 1 while maintenance mode is on (section 6.15) | 0 |
+| maintenance_message | Markdown shown to visitors during maintenance | empty |
+| update_check | JSON cache of the last release check (section 6.16) | empty |
 
 ### users
 `username TEXT UNIQUE, display_name TEXT, password_hash TEXT, role TEXT` (`admin`,
@@ -273,6 +277,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/users`, `/admin/users/{id}` | administrators only |
 | `/admin/settings` | administrators only: title, scheme, custom scheme, width, footer, home page, menu order and visibility |
 | `/admin/backup` | administrators only: download a zip of the database and uploads |
+| `/admin/update` | administrators only: the update screen (1.4.0); `/admin/update/check`, `/admin/update/install` and `/admin/update/rollback` are POST |
 | `/admin/account` | change own password and display name |
 
 Reserved first path segments that a page slug may not use: `admin`, `blog`, `login`,
@@ -446,6 +451,50 @@ Deleting a container opens a confirmation screen with two choices: delete it wit
 boxes, or delete the container but keep its boxes, which moves every box directly inside
 it to its own new row on the workbench (nested containers as whole units). Other boxes
 keep the browser confirm.
+
+### 6.15 Maintenance mode (1.4.0)
+An administrator switches maintenance mode on under Settings, with a message. While it is
+on, visitors who are not logged in as editor or administrator get a 503 page with the
+message and `Retry-After: 600` for every public address; `/login`, `/logout`, `/admin`,
+`/install` and `/assets` stay reachable. Editors and administrators see the site as usual
+with a bar at the top saying that maintenance mode is on, and every admin screen shows
+the same bar with a link to Settings.
+
+The updater (6.16) uses a separate, lower-level block while it replaces files:
+`data/updating.lock`, checked at the very top of `index.php` before any code is loaded,
+answers 503 with a plain page and `Retry-After: 30`. That text is the one interface
+string outside `app/lang/en.php`, because no code may be loaded at that moment.
+
+### 6.16 Updates from GitHub (1.4.0)
+Releases are published on GitHub as tag `v<version>` with two assets built by
+`dev/build.sh` and published by `dev/release.sh`: `angelma-<version>.zip` and
+`angelma-<version>.zip.sha256`. The release notes are the version's section of
+`CHANGELOG.md`.
+
+The site asks `https://api.github.com/repos/polemistes/angelma/releases/latest` at most
+once a day; the answer is cached in the `update_check` setting. The dashboard triggers
+the check for administrators and shows a notice when a newer version exists; the Update
+screen has "Check now". The repository and the two base addresses can be overridden in
+`data/config.php` (`update_repo`, `update_api_base`, `update_download_base`), which is
+how the whole flow is tested against a local stand-in for GitHub. Asset addresses are
+accepted only under the download base of the configured repository.
+
+The Update screen (`/admin/update`, administrators only) shows the installed and the
+newest version, the release notes rendered as Markdown with HTML stripped, and the
+preflight checks: outbound HTTPS (curl or `allow_url_fopen`), the zip extension,
+writable code files and folders, and free disk space. "Install" does everything in one
+request: downloads the zip and the checksum into `data/updates/`, verifies the SHA-256,
+extracts entry by entry (refusing any path that would leave the folder), checks that the
+tree is Angelma with the expected version and that PHP satisfies the release's
+`composer.json`, copies the current code to `data/updates/previous/`, writes
+`data/updating.lock`, copies the new tree over the site (vendor, app, assets, then the
+root files with `index.php` last), removes files under app, vendor and assets that the
+release no longer has, removes the lock and resets the opcode cache. `data/` and
+`uploads/` are never touched; `install/` is only replaced when it still exists. The
+database migrates on the next request. "Restore previous version" copies
+`data/updates/previous/` back the same way. When a preflight check fails, the screen
+shows the manual upload instructions instead of the button. Nothing ever updates
+unattended.
 
 ---
 
@@ -817,6 +866,34 @@ Done when: a test shows the boxes directly inside a deleted container appear as 
 rows on the workbench, nested containers whole; in the browser both choices work;
 `app/version.php` is `1.3.0`, tagged `v1.3.0`.
 
+### Phase 10: Maintenance mode and updates (1.4.0, requested by the owner)
+
+**10.1 Maintenance mode**
+Settings `maintenance` and `maintenance_message`, the switch and message under Settings,
+the 503 page, the bars for editors and in the admin, per section 6.15.
+Done when: a unit test shows which requests are blocked and which pass; on a copy a
+visitor gets 503 with the message and `Retry-After`, the login page works, an editor sees
+the site with the bar, and the admin screens show the bar.
+
+**10.2 Release tooling**
+`dev/build.sh` also writes the `.sha256` file; `dev/release.sh` tags, pushes and creates
+the GitHub release with both assets and the notes from `CHANGELOG.md`; `CHANGELOG.md`
+with entries since 1.0.0.
+Done when: `dev/build.sh` produces both files and `sha256sum -c` accepts the checksum;
+`dev/release.sh` is ready to run. Publishing is the owner's action, so the agent does
+not run it.
+
+**10.3 Updater**
+`Angelma\Updater`, the update screen, the dashboard notice, the navigation item and the
+lock check in `index.php`, per section 6.16.
+Done when: unit tests cover parsing a release, the checksum, a refused path in a zip,
+applying a tree over a fake site (new files in, stale files out, data and uploads
+untouched, install skipped when absent) and restoring the previous version; on a copy
+served next to a local stand-in for GitHub, the screen reports the newer version,
+installs it, the site comes back with the new version number and its data intact, and
+"Restore previous version" brings the old one back; `app/version.php` is `1.4.0`, tagged
+`v1.4.0`.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -857,6 +934,9 @@ Tick when done and committed.
 - [x] 9.1 Workbench page
 - [x] 9.2 Move a box
 - [x] 9.3 Deleting a container with or without its boxes
+- [ ] 10.1 Maintenance mode
+- [ ] 10.2 Release tooling
+- [ ] 10.3 Updater
 
 ---
 
