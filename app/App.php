@@ -126,6 +126,7 @@ final class App
                 $path = self::$root . '/' . $path;
             }
             self::$db = Db::sqlite($path);
+            self::$db->upgrade();
         }
         return self::$db;
     }

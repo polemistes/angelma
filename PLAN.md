@@ -791,7 +791,7 @@ Tick when done and committed.
 - [x] 6.2 Backup
 - [x] 6.3 Build and install test
 - [x] 6.4 Review pass
-- [ ] 7.1 Container box: data model, repos and public rendering
+- [x] 7.1 Container box: data model, repos and public rendering
 - [ ] 7.2 Container box: layout editor
 
 ---

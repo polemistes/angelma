@@ -207,6 +207,20 @@ img {
     overflow: hidden;
 }
 
+/* A container box draws nothing of its own: the rows inside it are the content
+   (PLAN.md section 6.13). Its last row drops its margin so the container is no taller
+   than its rows. */
+.box-container {
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 0;
+}
+
+.box-container > .row:last-child {
+    margin-bottom: 0;
+}
+
 /* Text inside boxes, posts and the footer */
 
 .prose > :first-child {

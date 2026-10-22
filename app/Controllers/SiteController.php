@@ -27,7 +27,7 @@ final class SiteController
 
         return view('site/page', [
             'page' => $page,
-            'rows' => (new Rows())->forPage((int) $page['id']),
+            'rowsByParent' => (new Rows())->forPageByParent((int) $page['id']),
             'boxes' => (new Boxes())->forPage((int) $page['id']),
             'title' => (string) $page['title'],
             'is_home' => (int) $page['id'] === $homeId,

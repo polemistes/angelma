@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Angelma\Tests;
 
+use Angelma\Db;
 use Angelma\Repos\Blogs;
 use Angelma\Repos\Boxes;
 use Angelma\Repos\Comments;
@@ -19,7 +20,27 @@ final class DbTest extends DbTestCase
     {
         $this->assertSame(0, $this->db->migrate());
         $this->assertSame(1, (int) $this->db->value('SELECT COUNT(*) FROM schema_version'));
-        $this->assertSame(1, (int) $this->db->value('SELECT version FROM schema_version'));
+        $this->assertSame(2, (int) $this->db->value('SELECT version FROM schema_version'));
+        $this->assertSame(Db::SCHEMA_VERSION, (int) $this->db->value('SELECT version FROM schema_version'));
+    }
+
+    public function testUpgradeAppliesNewerMigrations(): void
+    {
+        // A database at schema version 1, as installed before 1.2.0.
+        $dir = sys_get_temp_dir() . '/angelma-migrations-' . bin2hex(random_bytes(4));
+        mkdir($dir);
+        copy(dirname(__DIR__) . '/app/migrations/001_initial.sql', $dir . '/001_initial.sql');
+        $db = Db::sqlite(':memory:');
+        $this->assertSame(1, $db->migrate($dir));
+        unlink($dir . '/001_initial.sql');
+        rmdir($dir);
+        $this->assertSame(1, (int) $db->value('SELECT version FROM schema_version'));
+
+        $db->upgrade();
+        $this->assertSame(Db::SCHEMA_VERSION, (int) $db->value('SELECT version FROM schema_version'));
+        $this->assertNull($db->value('SELECT parent_box_id FROM rows WHERE 1 = 0'));
+        $db->upgrade();
+        $this->assertSame(Db::SCHEMA_VERSION, (int) $db->value('SELECT version FROM schema_version'));
     }
 
     public function testPageWithRowAndBoxRoundTrip(): void
@@ -69,6 +90,123 @@ final class DbTest extends DbTestCase
         $this->assertSame([$a, $c, $b], array_column($rows->forPage($pageId), 'id'));
         $rows->move($a, 'up');
         $this->assertSame([$a, $c, $b], array_column($rows->forPage($pageId), 'id'));
+    }
+
+    public function testRowsInsideContainer(): void
+    {
+        $owner = $this->makeUser();
+        $pageId = (new Pages($this->db))->create(['slug' => 'x', 'name' => 'X', 'title' => 'X', 'owner_id' => $owner]);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $top = $rows->create($pageId);
+        $container = $boxes->create($top, 'container', 6, []);
+        $inner1 = $rows->create($pageId, 'left', $container);
+        $inner2 = $rows->create($pageId, 'center', $container);
+        $text = $boxes->create($inner1, 'text', 12, ['markdown' => 'One']);
+
+        // Positions count within the parent; the page's own rows are unaffected.
+        $this->assertSame([1, 2], array_column($rows->forBox($container), 'position'));
+        $this->assertSame(1, $rows->find($top)['position']);
+        $this->assertSame($container, $rows->find($inner1)['parent_box_id']);
+        $this->assertNull($rows->find($top)['parent_box_id']);
+        $grouped = $rows->forPageByParent($pageId);
+        $this->assertSame([$top], array_column($grouped[0], 'id'));
+        $this->assertSame([$inner1, $inner2], array_column($grouped[$container], 'id'));
+        $this->assertSame(0, $rows->depth($top));
+        $this->assertSame(1, $rows->depth($inner1));
+        $this->assertSame($pageId, $boxes->find($text)['page_id']);
+        $this->assertArrayHasKey($inner1, $boxes->forPage($pageId));
+
+        // Moving stays within the container, and the page's own rows ignore the inner ones.
+        $rows->move($inner2, 'up');
+        $this->assertSame([$inner2, $inner1], array_column($rows->forBox($container), 'id'));
+        $this->assertSame([1, 2], array_column($rows->forBox($container), 'position'));
+        $rows->move($top, 'down');
+        $this->assertSame([$top], array_column($rows->forPageByParent($pageId)[0], 'id'));
+        $this->assertSame([$inner2, $inner1], array_column($rows->forBox($container), 'id'));
+    }
+
+    public function testDeletingContainersIsRecursive(): void
+    {
+        $owner = $this->makeUser();
+        $pages = new Pages($this->db);
+        $pageId = $pages->create(['slug' => 'x', 'name' => 'X', 'title' => 'X', 'owner_id' => $owner]);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $count = fn (string $table): int => (int) $this->db->value("SELECT COUNT(*) FROM $table");
+
+        // A container two deep: the box delete removes both levels, the sibling survives.
+        $top = $rows->create($pageId);
+        $outer = $boxes->create($top, 'container', 6, []);
+        $sibling = $boxes->create($top, 'text', 6, []);
+        $outerRow = $rows->create($pageId, 'left', $outer);
+        $inner = $boxes->create($outerRow, 'container', 12, []);
+        $innerRow = $rows->create($pageId, 'left', $inner);
+        $boxes->create($innerRow, 'text', 12, []);
+        $this->assertSame(2, $rows->depth($innerRow));
+        $this->assertSame(3, $count('rows'));
+        $this->assertSame(4, $count('boxes'));
+
+        $boxes->delete($outer);
+        $this->assertSame([$top], array_column($rows->forPage($pageId), 'id'));
+        $this->assertSame([$sibling], array_column($boxes->forRow($top), 'id'));
+
+        // Deleting a row removes the containers in it.
+        $outer = $boxes->create($top, 'container', 6, []);
+        $boxes->create($rows->create($pageId, 'left', $outer), 'text', 12, []);
+        $rows->delete($top);
+        $this->assertSame(0, $count('rows'));
+        $this->assertSame(0, $count('boxes'));
+
+        // And so does deleting the page.
+        $top = $rows->create($pageId);
+        $outer = $boxes->create($top, 'container', 6, []);
+        $boxes->create($rows->create($pageId, 'left', $outer), 'text', 12, []);
+        $pages->delete($pageId);
+        $this->assertSame(0, $count('rows'));
+        $this->assertSame(0, $count('boxes'));
+    }
+
+    public function testImageUsageInsideContainerIsFound(): void
+    {
+        $owner = $this->makeUser();
+        $pageId = (new Pages($this->db))->create(['slug' => 'x', 'name' => 'Nested', 'title' => 'X', 'owner_id' => $owner]);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $container = $boxes->create($rows->create($pageId), 'container', 6, []);
+        $innerRow = $rows->create($pageId, 'left', $container);
+        $boxes->create($innerRow, 'image', 12, ['image_id' => 42, 'alt' => '', 'caption' => '', 'fit' => 'cover']);
+        $this->assertSame(['Nested'], array_column($boxes->pagesUsing('image', 'image_id', 42), 'name'));
+        $this->assertSame([], $boxes->pagesUsing('image', 'image_id', 43));
+    }
+
+    public function testContainerRendersNestedRows(): void
+    {
+        $owner = $this->makeUser();
+        $pages = new Pages($this->db);
+        $pageId = $pages->create(['slug' => 'x', 'name' => 'X', 'title' => 'Nested page', 'owner_id' => $owner]);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $top = $rows->create($pageId);
+        $boxes->create($top, 'text', 6, ['markdown' => 'Tall'], 400);
+        $container = $boxes->create($top, 'container', 6, []);
+        $boxes->create($rows->create($pageId, 'left', $container), 'text', 12, ['markdown' => 'Upper']);
+        $boxes->create($rows->create($pageId, 'right', $container), 'text', 6, ['markdown' => 'Lower']);
+        $rows->create($pageId, 'left', $container); // an empty inner row is not shown
+
+        $html = render('site/page', [
+            'page' => $pages->find($pageId),
+            'rowsByParent' => $rows->forPageByParent($pageId),
+            'boxes' => $boxes->forPage($pageId),
+        ]);
+        $pattern = '#<div class="row cols-12 align-left">\s*'
+            . '<div class="box box-text w-6 fixed" style="--h:400px">.*?Tall.*?</div>\s*'
+            . '<div class="box box-container w-6">\s*'
+            . '<div class="row cols-12 align-left">\s*<div class="box box-text w-12">.*?Upper.*?</div>\s*</div>\s*'
+            . '<div class="row cols-6 align-right">\s*<div class="box box-text w-6">.*?Lower.*?</div>\s*</div>\s*'
+            . '</div>\s*</div>#s';
+        $this->assertSame(1, preg_match($pattern, $html), $html);
+        $this->assertSame(3, substr_count($html, '<div class="row '), $html);
     }
 
     public function testMenuMoveRenumbers(): void

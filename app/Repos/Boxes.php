@@ -7,8 +7,14 @@ namespace Angelma\Repos;
 final class Boxes extends Repo
 {
     protected const TABLE = 'boxes';
-    public const TYPES = ['text', 'image', 'blog', 'embed'];
+    public const TYPES = ['text', 'image', 'blog', 'embed', 'container'];
     public const WIDTHS = [3, 4, 6, 8, 9, 12];
+
+    /**
+     * A container may be added to a row whose depth (Rows::depth) is below this, so
+     * containers nest at most two deep (PLAN.md section 6.13).
+     */
+    public const MAX_DEPTH = 2;
 
     /** @return array<string, mixed>|null box with decoded content and its page_id */
     public function find(int $id): ?array
@@ -76,9 +82,13 @@ final class Boxes extends Repo
         $this->updateRow($id, ['width' => $width, 'height' => $height, 'content' => self::encode($content)]);
     }
 
+    /** Delete a box; for a container, also the rows and boxes inside it. */
     public function delete(int $id): void
     {
-        $this->db->execute('DELETE FROM boxes WHERE id = ?', [$id]);
+        $this->db->transaction(function () use ($id): void {
+            (new Rows($this->db))->deleteInsideBox($id);
+            $this->db->execute('DELETE FROM boxes WHERE id = ?', [$id]);
+        });
     }
 
     /** Move a box left (up) or right (down) within its row and renumber the positions. */

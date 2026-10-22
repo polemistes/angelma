@@ -145,6 +145,20 @@ final class Db
         }
     }
 
+    /** The schema version the code expects: the number of the newest migration file. */
+    public const SCHEMA_VERSION = 2;
+
+    /**
+     * Apply pending migrations when the code is newer than the database, as after an
+     * upgrade by uploading new files. One small query per request when up to date.
+     */
+    public function upgrade(): void
+    {
+        if ((int) $this->value('SELECT version FROM schema_version') < self::SCHEMA_VERSION) {
+            $this->migrate();
+        }
+    }
+
     /**
      * Apply every migrations/NNN_*.sql with a number above the stored schema version, in
      * order, each in its own transaction. Returns the number of migrations applied.
