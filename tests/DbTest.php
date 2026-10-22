@@ -209,6 +209,44 @@ final class DbTest extends DbTestCase
         $this->assertSame(3, substr_count($html, '<div class="row '), $html);
     }
 
+    public function testMoveBoxBetweenRowsAndPages(): void
+    {
+        $owner = $this->makeUser();
+        $pages = new Pages($this->db);
+        $rows = new Rows($this->db);
+        $boxes = new Boxes($this->db);
+        $a = $pages->create(['slug' => 'a', 'name' => 'A', 'title' => 'A', 'owner_id' => $owner]);
+        $b = $pages->create(['slug' => 'b', 'name' => 'B', 'title' => 'B', 'owner_id' => $owner]);
+        $rowA = $rows->create($a);
+        $text = $boxes->create($rowA, 'text', 6, ['markdown' => 'Hi']);
+        $container = $boxes->create($rowA, 'container', 6, []);
+        $innerRow = $rows->create($a, 'left', $container);
+        $innerText = $boxes->create($innerRow, 'text', 12, []);
+        $rowB = $rows->create($b);
+        $boxes->create($rowB, 'text', 3, []);
+
+        $this->assertTrue($boxes->isInside($innerRow, $container));
+        $this->assertFalse($boxes->isInside($rowA, $container));
+        $this->assertFalse($boxes->isInside($rowB, $container));
+        $this->assertSame(0, $boxes->innerLevels($container));
+        $this->assertSame([$text, $container], array_column($boxes->topLevelForPage($a), 'id'));
+
+        // The container moves to page B with a new width; the rows inside follow.
+        $boxes->moveTo($container, $rowB, 9);
+        $moved = $boxes->find($container);
+        $this->assertSame([$rowB, 2, 9, $b], [$moved['row_id'], $moved['position'], $moved['width'], $moved['page_id']]);
+        $this->assertSame($b, $rows->find($innerRow)['page_id']);
+        $this->assertSame($b, $boxes->find($innerText)['page_id']);
+        $this->assertSame([$text], array_column($boxes->forRow($rowA), 'id'));
+        $this->assertSame(12, $boxes->widthSum($rowB));
+
+        // A container inside the container counts as one inner level.
+        $deep = $boxes->create($innerRow, 'container', 6, []);
+        $this->assertSame(1, $boxes->innerLevels($container));
+        $this->assertSame(0, $boxes->innerLevels($deep));
+        $this->assertTrue($boxes->isInside($rows->create($b, 'left', $deep), $container));
+    }
+
     public function testMenuMoveRenumbers(): void
     {
         $owner = $this->makeUser();

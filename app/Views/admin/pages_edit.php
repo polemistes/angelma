@@ -7,6 +7,7 @@
  * @var bool $isWorkbench
  * @var array<int, list<array<string, mixed>>> $rowsByParent
  * @var array<int, list<array<string, mixed>>> $boxes
+ * @var list<array<string, mixed>> $workbenchBoxes boxes that can be moved here from the workbench
  */
 ?>
 <p class="actions">
@@ -36,4 +37,4 @@
 </details>
 <?php endif ?>
 
-<?= render('admin/layout_editor', ['page' => $page, 'rowsByParent' => $rowsByParent, 'boxes' => $boxes]) ?>
+<?= render('admin/layout_editor', ['page' => $page, 'rowsByParent' => $rowsByParent, 'boxes' => $boxes, 'workbenchBoxes' => $workbenchBoxes]) ?>

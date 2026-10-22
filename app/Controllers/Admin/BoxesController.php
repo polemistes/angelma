@@ -14,6 +14,7 @@ use Angelma\Repos\Pages;
 use Angelma\Repos\Rows;
 use Angelma\Request;
 use Angelma\Response;
+use Angelma\Workbench;
 
 /**
  * Boxes in a row: add, edit, move, delete.
@@ -33,6 +34,16 @@ final class BoxesController
     {
         $row = RowsController::load($rowId);
         $pageId = (int) $row['page_id'];
+        if ($request->int('box_id') > 0) {
+            // "Move here from the workbench": an existing box moves into this row (section 6.14).
+            $box = self::load($request->int('box_id'));
+            $error = self::moveCheck($box, $row, (int) $box['width']);
+            if ($error !== null) {
+                flash('error', $error);
+                return RowsController::back($pageId, $rowId);
+            }
+            return $this->performMove($box, $row, (int) $box['width']);
+        }
         $type = $request->str('type');
         $width = $request->int('width');
         if (!in_array($type, Boxes::TYPES, true) || !in_array($width, Boxes::WIDTHS, true)) {
@@ -208,6 +219,137 @@ final class BoxesController
         (new Boxes())->move($id, $request->str('direction') === 'up' ? 'up' : 'down');
         (new Pages())->touch((int) $box['page_id']);
         return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+    }
+
+    /** The move screen: choose a row on any page, or a new row (PLAN.md section 6.14). */
+    public function moveForm(Request $request, int $id): Response
+    {
+        $box = self::load($id);
+        return $this->moveView($box, '', (int) $box['width']);
+    }
+
+    public function moveTo(Request $request, int $id): Response
+    {
+        $box = self::load($id);
+        $target = $request->str('target');
+        $width = $request->int('width');
+        if (!in_array($width, Boxes::WIDTHS, true)) {
+            return $this->moveView($box, $target, $width, t('box_error_type_width'), 422);
+        }
+        if (preg_match('/^page:(\d+)$/', $target, $m)) {
+            // A new row at the end of the page: always fits, always depth 0.
+            $page = PagesController::load((int) $m[1]);
+            $rowId = (new Rows())->create((int) $page['id'], 'left');
+            return $this->performMove($box, (array) (new Rows())->find($rowId), $width);
+        }
+        if (!preg_match('/^row:(\d+)$/', $target, $m)) {
+            return $this->moveView($box, $target, $width, t('box_error_move_target'), 422);
+        }
+        $row = RowsController::load((int) $m[1]);
+        $error = self::moveCheck($box, $row, $width);
+        if ($error !== null) {
+            return $this->moveView($box, $target, $width, $error, 422);
+        }
+        return $this->performMove($box, $row, $width);
+    }
+
+    /**
+     * Why a box may not go into a row with a width, or null when it may: a container
+     * cannot go inside itself, the width must fit, and containers nest at most two deep.
+     *
+     * @param array<string, mixed> $box
+     * @param array<string, mixed> $row
+     */
+    public static function moveCheck(array $box, array $row, int $width): ?string
+    {
+        $boxes = new Boxes();
+        if (!in_array($width, Boxes::WIDTHS, true)) {
+            return t('box_error_type_width');
+        }
+        if ($boxes->isInside((int) $row['id'], (int) $box['id'])) {
+            return t('box_error_move_inside_self');
+        }
+        $free = 12 - $boxes->widthSum((int) $row['id'], (int) $box['id']);
+        if ($width > $free) {
+            return t('box_error_too_wide', ['width' => $width, 'free' => $free]);
+        }
+        if ($box['type'] === 'container'
+            && (new Rows())->depth((int) $row['id']) + $boxes->innerLevels((int) $box['id']) >= Boxes::MAX_DEPTH) {
+            return t('box_error_container_depth');
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $box
+     * @param array<string, mixed> $row the target row
+     */
+    private function performMove(array $box, array $row, int $width): Response
+    {
+        (new Boxes())->moveTo((int) $box['id'], (int) $row['id'], $width);
+        $pages = new Pages();
+        $pages->touch((int) $box['page_id']);
+        $pages->touch((int) $row['page_id']);
+        flash('success', t('box_moved'));
+        return RowsController::back((int) $row['page_id'], (int) $row['id']);
+    }
+
+    /**
+     * The move screen's data: every row of every page the box could go to, grouped by
+     * page with the workbench first, leaving out the box's own row and the rows inside it.
+     *
+     * @param array<string, mixed> $box
+     */
+    private function moveView(array $box, string $selected, int $width, ?string $error = null, int $status = 200): Response
+    {
+        $rows = new Rows();
+        $boxes = new Boxes();
+        $groups = [];
+        $pages = array_merge([Workbench::page()], (new Pages())->all());
+        foreach ($pages as $page) {
+            $pageId = (int) $page['id'];
+            $rowsByParent = $rows->forPageByParent($pageId);
+            $pageBoxes = $boxes->forPage($pageId);
+            $build = function (array $list, string $prefix) use (&$build, $rowsByParent, $pageBoxes, $box): array {
+                $options = [];
+                foreach ($list as $i => $row) {
+                    $label = $prefix . t('box_move_row', ['n' => $i + 1]);
+                    $rowBoxes = $pageBoxes[(int) $row['id']] ?? [];
+                    $free = 12 - array_sum(array_column($rowBoxes, 'width'));
+                    if ((int) $row['id'] !== (int) $box['row_id'] && $free >= min(Boxes::WIDTHS)) {
+                        $options[] = ['row:' . $row['id'], $label . ' (' . t('box_move_free', ['free' => $free]) . ')'];
+                    }
+                    $k = 0;
+                    foreach ($rowBoxes as $b) {
+                        if ($b['type'] !== 'container') {
+                            continue;
+                        }
+                        $k++;
+                        if ((int) $b['id'] === (int) $box['id']) {
+                            continue; // the rows inside the moved box itself
+                        }
+                        $inner = $build($rowsByParent[(int) $b['id']] ?? [], $label . ' › ' . t('box_move_container', ['k' => $k]) . ' › ');
+                        $options = array_merge($options, $inner);
+                    }
+                }
+                return $options;
+            };
+            $groups[] = [
+                'page' => $page,
+                'options' => $build($rowsByParent[0] ?? [], ''),
+                'newRow' => 'page:' . $pageId,
+            ];
+        }
+        return view('admin/box_move', [
+            'title' => t('box_move_title', ['label' => box_label($box)]),
+            'nav' => 'pages',
+            'box' => $box,
+            'page' => (new Pages())->find((int) $box['page_id']),
+            'groups' => $groups,
+            'selected' => $selected,
+            'width' => $width,
+            'error' => $error,
+        ], $status);
     }
 
     public function delete(Request $request, int $id): Response

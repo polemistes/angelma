@@ -138,6 +138,26 @@ function partial(string $name, array $data = []): string
     return render('partials/' . $name, $data);
 }
 
+/**
+ * Short plain-text description of a box for selects and messages: its type and a
+ * glimpse of its content.
+ *
+ * @param array<string, mixed> $box
+ */
+function box_label(array $box): string
+{
+    $type = t('box_type_' . $box['type']);
+    $content = is_array($box['content'] ?? null) ? $box['content'] : [];
+    $text = match ((string) $box['type']) {
+        'text' => (string) ($content['markdown'] ?? ''),
+        'image' => (string) (($content['alt'] ?? '') !== '' ? $content['alt'] : ($content['caption'] ?? '')),
+        'embed' => (string) ($content['url'] ?? ''),
+        default => '',
+    };
+    $text = trim((string) preg_replace(['/^#+\s*/m', '/\s+/'], ['', ' '], $text));
+    return $text === '' ? $type : $type . ': ' . mb_strimwidth($text, 0, 50, '…');
+}
+
 /** Store a message shown once on the next page. */
 function flash(string $type, string $message): void
 {

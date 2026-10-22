@@ -88,6 +88,18 @@ final class Rows extends Repo
         });
     }
 
+    /** Set the page of every row inside a container box, recursively (when a box moves). */
+    public function setPageInsideBox(int $boxId, int $pageId): void
+    {
+        foreach ($this->forBox($boxId) as $row) {
+            $this->db->execute('UPDATE rows SET page_id = ? WHERE id = ?', [$pageId, (int) $row['id']]);
+            $containers = $this->db->all('SELECT id FROM boxes WHERE row_id = ? AND type = ?', [(int) $row['id'], 'container']);
+            foreach ($containers as $box) {
+                $this->setPageInsideBox((int) $box['id'], $pageId);
+            }
+        }
+    }
+
     /**
      * How deep a row is: 0 for a page's own row, 1 for a row inside a container in such
      * a row, and so on. Boxes::MAX_DEPTH limits where containers may be added.

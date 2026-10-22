@@ -8,6 +8,7 @@
  * @var array<int, list<array<string, mixed>>> $rowsByParent all rows of the page by parent box id
  * @var array<int, list<array<string, mixed>>> $boxes boxes grouped by row id
  * @var int $depth 0 for the page's own rows, 1 inside a container, and so on
+ * @var list<array<string, mixed>> $workbenchBoxes boxes that can be moved here from the workbench
  */
 use Angelma\Repos\Boxes;
 use Angelma\Repos\Rows;
@@ -81,6 +82,7 @@ $types = $depth < Boxes::MAX_DEPTH ? Boxes::TYPES : array_values(array_diff(Boxe
                                 'rows' => $rowsByParent[(int) $box['id']] ?? [],
                                 'rowsByParent' => $rowsByParent,
                                 'boxes' => $boxes,
+                                'workbenchBoxes' => $workbenchBoxes,
                                 'depth' => $depth + 1,
                             ]) ?>
                             <form method="post" action="<?= e(url('/admin/boxes/' . $box['id'] . '/rows')) ?>" class="inline">
@@ -102,6 +104,7 @@ $types = $depth < Boxes::MAX_DEPTH ? Boxes::TYPES : array_values(array_diff(Boxe
                             'downIcon' => '→',
                         ]) ?>
                         <a class="button small" href="<?= e(url('/admin/boxes/' . $box['id'])) ?>"><?= e(t('edit')) ?></a>
+                        <a class="button small secondary" href="<?= e(url('/admin/boxes/' . $box['id'] . '/move-to')) ?>"><?= e(t('box_move')) ?></a>
                         <form method="post" action="<?= e(url('/admin/boxes/' . $box['id'] . '/delete')) ?>" class="inline"
                               data-confirm="<?= e(t($isContainer ? 'box_confirm_delete_container' : 'box_confirm_delete')) ?>">
                             <?= csrf_field() ?>
@@ -133,6 +136,20 @@ $types = $depth < Boxes::MAX_DEPTH ? Boxes::TYPES : array_values(array_diff(Boxe
                 </label>
                 <button type="submit" class="button small"><?= e(t('box_add')) ?></button>
             </form>
+            <?php $fitting = array_values(array_filter($workbenchBoxes, static fn (array $b): bool => (int) $b['width'] <= $free)); ?>
+            <?php if ($fitting !== []): ?>
+                <form method="post" action="<?= e(url('/admin/rows/' . $row['id'] . '/boxes')) ?>" class="add-box move-here">
+                    <?= csrf_field() ?>
+                    <label class="small"><?= e(t('box_move_from_workbench')) ?>
+                        <select name="box_id">
+                            <?php foreach ($fitting as $b): ?>
+                                <option value="<?= (int) $b['id'] ?>"><?= e(box_label($b)) ?> (<?= e(t('box_width_of', ['width' => (int) $b['width']])) ?>)</option>
+                            <?php endforeach ?>
+                        </select>
+                    </label>
+                    <button type="submit" class="button small secondary"><?= e(t('box_move_here')) ?></button>
+                </form>
+            <?php endif ?>
         <?php else: ?>
             <p class="muted small"><?= e(t('row_full')) ?></p>
         <?php endif ?>

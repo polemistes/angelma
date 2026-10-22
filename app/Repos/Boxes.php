@@ -49,6 +49,71 @@ final class Boxes extends Repo
         return $out;
     }
 
+    /**
+     * The boxes in a page's own rows (not inside containers), in page order.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function topLevelForPage(int $pageId): array
+    {
+        return array_map([self::class, 'decode'], $this->db->all(
+            'SELECT b.* FROM boxes b JOIN rows r ON r.id = b.row_id
+             WHERE r.page_id = ? AND r.parent_box_id IS NULL ORDER BY r.position, r.id, b.position, b.id',
+            [$pageId],
+        ));
+    }
+
+    /** Is the row inside the box, at any depth? A container may not be moved into itself. */
+    public function isInside(int $rowId, int $boxId): bool
+    {
+        $id = $rowId;
+        while (true) {
+            $row = $this->db->one(
+                'SELECT r.parent_box_id, b.row_id AS parent_row FROM rows r LEFT JOIN boxes b ON b.id = r.parent_box_id WHERE r.id = ?',
+                [$id],
+            );
+            if ($row === null || $row['parent_box_id'] === null) {
+                return false;
+            }
+            if ((int) $row['parent_box_id'] === $boxId) {
+                return true;
+            }
+            $id = (int) $row['parent_row'];
+        }
+    }
+
+    /** How many levels of containers a box holds: 0 for a box with no container inside it. */
+    public function innerLevels(int $boxId): int
+    {
+        $levels = 0;
+        $children = $this->db->all(
+            'SELECT b.id FROM boxes b JOIN rows r ON r.id = b.row_id WHERE r.parent_box_id = ? AND b.type = ?',
+            [$boxId, 'container'],
+        );
+        foreach ($children as $child) {
+            $levels = max($levels, 1 + $this->innerLevels((int) $child['id']));
+        }
+        return $levels;
+    }
+
+    /**
+     * Move a box to the end of another row with the given width, and give every row
+     * inside it the page of that row (PLAN.md section 6.14).
+     */
+    public function moveTo(int $id, int $rowId, int $width): void
+    {
+        $this->db->transaction(function () use ($id, $rowId, $width): void {
+            $rows = new Rows($this->db);
+            $row = $rows->find($rowId);
+            if ($row === null) {
+                return;
+            }
+            $position = (int) $this->db->value('SELECT COALESCE(MAX(position), 0) FROM boxes WHERE row_id = ?', [$rowId]) + 1;
+            $this->db->execute('UPDATE boxes SET row_id = ?, position = ?, width = ? WHERE id = ?', [$rowId, $position, $width, $id]);
+            $rows->setPageInsideBox($id, (int) $row['page_id']);
+        });
+    }
+
     /** Number of boxes on a page, those inside containers included. */
     public function countForPage(int $pageId): int
     {

@@ -855,7 +855,7 @@ Tick when done and committed.
 - [x] 7.2 Container box: layout editor
 - [x] 8.1 Editors manage all content
 - [x] 9.1 Workbench page
-- [ ] 9.2 Move a box
+- [x] 9.2 Move a box
 - [ ] 9.3 Deleting a container with or without its boxes
 
 ---

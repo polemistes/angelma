@@ -188,6 +188,7 @@ final class PagesController
             'isWorkbench' => Workbench::is($pageId),
             'rowsByParent' => (new Rows())->forPageByParent($pageId),
             'boxes' => (new Boxes())->forPage($pageId),
+            'workbenchBoxes' => Workbench::id() > 0 && !Workbench::is($pageId) ? (new Boxes())->topLevelForPage(Workbench::id()) : [],
         ], $status);
     }
 }

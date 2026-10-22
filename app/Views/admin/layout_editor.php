@@ -6,6 +6,7 @@
  * @var array<string, mixed> $page
  * @var array<int, list<array<string, mixed>>> $rowsByParent rows grouped by parent box id, 0 for the page's own
  * @var array<int, list<array<string, mixed>>> $boxes boxes grouped by row id
+ * @var list<array<string, mixed>> $workbenchBoxes boxes that can be moved here from the workbench
  */
 $rows = $rowsByParent[0] ?? [];
 ?>
@@ -20,6 +21,7 @@ $rows = $rowsByParent[0] ?? [];
         'rows' => $rows,
         'rowsByParent' => $rowsByParent,
         'boxes' => $boxes,
+        'workbenchBoxes' => $workbenchBoxes,
         'depth' => 0,
     ]) ?>
 

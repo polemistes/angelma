@@ -53,6 +53,8 @@ return static function (Router $r): void {
     $r->post('/admin/boxes/{id}/move', [BoxesController::class, 'move']);
     $r->post('/admin/boxes/{id}/delete', [BoxesController::class, 'delete']);
     $r->post('/admin/boxes/{id}/rows', [RowsController::class, 'createInBox']);
+    $r->get('/admin/boxes/{id}/move-to', [BoxesController::class, 'moveForm']);
+    $r->post('/admin/boxes/{id}/move-to', [BoxesController::class, 'moveTo']);
     $r->post('/admin/preview', [BoxesController::class, 'preview']);
 
     $r->get('/admin/images', [ImagesController::class, 'index']);
