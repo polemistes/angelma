@@ -149,6 +149,57 @@ img {
     text-decoration: underline;
 }
 
+/* The "Menu" button on narrow screens (PLAN.md section 6.1). site.js shows the button
+   and hides the list until it is opened; without the script the list is simply shown. */
+
+.site-menu .menu-button {
+    display: none;
+    align-items: center;
+    gap: .5rem;
+    padding: .7rem 1rem;
+    border: 0;
+    background: none;
+    color: var(--menu-text);
+    font: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.site-menu .menu-button:hover,
+.site-menu .menu-button:focus {
+    text-decoration: underline;
+}
+
+.menu-icon {
+    font-size: 1.15em;
+    line-height: 1;
+}
+
+@media (max-width: 699.98px) {
+    .site-menu .menu-button:not([hidden]) {
+        display: flex;
+    }
+
+    .site-menu ul {
+        flex-basis: 100%;
+        flex-direction: column;
+        order: 3;
+    }
+
+    .site-menu.has-js:not(.open) ul {
+        display: none;
+    }
+
+    .site-menu li a {
+        padding: .8rem 1rem;
+        border-top: 1px solid rgba(255, 255, 255, .18);
+    }
+
+    .menu-user {
+        margin-left: auto;
+    }
+}
+
 /* Content and rows */
 
 .site-content {

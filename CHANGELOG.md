@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.1
+- On narrow screens the menu bar shows a "Menu" button that opens the pages as a list, instead of wrapping the links.
+
 ## 1.4.0
 - Maintenance mode: a switch under Settings shows visitors a notice while editors keep working.
 - Updates from GitHub: the Update screen checks for a new release, installs it with one click and can restore the previous version.

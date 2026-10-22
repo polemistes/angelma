@@ -52,7 +52,7 @@ These were decided with the site owner and are not open for change.
 | Templates | Plain PHP files under `app/Views`. |
 | Text format | Markdown, rendered server-side with `league/commonmark`. HTML in Markdown is stripped. |
 | Composer | Only `league/commonmark` in production, `phpunit/phpunit` in development. `vendor/` is committed to the repository so the archive is complete and the host never runs Composer. |
-| JavaScript | Small plain scripts, no libraries, no bundler. Used only in the admin: Markdown preview, image picker, confirmation dialogs. |
+| JavaScript | Small plain scripts, no libraries, no bundler. Used in the admin: Markdown preview, image picker, confirmation dialogs. Since 1.4.1 the public site has one small script too, `assets/site.js`, for the menu button on narrow screens; without it the menu is simply shown. |
 | Accounts | Administrators create users and set passwords. No self-registration. No email anywhere in version 1. |
 | Languages | English only. Strings in `app/lang/en.php` through the `t()` helper so a second language can be added later. |
 | Ordering | Rows, boxes and menu items are ordered with up and down buttons, not drag and drop. |
@@ -296,6 +296,10 @@ with one item per page that has `show_in_menu` set, in `menu_order`, the current
 marked. At the right end of the menu bar: "Log in" when logged out, or the display name
 with a logout button when logged in. Then the rows of the page. Then a footer with the
 footer Markdown and a small "Powered by Angelma" line.
+
+Below 700 px (1.4.1) the menu bar shows only a "Menu" button and the login link; the
+button opens the pages as a full-width stacked list with the current page marked. With
+scripts off the list is shown stacked from the start.
 
 `<title>` is `{page title} - {site title}`, or just the site title on the home page.
 `<meta name="description">` from the page when set.
@@ -894,6 +898,15 @@ installs it, the site comes back with the new version number and its data intact
 "Restore previous version" brings the old one back; `app/version.php` is `1.4.0`, tagged
 `v1.4.0`.
 
+### Phase 11: Small improvements
+
+**11.1 Menu button on narrow screens (1.4.1)**
+`assets/site.js`, the button in the public layout and the styles, per section 6.1.
+Done when: at 390 px the bar shows only the button and the login link, the opened list
+stacks the pages full width with the current one marked, with scripts off the list is
+shown stacked, and at 1100 px nothing has changed; `app/version.php` is `1.4.1`, tagged
+`v1.4.1`.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -937,6 +950,7 @@ Tick when done and committed.
 - [x] 10.1 Maintenance mode
 - [x] 10.2 Release tooling
 - [x] 10.3 Updater
+- [x] 11.1 Menu button on narrow screens
 
 ---
 

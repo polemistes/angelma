@@ -21,6 +21,7 @@ $version = require \Angelma\App::$root . '/app/version.php';
 <link rel="alternate" type="application/rss+xml" title="<?= e($feed_title ?? '') ?>" href="<?= e($feed_url) ?>">
 <?php endif ?>
 <link rel="stylesheet" href="<?= e(url('/assets/site.css', ['v' => $version])) ?>">
+<script src="<?= e(url('/assets/site.js', ['v' => $version])) ?>" defer></script>
 <style><?= e($frame['scheme_css']) ?>:root{--page-width:<?= (int) $frame['page_width'] ?>px}</style>
 </head>
 <body>
@@ -42,7 +43,10 @@ $version = require \Angelma\App::$root . '/app/version.php';
     </header>
 
     <nav class="site-menu" aria-label="<?= e(t('menu_label')) ?>">
-        <ul>
+        <button type="button" class="menu-button" aria-expanded="false" aria-controls="site-menu-list" hidden>
+            <span class="menu-icon" aria-hidden="true">☰</span> <?= e(t('menu_button')) ?>
+        </button>
+        <ul id="site-menu-list">
             <?php foreach ($frame['menu'] as $item): ?>
                 <?php $active = (int) $item['id'] === $frame['current_page_id']; ?>
                 <li><a href="<?= e((int) $item['id'] === $frame['home_page_id'] ? url('/') : url('/' . $item['slug'])) ?>"<?= $active ? ' class="active" aria-current="page"' : '' ?>><?= e($item['name']) ?></a></li>
