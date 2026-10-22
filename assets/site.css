@@ -688,3 +688,17 @@ pre {
     height: 1px;
     overflow: hidden;
 }
+
+/* Bar shown to logged-in editors while maintenance mode is on (PLAN.md section 6.15). */
+
+.maintenance-bar {
+    margin: 0;
+    padding: .45rem var(--gap);
+    background: #b4531d;
+    color: #fff;
+    font-size: .9rem;
+}
+
+.maintenance-bar a {
+    color: #fff;
+}

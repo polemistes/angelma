@@ -25,6 +25,9 @@ $version = require \Angelma\App::$root . '/app/version.php';
 </head>
 <body>
 <div class="site">
+    <?php if (\Angelma\App::maintenance() && \Angelma\Auth::can('editor')): ?>
+        <p class="maintenance-bar"><?= e(t('maintenance_bar')) ?> <a href="<?= e(url('/admin/settings')) ?>#maintenance"><?= e(t('maintenance_bar_link')) ?></a></p>
+    <?php endif ?>
     <header class="site-header">
         <a class="site-brand" href="<?= e(url('/')) ?>">
             <?php if ($frame['logo'] !== null): ?>

@@ -59,6 +59,9 @@ $items = [
         <?php endif ?>
     </aside>
     <main class="admin-main" id="content">
+        <?php if (App::maintenance()): ?>
+            <div class="flash flash-warning maintenance-bar"><?= e(t('maintenance_bar')) ?> <a href="<?= e(url('/admin/settings')) ?>#maintenance"><?= e(t('maintenance_bar_link')) ?></a></div>
+        <?php endif ?>
         <?php if (isset($title)): ?>
             <h1><?= e($title) ?></h1>
         <?php endif ?>

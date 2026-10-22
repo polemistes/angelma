@@ -23,6 +23,7 @@ final class SettingsController
     public const MAX_TAGLINE = 200;
     public const MAX_FOOTER = 10000;
     public const MAX_DATE_FORMAT = 40;
+    public const MAX_MAINTENANCE = 2000;
 
     public function show(Request $request): Response
     {
@@ -46,6 +47,8 @@ final class SettingsController
             'timezone' => $request->str('timezone'),
             'date_format' => $request->str('date_format'),
             'moderate_anonymous' => $request->bool('moderate_anonymous') ? '1' : '0',
+            'maintenance' => $request->bool('maintenance') ? '1' : '0',
+            'maintenance_message' => trim($request->input('maintenance_message')),
         ];
         $custom = [];
         $posted = is_array($request->post['custom'] ?? null) ? $request->post['custom'] : [];
@@ -96,6 +99,9 @@ final class SettingsController
         }
         if ($values['date_format'] === '' || mb_strlen($values['date_format']) > self::MAX_DATE_FORMAT) {
             $errors['date_format'] = t('settings_error_date_format', ['max' => self::MAX_DATE_FORMAT]);
+        }
+        if (mb_strlen($values['maintenance_message']) > self::MAX_MAINTENANCE) {
+            $errors['maintenance_message'] = t('settings_error_maintenance', ['max' => self::MAX_MAINTENANCE]);
         }
 
         if ($errors !== []) {

@@ -36,6 +36,34 @@ final class AppTest extends DbTestCase
         $this->assertStringContainsString('Visible &lt;detail&gt;', $response->body);
     }
 
+    public function testMaintenanceBlocksVisitorsOnly(): void
+    {
+        $settings = new \Angelma\Repos\Settings($this->db);
+        $this->assertFalse(App::maintenanceBlocks(new Request('GET', '/'), false));
+
+        $settings->set('maintenance', '1');
+        App::forgetSettings();
+        foreach (['/', '/about', '/blog/news', '/blog/news/hello'] as $path) {
+            $this->assertTrue(App::maintenanceBlocks(new Request('GET', $path), false), $path);
+        }
+        $this->assertTrue(App::maintenanceBlocks(new Request('POST', '/blog/news/hello/comment'), false));
+        foreach (['/login', '/logout', '/admin', '/admin/pages/1', '/assets/site.css', '/install/'] as $path) {
+            $this->assertFalse(App::maintenanceBlocks(new Request('GET', $path), false), $path);
+        }
+        $this->assertFalse(App::maintenanceBlocks(new Request('GET', '/'), true), 'editors pass');
+
+        $response = App::maintenanceResponse();
+        $this->assertSame(503, $response->status);
+        $this->assertSame('600', $response->header('Retry-After'));
+        $this->assertStringContainsString(t('maintenance_default_text'), $response->body);
+
+        $settings->set('maintenance_message', 'Back **soon**. <script>x</script>');
+        App::forgetSettings();
+        $body = App::maintenanceResponse()->body;
+        $this->assertStringContainsString('Back <strong>soon</strong>.', $body);
+        $this->assertStringNotContainsString('<script>', $body);
+    }
+
     public function testEveryResponseGetsTheCsp(): void
     {
         $response = App::handle(new Request('GET', '/install/rewrite-check'));

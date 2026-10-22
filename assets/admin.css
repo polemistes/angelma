@@ -135,6 +135,7 @@ h3 { font-size: 1.05rem; margin: 0 0 .5rem; }
 }
 .flash-error { background: #fdecea; border-left-color: var(--danger); }
 .flash-warning { background: #fff5e0; border-left-color: var(--warn); }
+.maintenance-bar { margin-bottom: 1rem; }
 
 /* Forms */
 

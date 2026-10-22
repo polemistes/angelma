@@ -25,6 +25,9 @@ final class App
         'footer_markdown' => '',
         'home_page_id' => '',
         'workbench_page_id' => '',
+        'maintenance' => '0',
+        'maintenance_message' => '',
+        'update_check' => '',
         'moderate_anonymous' => '1',
         'timezone' => 'Europe/Oslo',
         'date_format' => 'j F Y',
@@ -105,6 +108,31 @@ final class App
     public static function debug(): bool
     {
         return (bool) (self::$config['debug'] ?? false);
+    }
+
+    /** Addresses that stay reachable while maintenance mode is on (PLAN.md section 6.15). */
+    private const MAINTENANCE_EXEMPT = '#^/(login|logout|admin|install|assets)(/|$)#';
+
+    public static function maintenance(): bool
+    {
+        return self::setting('maintenance') === '1';
+    }
+
+    /** Does maintenance mode block this request? Editors and administrators always pass. */
+    public static function maintenanceBlocks(Request $request, bool $editor): bool
+    {
+        return self::maintenance() && !$editor && !preg_match(self::MAINTENANCE_EXEMPT, $request->path);
+    }
+
+    /** The 503 page visitors get during maintenance, with the administrator's message. */
+    public static function maintenanceResponse(): Response
+    {
+        $response = view('site/maintenance', [
+            'title' => t('maintenance_title'),
+            'message' => self::setting('maintenance_message'),
+        ], 503);
+        $response->headers['Retry-After'] = '600';
+        return $response;
     }
 
     public static function installed(): bool
@@ -219,6 +247,9 @@ final class App
         } else {
             self::startSession($request);
             $request->user = Auth::user();
+            if (self::maintenanceBlocks($request, Auth::can('editor'))) {
+                return self::maintenanceResponse();
+            }
         }
         // A POST larger than post_max_size arrives empty: say so instead of failing the CSRF check.
         if ($request->method === 'POST' && $request->post === [] && $request->files === []

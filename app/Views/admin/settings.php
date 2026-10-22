@@ -184,6 +184,20 @@ $pageCount = count($pages);
         </label>
     </section>
 
+    <section class="panel" id="maintenance">
+        <h2><?= e(t('settings_maintenance_title')) ?></h2>
+        <label class="check">
+            <input type="checkbox" name="maintenance" value="1"<?= ($values['maintenance'] ?? '0') === '1' ? ' checked' : '' ?>>
+            <span><?= e(t('settings_maintenance')) ?></span>
+        </label>
+        <label>
+            <span><?= e(t('settings_maintenance_message')) ?></span>
+            <textarea name="maintenance_message" rows="4"><?= e($values['maintenance_message'] ?? '') ?></textarea>
+            <span class="hint"><?= e(t('settings_maintenance_hint')) ?></span>
+            <?= $err('maintenance_message') ?>
+        </label>
+    </section>
+
     <p class="actions sticky-actions"><button type="submit" class="button"><?= e(t('settings_save')) ?></button></p>
 </form>
 
