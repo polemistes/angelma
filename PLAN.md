@@ -261,6 +261,8 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/boxes/{id}` | edit box (type-specific form) |
 | `/admin/boxes/{id}/move`, `/admin/boxes/{id}/delete` | POST |
 | `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
+| `/admin/boxes/{id}/move-to` | GET: choose where to move a box; POST: move it (1.3.0) |
+| `/admin/boxes/{id}/delete` | also GET since 1.3.0: the confirmation screen with the keep-boxes choice for a container |
 | `/admin/preview` | POST Markdown, returns rendered HTML (used by admin.js) |
 | `/admin/images` | library with upload form, delete, edit alt text |
 | `/admin/images/picker` | small list used inside the image box form |
@@ -422,9 +424,36 @@ strips and columns is possible.
   toolbars and "Add box" forms, and an "Add row" button of its own. The box edit form of
   a container has only the width.
 
+### 6.14 The workbench and moving boxes (1.3.0)
+The workbench is a hidden page that holds unused boxes. It is created the first time it
+is needed, its id is the `workbench_page_id` setting, and it is never in the menu, the
+pages table, the Settings menu table, the home page selector or the public site: only
+logged-in editors can view it, which serves as a preview. It is edited with the ordinary
+layout editor, so boxes and containers can be created, edited and arranged there before
+they go on a page, and boxes inside a parked container stay reachable.
+
+Moving: every box in the editor has a "Move…" button. It opens a screen with one list of
+targets grouped by page, the workbench first: each row, rows inside containers labelled
+by their container, and "new row at the end" per page, plus a width select. The server
+refuses a target inside the box itself, a width that does not fit, and a container
+nesting deeper than two (counting the containers inside the moved box). The box goes to
+the end of the target row, and the page id of every row inside it is updated. Each
+row's "Add box" form also offers "move a box here from the workbench" when the workbench
+has boxes.
+
+Deleting a container opens a confirmation screen with two choices: delete it with its
+boxes, or delete the container but keep its boxes, which moves every box directly inside
+it to its own new row on the workbench (nested containers as whole units). Other boxes
+keep the browser confirm.
+
 ---
 
 ## 7. Roles and permissions
+
+Until 1.2.0 editors could only change the content they had created themselves. Content
+ownership was removed in 1.3.0 (phase 8): editors manage all content, administrators
+also manage the site. The created-by columns (`owner_id`, `uploader_id`, `author_id`)
+stay as information shown in lists, but nothing is enforced on them.
 
 | Action | admin | editor | user | anonymous |
 |---|---|---|---|---|
@@ -432,26 +461,20 @@ strips and columns is possible.
 | Comment on `anyone` posts | yes | yes | yes | yes, name required |
 | Comment on `users` posts | yes | yes | yes | no |
 | Delete own comment | yes | yes | yes | no |
-| Create pages | yes | yes, becomes owner | no | no |
-| Edit or delete a page, its rows and boxes | yes, any | own pages only | no | no |
+| Create, edit and delete pages, rows and boxes, the workbench included | yes | yes | no | no |
 | Set home page, menu order, menu visibility | yes | no | no | no |
-| Upload images | yes | yes | no | no |
-| Delete images | yes, any unused | own unused only | no | no |
-| Edit image alt text | yes, any | own only | no | no |
-| Create blogs | yes | yes, becomes owner | no | no |
-| Edit or delete a blog | yes, any | own only | no | no |
-| Create posts | yes, any blog | own blogs only | no | no |
-| Edit or delete posts | yes, any | posts in own blogs | no | no |
-| Approve or delete comments | yes, any | on posts in own blogs | no | no |
+| Upload images, edit alt text, delete unused images | yes | yes | no | no |
+| Create, edit and delete blogs and posts | yes | yes | no | no |
+| Approve or delete comments | yes | yes | no | no |
 | Raw HTML in embed boxes | yes | no | no | no |
 | Users, settings, backup | yes | no | no | no |
 | Change own password and display name | yes | yes | yes | no |
 
-Rules are enforced in the controllers through two helpers: `Auth::requireRole('editor')`
-(admin satisfies every role requirement) and `Auth::requireOwner($ownerId)` (admin always
-passes). A user with role `user` who opens `/admin` is sent to `/admin/account`, the
-only admin screen they may use. The last active administrator cannot be deactivated,
-deleted or demoted.
+Rules are enforced in the controllers through `Auth::requireRole('editor')` (admin
+satisfies every role requirement). Raw HTML stays with administrators because it is about
+what visitors' browsers run, not about who made the box. A user with role `user` who
+opens `/admin` is sent to `/admin/account`, the only admin screen they may use. The last
+active administrator cannot be deactivated, deleted or demoted.
 
 ---
 
@@ -757,6 +780,42 @@ stacked texts beside the image and stacks in reading order at 600 px; adding a c
 three deep is refused with a message; all tests pass; `app/version.php` is `1.2.0`,
 tagged `v1.2.0`.
 
+### Phase 8: Remove content ownership (1.3.0, requested by the owner)
+
+**8.1 Editors manage all content**
+Remove `Auth::owns()` and `Auth::requireOwner()` and every owner filter in the
+controllers and repos: pages, blogs, posts, images, comments, the dashboard counts, the
+image picker and the moderation rule on the post page. Section 7 is the new rule. The
+created-by names stay in the lists. Update the strings that describe the roles.
+Done when: an editor can open, edit and delete another user's page, blog, post and image,
+moderate any comment, and still gets 403 for raw HTML, users, settings, backup and page
+order; the role helper tests pass without the owner helpers.
+
+### Phase 9: The workbench and moving boxes (1.3.0)
+
+**9.1 Workbench page**
+`Angelma\Workbench` creates the hidden page on first use and remembers its id in the
+`workbench_page_id` setting. `Pages::all()` and `Pages::menu()` leave it out, so it is
+absent from the pages table, the Settings menu table and the home page selector; it
+cannot be deleted and its settings form is not shown. The pages list links to it with
+the number of boxes it holds. The public site serves it only to logged-in editors.
+Done when: tests cover creation on first use, idempotence and exclusion from `all()`; an
+editor builds a container with two boxes on the workbench and previews it; an anonymous
+visitor gets 404 for its address.
+
+**9.2 Move a box**
+`Boxes::moveTo()`, `Boxes::isInside()` and `Boxes::innerLevels()` in the repo; the move
+screen and its POST; the "move here from the workbench" form in each row.
+Done when: tests cover moving between rows, pages and the workbench with page id
+propagation, the self-containment refusal, and the width and depth checks; in the
+browser a box moves from the workbench to a row on the home page and back.
+
+**9.3 Deleting a container with or without its boxes**
+The confirmation screen for containers and `Boxes::deleteKeepingContents()`.
+Done when: a test shows the boxes directly inside a deleted container appear as separate
+rows on the workbench, nested containers whole; in the browser both choices work;
+`app/version.php` is `1.3.0`, tagged `v1.3.0`.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -793,6 +852,10 @@ Tick when done and committed.
 - [x] 6.4 Review pass
 - [x] 7.1 Container box: data model, repos and public rendering
 - [x] 7.2 Container box: layout editor
+- [ ] 8.1 Editors manage all content
+- [ ] 9.1 Workbench page
+- [ ] 9.2 Move a box
+- [ ] 9.3 Deleting a container with or without its boxes
 
 ---
 
@@ -814,7 +877,8 @@ Security
 
 Permissions
 - [x] Every row of the table in section 7 has been tried with each role.
-- [x] Editors get 403 on another editor's page, blog, post, image and comments.
+- [ ] Editors can edit every page, blog, post, image and comment (ownership removed in
+      1.3.0); raw HTML, users, settings, backup and the menu stay with administrators.
 - [x] A `user` role cannot reach any admin screen except Account.
 
 Behaviour
