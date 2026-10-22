@@ -2,17 +2,23 @@
 /**
  * @var list<array<string, mixed>> $pages
  * @var int $homeId
+ * @var bool $canOrder administrators may change the menu order
  * @var array<string, string> $input
  * @var array<string, string> $errors
  */
+$pageCount = count($pages);
 ?>
 <?php if ($pages === []): ?>
     <p class="muted"><?= e(t('pages_none')) ?></p>
 <?php else: ?>
+    <?php if ($canOrder): ?>
+        <p class="hint"><?= e(t('pages_order_hint')) ?></p>
+    <?php endif ?>
     <div class="table-wrap">
         <table class="list">
             <thead>
             <tr>
+                <?php if ($canOrder): ?><th><?= e(t('settings_order')) ?></th><?php endif ?>
                 <th><?= e(t('page_field_name')) ?></th>
                 <th><?= e(t('field_address')) ?></th>
                 <th><?= e(t('field_owner')) ?></th>
@@ -21,9 +27,22 @@
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($pages as $page): ?>
+            <?php foreach ($pages as $i => $page): ?>
                 <?php $isHome = (int) $page['id'] === $homeId; ?>
                 <tr>
+                    <?php if ($canOrder): ?>
+                        <td class="order-cell">
+                            <?= partial('move_buttons', [
+                                'action' => '/admin/pages/' . $page['id'] . '/move',
+                                'first' => $i === 0,
+                                'last' => $i === $pageCount - 1,
+                                'up' => t('move_up'),
+                                'down' => t('move_down'),
+                                'upIcon' => '↑',
+                                'downIcon' => '↓',
+                            ]) ?>
+                        </td>
+                    <?php endif ?>
                     <td>
                         <a href="<?= e(url('/admin/pages/' . $page['id'])) ?>"><?= e($page['name']) ?></a>
                         <?php if ($isHome): ?><span class="badge ok"><?= e(t('pages_home')) ?></span><?php endif ?>

@@ -39,6 +39,7 @@ return static function (Router $r): void {
     $r->get('/admin/pages/{id}', [PagesController::class, 'edit']);
     $r->post('/admin/pages/{id}', [PagesController::class, 'update']);
     $r->post('/admin/pages/{id}/delete', [PagesController::class, 'delete']);
+    $r->post('/admin/pages/{id}/move', [PagesController::class, 'move']);
     $r->post('/admin/pages/{id}/rows', [RowsController::class, 'create']);
 
     $r->post('/admin/rows/{id}/move', [RowsController::class, 'move']);

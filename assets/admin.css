@@ -205,6 +205,8 @@ table.list td { padding: .55rem .75rem; text-align: left; border-bottom: 1px sol
 table.list th { background: #f8f9fb; font-size: .85rem; color: var(--muted); font-weight: 600; }
 table.list td.actions-cell { white-space: nowrap; text-align: right; }
 table.list td.actions-cell form { display: inline; }
+table.list td.order-cell { white-space: nowrap; width: 1%; }
+table.list td.order-cell form { display: inline; }
 .table-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
 
 .badge { display: inline-block; padding: .05rem .45rem; border-radius: 10px; font-size: .75rem; background: #e5e9ef; color: #3e4c59; }

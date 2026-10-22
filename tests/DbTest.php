@@ -71,6 +71,27 @@ final class DbTest extends DbTestCase
         $this->assertSame([$a, $c, $b], array_column($rows->forPage($pageId), 'id'));
     }
 
+    public function testMenuMoveRenumbers(): void
+    {
+        $owner = $this->makeUser();
+        $pages = new Pages($this->db);
+        $a = $pages->create(['slug' => 'a', 'name' => 'A', 'title' => 'A', 'owner_id' => $owner]);
+        $b = $pages->create(['slug' => 'b', 'name' => 'B', 'title' => 'B', 'owner_id' => $owner, 'show_in_menu' => 0]);
+        $c = $pages->create(['slug' => 'c', 'name' => 'C', 'title' => 'C', 'owner_id' => $owner]);
+
+        $pages->moveInMenu($c, 'up');
+        $this->assertSame([$a, $c, $b], array_column($pages->all(), 'id'));
+        $this->assertSame([1, 2, 3], array_column($pages->all(), 'menu_order'));
+        $this->assertSame(['a', 'c'], array_column($pages->menu(), 'slug'));
+
+        // Hidden pages keep their place in the order; moving past the ends does nothing.
+        $pages->moveInMenu($a, 'down');
+        $this->assertSame([$c, $a, $b], array_column($pages->all(), 'id'));
+        $pages->moveInMenu($c, 'up');
+        $pages->moveInMenu($b, 'down');
+        $this->assertSame([$c, $a, $b], array_column($pages->all(), 'id'));
+    }
+
     public function testMenuOrderAppendsNewPagesLast(): void
     {
         $owner = $this->makeUser();

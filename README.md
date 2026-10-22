@@ -50,6 +50,9 @@ program such as FileZilla (or the file manager in the control panel, if you pref
 
 ### Good to know
 
+- **Page order:** the *Pages* list shows the pages in menu order. Administrators use the
+  arrows in the list to move a page up or down; the same table is also under *Settings*,
+  where pages can be hidden from the menu.
 - **Backups:** *Backup* in the admin area downloads a zip with the database and all
   uploaded images. To restore, put `data/angelma.sqlite` and the `uploads` folder from the
   zip back in place by FTP.

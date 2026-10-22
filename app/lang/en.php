@@ -152,6 +152,7 @@ return [
     // Pages
     'pages_none' => 'You have no pages yet.',
     'pages_in_menu' => 'In menu',
+    'pages_order_hint' => 'The pages are listed in menu order. Use the arrows to move a page up or down.',
     'pages_home' => 'Home page',
     'pages_new' => 'New page',
     'pages_create' => 'Create page',

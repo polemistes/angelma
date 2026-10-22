@@ -69,6 +69,18 @@ final class PagesController
         return redirect('/admin/pages');
     }
 
+    /** Move a page one step up or down in the menu order (administrators only, section 7). */
+    public function move(Request $request, int $id): Response
+    {
+        Auth::requireRole('admin');
+        $pages = new Pages();
+        if ($pages->find($id) === null) {
+            abort(404);
+        }
+        $pages->moveInMenu($id, $request->str('direction') === 'up' ? 'up' : 'down');
+        return redirect('/admin/pages');
+    }
+
     /**
      * Load a page the current user may edit, or stop with 404 / 403.
      *
@@ -139,6 +151,7 @@ final class PagesController
             'nav' => 'pages',
             'pages' => (new Pages())->all(Auth::isAdmin() ? null : Auth::id()),
             'homeId' => (int) App::setting('home_page_id'),
+            'canOrder' => Auth::isAdmin(),
             'input' => $input + ['name' => '', 'title' => '', 'slug' => '', 'meta_description' => ''],
             'errors' => $errors,
         ], $status);
