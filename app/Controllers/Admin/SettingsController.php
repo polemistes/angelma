@@ -12,6 +12,7 @@ use Angelma\Repos\Settings;
 use Angelma\Request;
 use Angelma\Response;
 use Angelma\Schemes;
+use Angelma\Workbench;
 
 /**
  * Site settings and the menu. Administrators only.
@@ -87,7 +88,7 @@ final class SettingsController
         if (mb_strlen($values['footer_markdown']) > self::MAX_FOOTER) {
             $errors['footer_markdown'] = t('box_error_markdown_long', ['max' => self::MAX_FOOTER]);
         }
-        if ((new Pages())->find((int) $values['home_page_id']) === null) {
+        if ((new Pages())->find((int) $values['home_page_id']) === null || Workbench::is((int) $values['home_page_id'])) {
             $errors['home_page_id'] = t('settings_error_home');
         }
         if (!in_array($values['timezone'], \DateTimeZone::listIdentifiers(), true)) {

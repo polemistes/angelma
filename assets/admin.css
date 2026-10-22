@@ -238,6 +238,8 @@ details.panel[open] > summary { margin-bottom: 1rem; }
 /* Layout editor */
 
 .layout > h2 { margin-top: 1.5rem; }
+.workbench-link { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+.workbench-hint { margin: 0 0 1.25rem; }
 .layout-row { padding: .8rem 1rem 1rem; }
 .row-toolbar { display: flex; flex-wrap: wrap; gap: .5rem .75rem; align-items: center; margin-bottom: .75rem; }
 .row-toolbar label { display: inline-flex; gap: .35rem; align-items: center; margin: 0; }

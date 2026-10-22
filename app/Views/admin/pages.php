@@ -3,11 +3,16 @@
  * @var list<array<string, mixed>> $pages
  * @var int $homeId
  * @var bool $canOrder administrators may change the menu order
+ * @var int|null $workbenchBoxes boxes on the workbench, null while it does not exist yet
  * @var array<string, string> $input
  * @var array<string, string> $errors
  */
 $pageCount = count($pages);
 ?>
+<p class="actions workbench-link">
+    <a class="button secondary" href="<?= e(url('/admin/workbench')) ?>"><?= e(t('workbench_name')) ?><?php if ($workbenchBoxes !== null): ?> (<?= e(t('workbench_boxes', ['count' => $workbenchBoxes])) ?>)<?php endif ?></a>
+    <span class="muted small"><?= e(t('workbench_lead')) ?></span>
+</p>
 <?php if ($pages === []): ?>
     <p class="muted"><?= e(t('pages_none')) ?></p>
 <?php else: ?>

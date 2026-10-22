@@ -4,6 +4,7 @@
  * @var array<string, mixed> $input
  * @var array<string, string> $errors
  * @var bool $isHome
+ * @var bool $isWorkbench
  * @var array<int, list<array<string, mixed>>> $rowsByParent
  * @var array<int, list<array<string, mixed>>> $boxes
  */
@@ -13,6 +14,9 @@
     <a class="button secondary" href="<?= e(url('/admin/pages')) ?>"><?= e(t('page_back_to_list')) ?></a>
 </p>
 
+<?php if ($isWorkbench): ?>
+<p class="hint workbench-hint"><?= e(t('workbench_hint')) ?></p>
+<?php else: ?>
 <details class="panel" id="page-settings"<?= $errors !== [] ? ' open' : '' ?>>
     <summary><h2><?= e(t('page_settings')) ?></h2></summary>
     <form method="post" action="<?= e(url('/admin/pages/' . $page['id'])) ?>" class="form">
@@ -30,5 +34,6 @@
         </form>
     <?php endif ?>
 </details>
+<?php endif ?>
 
 <?= render('admin/layout_editor', ['page' => $page, 'rowsByParent' => $rowsByParent, 'boxes' => $boxes]) ?>

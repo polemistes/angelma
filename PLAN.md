@@ -254,6 +254,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 |---|---|
 | `/admin` | dashboard: counts, recent posts, pending comments, quick links |
 | `/admin/pages` | list pages; new page form |
+| `/admin/workbench` | opens the workbench page, creating it on first use (1.3.0) |
 | `/admin/pages/{id}` | edit page settings and its layout (rows and boxes) |
 | `/admin/pages/{id}/rows` | POST: add row |
 | `/admin/rows/{id}/move`, `/admin/rows/{id}/delete`, `/admin/rows/{id}/alignment` | POST |
@@ -853,7 +854,7 @@ Tick when done and committed.
 - [x] 7.1 Container box: data model, repos and public rendering
 - [x] 7.2 Container box: layout editor
 - [x] 8.1 Editors manage all content
-- [ ] 9.1 Workbench page
+- [x] 9.1 Workbench page
 - [ ] 9.2 Move a box
 - [ ] 9.3 Deleting a container with or without its boxes
 

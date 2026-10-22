@@ -24,6 +24,7 @@ final class App
         'custom_scheme' => '',
         'footer_markdown' => '',
         'home_page_id' => '',
+        'workbench_page_id' => '',
         'moderate_anonymous' => '1',
         'timezone' => 'Europe/Oslo',
         'date_format' => 'j F Y',

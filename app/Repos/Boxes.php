@@ -49,6 +49,15 @@ final class Boxes extends Repo
         return $out;
     }
 
+    /** Number of boxes on a page, those inside containers included. */
+    public function countForPage(int $pageId): int
+    {
+        return (int) $this->db->value(
+            'SELECT COUNT(*) FROM boxes b JOIN rows r ON r.id = b.row_id WHERE r.page_id = ?',
+            [$pageId],
+        );
+    }
+
     /** Sum of the widths in a row, optionally ignoring one box. */
     public function widthSum(int $rowId, int $exceptId = 0): int
     {

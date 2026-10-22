@@ -11,6 +11,7 @@ use Angelma\Repos\Pages;
 use Angelma\Repos\Rows;
 use Angelma\Request;
 use Angelma\Response;
+use Angelma\Workbench;
 
 /**
  * Page list, new page, page settings and delete. The layout editor (rows and boxes)
@@ -18,6 +19,13 @@ use Angelma\Response;
  */
 final class PagesController
 {
+    /** Open the workbench (PLAN.md section 6.14), creating it on first use. */
+    public function workbench(Request $request): Response
+    {
+        Auth::requireRole('editor');
+        return redirect('/admin/pages/' . Workbench::page()['id']);
+    }
+
     public function index(Request $request): Response
     {
         Auth::requireRole('editor');
@@ -62,6 +70,10 @@ final class PagesController
         $page = self::load($id);
         if ($id === (int) App::setting('home_page_id')) {
             flash('error', t('page_delete_home'));
+            return redirect('/admin/pages/' . $id);
+        }
+        if (Workbench::is($id)) {
+            flash('error', t('page_delete_workbench'));
             return redirect('/admin/pages/' . $id);
         }
         (new Pages())->delete($id);
@@ -152,6 +164,7 @@ final class PagesController
             'pages' => (new Pages())->all(),
             'homeId' => (int) App::setting('home_page_id'),
             'canOrder' => Auth::isAdmin(),
+            'workbenchBoxes' => Workbench::id() > 0 ? (new Boxes())->countForPage(Workbench::id()) : null,
             'input' => $input + ['name' => '', 'title' => '', 'slug' => '', 'meta_description' => ''],
             'errors' => $errors,
         ], $status);
@@ -172,6 +185,7 @@ final class PagesController
             'input' => $input,
             'errors' => $errors,
             'isHome' => $pageId === (int) App::setting('home_page_id'),
+            'isWorkbench' => Workbench::is($pageId),
             'rowsByParent' => (new Rows())->forPageByParent($pageId),
             'boxes' => (new Boxes())->forPage($pageId),
         ], $status);

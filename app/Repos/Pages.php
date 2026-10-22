@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Angelma\Repos;
 
+use Angelma\Workbench;
+
 final class Pages extends Repo
 {
     protected const TABLE = 'pages';
@@ -19,12 +21,18 @@ final class Pages extends Repo
         return $this->db->one('SELECT * FROM pages WHERE slug = ?', [$slug]);
     }
 
-    /** @return list<array<string, mixed>> all pages in menu order, with the creator's name */
+    /**
+     * All pages in menu order, with the creator's name. The workbench (section 6.14) is
+     * left out: it is reached through its own link and is never listed or in the menu.
+     *
+     * @return list<array<string, mixed>>
+     */
     public function all(): array
     {
         return $this->db->all(
             'SELECT p.*, u.display_name AS owner_name FROM pages p LEFT JOIN users u ON u.id = p.owner_id
-             ORDER BY p.menu_order, p.id',
+             WHERE p.id <> ? ORDER BY p.menu_order, p.id',
+            [Workbench::id()],
         );
     }
 
@@ -32,7 +40,8 @@ final class Pages extends Repo
     public function menu(): array
     {
         return $this->db->all(
-            'SELECT id, slug, name FROM pages WHERE show_in_menu = 1 ORDER BY menu_order, id',
+            'SELECT id, slug, name FROM pages WHERE show_in_menu = 1 AND id <> ? ORDER BY menu_order, id',
+            [Workbench::id()],
         );
     }
 

@@ -35,6 +35,7 @@ return static function (Router $r): void {
     $r->post('/admin/account', [AccountController::class, 'save']);
 
     $r->get('/admin/pages', [PagesController::class, 'index']);
+    $r->get('/admin/workbench', [PagesController::class, 'workbench']);
     $r->post('/admin/pages', [PagesController::class, 'create']);
     $r->get('/admin/pages/{id}', [PagesController::class, 'edit']);
     $r->post('/admin/pages/{id}', [PagesController::class, 'update']);

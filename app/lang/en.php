@@ -179,6 +179,11 @@ return [
     'page_settings' => 'Page settings',
     'page_is_home' => 'This is the home page, so it cannot be deleted.',
     'page_delete' => 'Delete this page',
+    'page_delete_workbench' => 'The workbench cannot be deleted.',
+    'workbench_name' => 'Workbench',
+    'workbench_boxes' => '{count} boxes',
+    'workbench_lead' => 'Boxes that are not on any page. Build and preview them there, then move them to a page.',
+    'workbench_hint' => 'This is the workbench: a hidden page for boxes that are not on any page. Build boxes and containers here, preview them with "View page" (only logged-in editors can see it), and move them to a page with "Move…".',
 
     // Layout editor
     'set' => 'Set',
