@@ -3,7 +3,7 @@
         'name' => 'angelma/angelma',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '983ad36e1ad930b4bd045373188add003e4e5cdd',
+        'reference' => '14902e5845e32d59b74e0802046ad2e1d6a0c0c8',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'angelma/angelma' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '983ad36e1ad930b4bd045373188add003e4e5cdd',
+            'reference' => '14902e5845e32d59b74e0802046ad2e1d6a0c0c8',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

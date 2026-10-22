@@ -22,4 +22,7 @@ zip -qr "$OUT" . \
 # The empty folders the installer needs, with their protection files.
 zip -q "$OUT" data/.htaccess data/sessions/.gitkeep uploads/.htaccess uploads/index.html
 
-echo "Built $OUT ($(du -h "$OUT" | cut -f1))"
+# The checksum the updater verifies (PLAN.md section 6.16), in sha256sum's format.
+(cd dist && sha256sum "angelma-$VERSION.zip" > "angelma-$VERSION.zip.sha256")
+
+echo "Built $OUT ($(du -h "$OUT" | cut -f1)) and $OUT.sha256"
