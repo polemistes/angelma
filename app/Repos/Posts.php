@@ -54,28 +54,10 @@ final class Posts extends Repo
         );
     }
 
-    /** @return list<array<string, mixed>> newest edited posts, optionally only in one owner's blogs */
-    public function recent(int $limit, ?int $blogOwnerId = null): array
+    /** @return list<array<string, mixed>> newest edited posts */
+    public function recent(int $limit): array
     {
-        $sql = self::SELECT;
-        $params = [];
-        if ($blogOwnerId !== null) {
-            $sql .= ' WHERE b.owner_id = ?';
-            $params[] = $blogOwnerId;
-        }
-        $params[] = $limit;
-        return $this->db->all($sql . ' ORDER BY p.updated_at DESC, p.id DESC LIMIT ?', $params);
-    }
-
-    public function countFor(?int $blogOwnerId = null): int
-    {
-        if ($blogOwnerId === null) {
-            return $this->count();
-        }
-        return (int) $this->db->value(
-            'SELECT COUNT(*) FROM posts p JOIN blogs b ON b.id = p.blog_id WHERE b.owner_id = ?',
-            [$blogOwnerId],
-        );
+        return $this->db->all(self::SELECT . ' ORDER BY p.updated_at DESC, p.id DESC LIMIT ?', [$limit]);
     }
 
     public function slugTaken(int $blogId, string $slug, int $exceptId = 0): bool

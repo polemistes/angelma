@@ -308,8 +308,8 @@ final class DbTest extends DbTestCase
             $images->create(['filename' => "f$i.jpg", 'original_name' => $name, 'mime' => 'image/jpeg',
                 'width' => 1, 'height' => 1, 'size' => 1, 'uploader_id' => $owner]);
         }
-        $this->assertSame(['Summer_beach.jpg'], array_column($images->all(null, 'r_b'), 'original_name'));
-        $this->assertCount(2, $images->all(null, 'summer'));
+        $this->assertSame(['Summer_beach.jpg'], array_column($images->all('r_b'), 'original_name'));
+        $this->assertCount(2, $images->all('summer'));
     }
 
     public function testCopyToMakesAConsistentCopy(): void

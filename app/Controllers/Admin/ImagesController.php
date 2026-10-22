@@ -27,9 +27,8 @@ final class ImagesController
         return view('admin/images', [
             'title' => t('nav_images'),
             'nav' => 'images',
-            'images' => (new ImagesRepo())->all(Auth::isAdmin() ? null : Auth::id()),
+            'images' => (new ImagesRepo())->all(),
             'maxBytes' => Images::maxUploadBytes(),
-            'showUploader' => Auth::isAdmin(),
         ]);
     }
 
@@ -37,7 +36,7 @@ final class ImagesController
     public function picker(Request $request): Response
     {
         Auth::requireRole('editor');
-        $images = (new ImagesRepo())->all(Auth::isAdmin() ? null : Auth::id(), $request->query('q'), self::PICKER_LIMIT);
+        $images = (new ImagesRepo())->all($request->query('q'), self::PICKER_LIMIT);
         return new Response(render('partials/image_picker_list', [
             'images' => $images,
             'selected' => $request->int('selected'),
@@ -143,7 +142,7 @@ final class ImagesController
     }
 
     /**
-     * An image the current user may change: admins any, editors their own.
+     * An image for editing or deleting, or 404. Any editor may change any image.
      *
      * @return array<string, mixed>
      */
@@ -154,7 +153,6 @@ final class ImagesController
         if ($image === null) {
             abort(404);
         }
-        Auth::requireOwner((int) $image['uploader_id']);
         return $image;
     }
 

@@ -103,12 +103,6 @@ final class Auth
         return self::user() !== null && self::satisfies(self::role(), $required);
     }
 
-    /** True when the current user is an admin or the given owner. */
-    public static function owns(int $ownerId): bool
-    {
-        return self::user() !== null && (self::isAdmin() || self::id() === $ownerId);
-    }
-
     /**
      * Stop unless the current user has at least the given role. Visitors who are not
      * logged in are sent to the login page with a return address.
@@ -120,15 +114,6 @@ final class Auth
             throw new HttpException(302, Response::redirect(url('/login', ['return' => $return]), 302));
         }
         if (!self::satisfies(self::role(), $role)) {
-            throw new HttpException(403);
-        }
-    }
-
-    /** Stop with 403 unless the current user is an admin or the owner. */
-    public static function requireOwner(int $ownerId): void
-    {
-        self::requireRole('user');
-        if (!self::owns($ownerId)) {
             throw new HttpException(403);
         }
     }

@@ -86,7 +86,6 @@ final class BlogsController
         if ($blog === null) {
             abort(404);
         }
-        Auth::requireOwner((int) $blog['owner_id']);
         return $blog;
     }
 
@@ -130,7 +129,7 @@ final class BlogsController
         return view('admin/blogs', [
             'title' => t('nav_blogs'),
             'nav' => 'blogs',
-            'blogs' => (new Blogs())->all(Auth::isAdmin() ? null : Auth::id()),
+            'blogs' => (new Blogs())->all(),
             'input' => $input + ['title' => '', 'slug' => '', 'description' => ''],
             'errors' => $errors,
         ], $status);

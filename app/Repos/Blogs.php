@@ -14,18 +14,14 @@ final class Blogs extends Repo
         return $this->db->one('SELECT * FROM blogs WHERE slug = ?', [$slug]);
     }
 
-    /** @return list<array<string, mixed>> blogs with owner name and post count */
-    public function all(?int $ownerId = null): array
+    /** @return list<array<string, mixed>> blogs with the creator's name and post count */
+    public function all(): array
     {
-        $sql = 'SELECT b.*, u.display_name AS owner_name,
+        return $this->db->all(
+            'SELECT b.*, u.display_name AS owner_name,
                 (SELECT COUNT(*) FROM posts p WHERE p.blog_id = b.id) AS post_count
-                FROM blogs b LEFT JOIN users u ON u.id = b.owner_id';
-        $params = [];
-        if ($ownerId !== null) {
-            $sql .= ' WHERE b.owner_id = ?';
-            $params[] = $ownerId;
-        }
-        return $this->db->all($sql . ' ORDER BY b.title, b.id', $params);
+                FROM blogs b LEFT JOIN users u ON u.id = b.owner_id ORDER BY b.title, b.id',
+        );
     }
 
     public function slugTaken(string $slug, int $exceptId = 0): bool

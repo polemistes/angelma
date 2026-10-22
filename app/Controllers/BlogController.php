@@ -122,7 +122,7 @@ final class BlogController
      */
     private function showPost(array $blog, array $post, array $input = [], array $errors = [], int $status = 200): Response
     {
-        $moderator = self::canModerate($post);
+        $moderator = self::canModerate();
         return view('site/post', [
             'title' => (string) $post['title'],
             'meta_description' => Markdown::firstParagraph((string) $post['body_markdown'], 160),
@@ -139,17 +139,10 @@ final class BlogController
         ], $status);
     }
 
-    /**
-     * May the current user see pending comments of this post and moderate them?
-     * Admins, the post's author and the blog's owner may.
-     *
-     * @param array<string, mixed> $post
-     */
-    public static function canModerate(array $post): bool
+    /** May the current user see pending comments and moderate them? Editors and admins may. */
+    public static function canModerate(): bool
     {
-        return Auth::user() !== null && (Auth::isAdmin()
-            || Auth::id() === (int) $post['author_id']
-            || Auth::id() === (int) $post['blog_owner_id']);
+        return Auth::can('editor');
     }
 
     /**

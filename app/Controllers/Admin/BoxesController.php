@@ -106,7 +106,7 @@ final class BoxesController
                 if (isset($request->post['image_id'])) {
                     $imageId = $request->int('image_id');
                     $image = (new ImagesRepo())->find($imageId);
-                    if ($image === null || !Auth::owns((int) $image['uploader_id'])) {
+                    if ($image === null) {
                         $errors['image_id'] = t('box_error_image');
                     } else {
                         $content['image_id'] = $imageId;
@@ -185,7 +185,7 @@ final class BoxesController
         }
         if ($box['type'] === 'image') {
             $repo = new ImagesRepo();
-            $extra['pickerImages'] = $repo->all(Auth::isAdmin() ? null : Auth::id(), '', ImagesController::PICKER_LIMIT);
+            $extra['pickerImages'] = $repo->all('', ImagesController::PICKER_LIMIT);
             $extra['selectedImage'] = !empty($content['image_id']) ? $repo->find((int) $content['image_id']) : null;
             $extra['maxBytes'] = \Angelma\Images::maxUploadBytes();
         }

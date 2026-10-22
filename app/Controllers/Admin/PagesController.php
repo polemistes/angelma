@@ -82,7 +82,8 @@ final class PagesController
     }
 
     /**
-     * Load a page the current user may edit, or stop with 404 / 403.
+     * Load a page for editing, or stop with 404. Any editor may edit any page
+     * (PLAN.md section 7).
      *
      * @return array<string, mixed>
      */
@@ -93,7 +94,6 @@ final class PagesController
         if ($page === null) {
             abort(404);
         }
-        Auth::requireOwner((int) $page['owner_id']);
         return $page;
     }
 
@@ -149,7 +149,7 @@ final class PagesController
         return view('admin/pages', [
             'title' => t('nav_pages'),
             'nav' => 'pages',
-            'pages' => (new Pages())->all(Auth::isAdmin() ? null : Auth::id()),
+            'pages' => (new Pages())->all(),
             'homeId' => (int) App::setting('home_page_id'),
             'canOrder' => Auth::isAdmin(),
             'input' => $input + ['name' => '', 'title' => '', 'slug' => '', 'meta_description' => ''],

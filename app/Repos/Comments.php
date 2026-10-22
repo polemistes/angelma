@@ -34,31 +34,24 @@ final class Comments extends Repo
     }
 
     /**
-     * Pending comments, oldest first, optionally only on posts in one owner's blogs.
+     * Pending comments, oldest first.
      *
      * @return list<array<string, mixed>>
      */
-    public function pendingFor(?int $blogOwnerId = null): array
+    public function pending(): array
     {
-        return $this->listByStatus('pending', $blogOwnerId, 'ASC', 500);
+        return $this->listByStatus('pending', 'ASC', 500);
     }
 
     /** @return list<array<string, mixed>> newest approved comments */
-    public function recentApproved(?int $blogOwnerId = null, int $limit = 50): array
+    public function recentApproved(int $limit = 50): array
     {
-        return $this->listByStatus('approved', $blogOwnerId, 'DESC', $limit);
+        return $this->listByStatus('approved', 'DESC', $limit);
     }
 
-    public function countPending(?int $blogOwnerId = null): int
+    public function countPending(): int
     {
-        $sql = "SELECT COUNT(*) FROM comments c JOIN posts p ON p.id = c.post_id JOIN blogs b ON b.id = p.blog_id
-            WHERE c.status = 'pending'";
-        $params = [];
-        if ($blogOwnerId !== null) {
-            $sql .= ' AND b.owner_id = ?';
-            $params[] = $blogOwnerId;
-        }
-        return (int) $this->db->value($sql, $params);
+        return (int) $this->db->value("SELECT COUNT(*) FROM comments WHERE status = 'pending'");
     }
 
     /** Number of comments from an IP hash since a UTC timestamp. */
@@ -89,14 +82,10 @@ final class Comments extends Repo
     }
 
     /** @return list<array<string, mixed>> */
-    private function listByStatus(string $status, ?int $blogOwnerId, string $order, int $limit): array
+    private function listByStatus(string $status, string $order, int $limit): array
     {
         $sql = self::SELECT . ' WHERE c.status = ?';
         $params = [$status];
-        if ($blogOwnerId !== null) {
-            $sql .= ' AND b.owner_id = ?';
-            $params[] = $blogOwnerId;
-        }
         $order = $order === 'ASC' ? 'ASC' : 'DESC';
         $params[] = $limit;
         return $this->db->all($sql . " ORDER BY c.created_at $order, c.id $order LIMIT ?", $params);

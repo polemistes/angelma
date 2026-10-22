@@ -11,22 +11,20 @@ use Angelma\Request;
 use Angelma\Response;
 
 /**
- * Comment moderation. Admins see all comments, editors those on posts in their blogs.
- * Approve and delete are also used from the post page; anyone logged in may delete
- * their own comment.
+ * Comment moderation for editors and administrators. Approve and delete are also used
+ * from the post page; anyone logged in may delete their own comment.
  */
 final class CommentsController
 {
     public function index(Request $request): Response
     {
         Auth::requireRole('editor');
-        $owner = Auth::isAdmin() ? null : Auth::id();
         $comments = new Comments();
         return view('admin/comments', [
             'title' => t('nav_comments'),
             'nav' => 'comments',
-            'pending' => $comments->pendingFor($owner),
-            'approved' => $comments->recentApproved($owner, 50),
+            'pending' => $comments->pending(),
+            'approved' => $comments->recentApproved(50),
         ]);
     }
 
@@ -67,10 +65,7 @@ final class CommentsController
     /** @param array<string, mixed> $comment */
     public static function canModerate(array $comment): bool
     {
-        return BlogController::canModerate([
-            'author_id' => $comment['post_author_id'],
-            'blog_owner_id' => $comment['blog_owner_id'],
-        ]);
+        return BlogController::canModerate();
     }
 
     /** Back to the post page or the moderation list, whichever the form came from. */

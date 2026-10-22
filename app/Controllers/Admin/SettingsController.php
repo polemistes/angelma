@@ -161,7 +161,7 @@ final class SettingsController
             'errors' => $errors,
             'schemes' => Schemes::builtIn(),
             'pages' => (new Pages())->all(),
-            'pickerImages' => $images->all(null, '', ImagesController::PICKER_LIMIT),
+            'pickerImages' => $images->all('', ImagesController::PICKER_LIMIT),
             'logo' => $logoId > 0 ? $images->find($logoId) : null,
             'timezones' => \DateTimeZone::listIdentifiers(),
         ], $status);

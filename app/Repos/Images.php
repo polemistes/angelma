@@ -9,19 +9,14 @@ final class Images extends Repo
     protected const TABLE = 'images';
 
     /**
-     * Images, newest first, optionally only one uploader's and matching a search on
-     * the original file name.
+     * Images, newest first, optionally matching a search on the original file name.
      *
      * @return list<array<string, mixed>>
      */
-    public function all(?int $uploaderId = null, string $search = '', int $limit = 500): array
+    public function all(string $search = '', int $limit = 500): array
     {
         $where = [];
         $params = [];
-        if ($uploaderId !== null) {
-            $where[] = 'i.uploader_id = ?';
-            $params[] = $uploaderId;
-        }
         if ($search !== '') {
             $where[] = "LOWER(i.original_name) LIKE ? ESCAPE '\\'";
             $params[] = '%' . addcslashes(mb_strtolower($search), '%_\\') . '%';

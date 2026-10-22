@@ -146,7 +146,7 @@ return [
     'move_down' => 'Move down',
     'field_slug' => 'Address (slug)',
     'field_address' => 'Address',
-    'field_owner' => 'Owner',
+    'field_owner' => 'Created by',
     'error_slug' => 'Use lowercase letters, digits and single dashes.',
 
     // Pages
@@ -405,7 +405,7 @@ return [
 
     // Users
     'user_role' => 'Role',
-    'user_roles_hint' => 'Administrators can do everything. Editors manage their own pages, images and blogs. Users can only comment and change their own account.',
+    'user_roles_hint' => 'Administrators manage the site: users, settings, backup and the menu. Editors manage all content: pages, images, blogs and comments. Users can only comment and change their own account.',
     'user_status' => 'Status',
     'user_active' => 'Active',
     'user_inactive' => 'Inactive',

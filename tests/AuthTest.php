@@ -110,21 +110,22 @@ final class AuthTest extends DbTestCase
         }
     }
 
-    public function testRequireRoleAndOwner(): void
+    public function testRequireRole(): void
     {
         $editor = $this->makeUser('ed', 'editor');
         $admin = $this->makeUser('boss', 'admin');
         Auth::setUser((new \Angelma\Repos\Users($this->db))->find($editor));
 
+        Auth::requireRole('user');
         Auth::requireRole('editor');
-        Auth::requireOwner($editor);
+        $this->assertTrue(Auth::can('editor'));
+        $this->assertFalse(Auth::isAdmin());
         $this->assertStatus(403, fn () => Auth::requireRole('admin'));
-        $this->assertStatus(403, fn () => Auth::requireOwner($admin));
 
         Auth::setUser((new \Angelma\Repos\Users($this->db))->find($admin));
-        Auth::requireOwner($editor);
+        Auth::requireRole('editor');
         Auth::requireRole('admin');
-        $this->assertTrue(Auth::owns($editor));
+        $this->assertTrue(Auth::isAdmin());
     }
 
     private function assertStatus(int $status, callable $fn): void

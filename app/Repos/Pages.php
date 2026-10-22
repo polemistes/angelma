@@ -19,16 +19,13 @@ final class Pages extends Repo
         return $this->db->one('SELECT * FROM pages WHERE slug = ?', [$slug]);
     }
 
-    /** @return list<array<string, mixed>> all pages in menu order, with the owner's name */
-    public function all(?int $ownerId = null): array
+    /** @return list<array<string, mixed>> all pages in menu order, with the creator's name */
+    public function all(): array
     {
-        $sql = 'SELECT p.*, u.display_name AS owner_name FROM pages p LEFT JOIN users u ON u.id = p.owner_id';
-        $params = [];
-        if ($ownerId !== null) {
-            $sql .= ' WHERE p.owner_id = ?';
-            $params[] = $ownerId;
-        }
-        return $this->db->all($sql . ' ORDER BY p.menu_order, p.id', $params);
+        return $this->db->all(
+            'SELECT p.*, u.display_name AS owner_name FROM pages p LEFT JOIN users u ON u.id = p.owner_id
+             ORDER BY p.menu_order, p.id',
+        );
     }
 
     /** @return list<array<string, mixed>> pages shown in the menu, in order */

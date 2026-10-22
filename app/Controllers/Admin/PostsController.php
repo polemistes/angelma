@@ -83,7 +83,6 @@ final class PostsController
         if ($post === null) {
             abort(404);
         }
-        Auth::requireOwner((int) $post['blog_owner_id']);
         return $post;
     }
 

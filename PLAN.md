@@ -852,7 +852,7 @@ Tick when done and committed.
 - [x] 6.4 Review pass
 - [x] 7.1 Container box: data model, repos and public rendering
 - [x] 7.2 Container box: layout editor
-- [ ] 8.1 Editors manage all content
+- [x] 8.1 Editors manage all content
 - [ ] 9.1 Workbench page
 - [ ] 9.2 Move a box
 - [ ] 9.3 Deleting a container with or without its boxes
@@ -877,7 +877,7 @@ Security
 
 Permissions
 - [x] Every row of the table in section 7 has been tried with each role.
-- [ ] Editors can edit every page, blog, post, image and comment (ownership removed in
+- [x] Editors can edit every page, blog, post, image and comment (ownership removed in
       1.3.0); raw HTML, users, settings, backup and the menu stay with administrators.
 - [x] A `user` role cannot reach any admin screen except Account.
 
