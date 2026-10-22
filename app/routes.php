@@ -13,6 +13,7 @@ use Angelma\Controllers\Admin\PagesController;
 use Angelma\Controllers\Admin\PostsController;
 use Angelma\Controllers\Admin\RowsController;
 use Angelma\Controllers\Admin\SettingsController;
+use Angelma\Controllers\Admin\UpdateController;
 use Angelma\Controllers\Admin\UsersController;
 use Angelma\Controllers\AuthController;
 use Angelma\Controllers\BlogController;
@@ -92,6 +93,11 @@ return static function (Router $r): void {
 
     $r->get('/admin/backup', [BackupController::class, 'show']);
     $r->post('/admin/backup', [BackupController::class, 'download']);
+
+    $r->get('/admin/update', [UpdateController::class, 'show']);
+    $r->post('/admin/update/check', [UpdateController::class, 'check']);
+    $r->post('/admin/update/install', [UpdateController::class, 'install']);
+    $r->post('/admin/update/rollback', [UpdateController::class, 'rollback']);
 
     // Public blogs.
     $r->get('/blog/{blog}', [BlogController::class, 'index']);

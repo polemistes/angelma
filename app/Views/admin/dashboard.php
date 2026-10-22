@@ -3,8 +3,13 @@
  * @var array<string, int> $counts
  * @var list<array<string, mixed>> $recentPosts
  * @var list<array<string, mixed>> $pending
+ * @var array<string, mixed>|null $update the cached release check, administrators only
  */
 ?>
+<?php if (!empty($update['newer'])): ?>
+    <p class="flash flash-warning"><?= e(t('dashboard_update', ['version' => (string) $update['version']])) ?>
+        <a href="<?= e(url('/admin/update')) ?>"><?= e(t('dashboard_update_link')) ?></a></p>
+<?php endif ?>
 <ul class="stats">
     <li><a href="<?= e(url('/admin/pages')) ?>"><strong><?= (int) $counts['pages'] ?></strong> <?= e(t('nav_pages')) ?></a></li>
     <li><a href="<?= e(url('/admin/images')) ?>"><strong><?= (int) $counts['images'] ?></strong> <?= e(t('nav_images')) ?></a></li>

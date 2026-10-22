@@ -936,7 +936,7 @@ Tick when done and committed.
 - [x] 9.3 Deleting a container with or without its boxes
 - [x] 10.1 Maintenance mode
 - [x] 10.2 Release tooling
-- [ ] 10.3 Updater
+- [x] 10.3 Updater
 
 ---
 

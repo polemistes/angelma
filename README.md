@@ -62,9 +62,13 @@ program such as FileZilla (or the file manager in the control panel, if you pref
 - **Who can do what:** editors manage all content, that is pages, images, blogs and
   comments. Administrators also manage users, settings, the menu and backups, and only
   they may paste raw HTML into an embed box.
-- **Upgrading:** upload the files of the new version over the old ones, keeping your
-  `data` and `uploads` folders, and open the site. Angelma updates its database by itself.
-  Delete the `install` folder again afterwards.
+- **Updating:** *Update* in the admin area checks GitHub for a new release and installs it
+  with one click. The previous version is kept and can be restored from the same screen.
+  If the server cannot do this by itself, upload the files of the new version over the old
+  ones, keeping your `data` and `uploads` folders, and open the site: Angelma updates its
+  database by itself. Delete the `install` folder again afterwards.
+- **Maintenance mode:** under *Settings* you can show visitors a notice while you work on
+  the site. Logged-in editors and administrators still see the site as usual.
 - **Page order:** the *Pages* list shows the pages in menu order. Administrators use the
   arrows in the list to move a page up or down; the same table is also under *Settings*,
   where pages can be hidden from the menu.

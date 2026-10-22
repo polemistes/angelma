@@ -211,6 +211,10 @@ table.list td.order-cell form { display: inline; }
 .table-wrap { overflow-x: auto; margin-bottom: 1.25rem; }
 
 .badge { display: inline-block; padding: .05rem .45rem; border-radius: 10px; font-size: .75rem; background: #e5e9ef; color: #3e4c59; }
+.badge.bad { background: #fdecea; color: var(--danger); }
+.check-list { list-style: none; padding: 0; margin: 0 0 1rem; }
+.check-list li { padding: .3rem 0; }
+.release-notes { margin-bottom: 1rem; }
 .badge.ok { background: #e3f3e8; color: var(--ok); }
 .badge.warn { background: #fff1d6; color: var(--warn); }
 

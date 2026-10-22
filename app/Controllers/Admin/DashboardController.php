@@ -12,6 +12,7 @@ use Angelma\Repos\Pages;
 use Angelma\Repos\Posts;
 use Angelma\Request;
 use Angelma\Response;
+use Angelma\Updater;
 
 final class DashboardController
 {
@@ -34,6 +35,8 @@ final class DashboardController
             ],
             'recentPosts' => (new Posts())->recent(5),
             'pending' => array_slice((new Comments())->pending(), 0, 5),
+            // Administrators are told about a newer release (the check is cached for a day).
+            'update' => Auth::isAdmin() ? Updater::fromApp()->check() : null,
         ]);
     }
 }

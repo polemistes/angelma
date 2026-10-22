@@ -19,6 +19,7 @@ $items = [
     ['users', '/admin/users', 'nav_users', 'admin'],
     ['settings', '/admin/settings', 'nav_settings', 'admin'],
     ['backup', '/admin/backup', 'nav_backup', 'admin'],
+    ['update', '/admin/update', 'nav_update', 'admin'],
     ['account', '/admin/account', 'nav_account', 'user'],
 ];
 ?><!doctype html>
