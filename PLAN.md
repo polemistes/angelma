@@ -174,11 +174,16 @@ The home page is the one whose id equals the `home_page_id` setting. The home pa
 also reachable as `/`. Slugs may not be any of the reserved words in section 5.
 
 ### rows
-`page_id INTEGER, position INTEGER, alignment TEXT` (`left`, `center`, `right`).
+`page_id INTEGER, position INTEGER, alignment TEXT` (`left`, `center`, `right`),
+`parent_box_id INTEGER NULL` (added in 1.2.0).
 Alignment matters only when the boxes in the row do not fill the full width.
+`parent_box_id` is null for the rows of the page itself, or the id of the container box
+the row lives in (section 6.13). Nested rows keep `page_id` set, so every query by page
+still finds them. `position` counts within the same parent.
 
 ### boxes
-`row_id INTEGER, position INTEGER, type TEXT` (`text`, `image`, `blog`, `embed`),
+`row_id INTEGER, position INTEGER, type TEXT` (`text`, `image`, `blog`, `embed`,
+`container` since 1.2.0),
 `width INTEGER` (columns out of 12: one of 3, 4, 6, 8, 9, 12), `height INTEGER NULL`
 (fixed height in pixels, null means height follows content), `content TEXT` (JSON).
 
@@ -190,6 +195,7 @@ Content JSON per type:
 | image | `image_id`, `alt`, `caption` (may be empty), `fit` (`cover` or `contain`, used only when height is fixed) |
 | blog | `blog_id`, `count` (number of newest posts to show, default 5), `show_excerpts` (1 or 0) |
 | embed | `url` (a URL from a supported provider, section 6.6), or `html` (raw HTML, only administrators may set this) |
+| container | no fields: the box's content is the rows whose `parent_box_id` is the box's id (section 6.13) |
 
 The sum of widths in a row may not exceed 12. The admin validates this.
 
@@ -254,6 +260,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/rows/{id}/boxes` | POST: add box of a given type and width |
 | `/admin/boxes/{id}` | edit box (type-specific form) |
 | `/admin/boxes/{id}/move`, `/admin/boxes/{id}/delete` | POST |
+| `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
 | `/admin/preview` | POST Markdown, returns rendered HTML (used by admin.js) |
 | `/admin/images` | library with upload form, delete, edit alt text |
 | `/admin/images/picker` | small list used inside the image box form |
@@ -392,6 +399,28 @@ message telling the administrator to download `data/` and `uploads/` by FTP inst
 - Deleting a blog is refused while it has posts or is used by a box.
 - Deleting a post deletes its comments.
 - Every delete button opens a browser confirm dialog (admin.js) and is a POST.
+
+### 6.13 Container box (1.2.0)
+A container box holds rows of boxes, exactly like a page does, so several boxes can be
+stacked beside one tall box. Rows are flat, so without containers that layout is
+impossible; with them, any layout that can be made by repeatedly cutting the page into
+strips and columns is possible.
+
+- Widths inside a container are shares of the container: an inner row is a 12-column
+  grid of the container's width, with the same widths, the same "at most 12" rule and
+  the same alignment setting as a page row.
+- The container draws nothing: no background, border or padding. A container holding one
+  full-width box therefore looks exactly like that box on its own.
+- Containers have no fixed height; the boxes inside keep their own.
+- Containers can be nested, but at most two deep: a container in a page row may hold
+  containers, and those may not. The server refuses deeper nesting with a message.
+- Deleting a container deletes its rows and boxes, recursively. Deleting a row or a page
+  deletes the containers in it the same way. Image and blog usage checks (6.12) see boxes
+  inside containers, because nested rows keep `page_id`.
+- Below 700 px, inner rows stack like page rows, in reading order.
+- In the layout editor a container shows its own rows inside the box, with the same row
+  toolbars and "Add box" forms, and an "Add row" button of its own. The box edit form of
+  a container has only the width.
 
 ---
 
@@ -702,6 +731,32 @@ contains no `dev/`, `tests/`, `.git` or data files.
 Go through the checklist in section 13 and fix what fails. Run all tests. Update
 `app/version.php` to `1.0.0`. Tag the commit `v1.0.0`.
 
+### Phase 7: Container boxes (1.2.0, requested by the owner after 1.1.1)
+
+**7.1 Container box: data model, repos and public rendering**
+Migration `002_container_rows.sql` adds `parent_box_id` to `rows` with an index. `Rows`
+gets a parent box for `create`, moves within the same parent, deletes recursively, and
+`forPageByParent()` returns the rows of a page grouped by parent box id (0 for the page's
+own rows). `Rows::depth()` tells how deep a row is. `Boxes::TYPES` gains `container` and
+`Boxes::delete()` removes the rows inside. `site/page.php` renders rows through a
+recursive `partials/rows.php`; `partials/box_container.php` renders the rows inside a
+box; `site.css` makes the container box invisible (section 6.13).
+Done when: integration tests cover rows inside a container (positions, moves, grouping,
+depth), recursive delete through box, row and page, image usage inside a container, and
+the rendered HTML of a page with a 6-wide image box beside a 6-wide container holding two
+full-width text boxes; `migrate()` reports version 2 and running it twice is harmless.
+
+**7.2 Container box: layout editor**
+`POST /admin/boxes/{id}/rows` adds a row inside a container. The layout editor renders
+rows through a recursive `admin/layout_rows.php`: a container box shows its rows, their
+toolbars and an "Add row" button. The "Add box" type list leaves out `container` where
+it would nest too deep, and the server checks again. The box edit form shows only the
+width for a container, and the server ignores a height for it.
+Done when: an editor builds the layout from 7.1 in the browser; the public page shows two
+stacked texts beside the image and stacks in reading order at 600 px; adding a container
+three deep is refused with a message; all tests pass; `app/version.php` is `1.2.0`,
+tagged `v1.2.0`.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -736,6 +791,8 @@ Tick when done and committed.
 - [x] 6.2 Backup
 - [x] 6.3 Build and install test
 - [x] 6.4 Review pass
+- [ ] 7.1 Container box: data model, repos and public rendering
+- [ ] 7.2 Container box: layout editor
 
 ---
 
