@@ -25,7 +25,7 @@ final class BoxesController
     public const DEFAULT_CONTENT = [
         'text' => ['markdown' => ''],
         'image' => ['image_id' => 0, 'alt' => '', 'caption' => '', 'fit' => 'cover'],
-        'blog' => ['blog_id' => 0, 'count' => 5, 'show_excerpts' => 1],
+        'blog' => ['blog_id' => 0, 'count' => 5, 'text' => 'first'],
         'embed' => ['url' => '', 'html' => ''],
         'container' => [],
     ];
@@ -146,7 +146,12 @@ final class BoxesController
                 if ($content['count'] < 1 || $content['count'] > 20) {
                     $errors['count'] = t('box_error_count');
                 }
-                $content['show_excerpts'] = $request->bool('show_excerpts') ? 1 : 0;
+                $content['text'] = $request->str('text');
+                if (!in_array($content['text'], Boxes::BLOG_TEXTS, true)) {
+                    $errors['text'] = t('box_error_blog_text');
+                }
+                // `text` replaces the `show_excerpts` of boxes saved before 1.4.5.
+                unset($content['show_excerpts']);
                 break;
 
             case 'embed':

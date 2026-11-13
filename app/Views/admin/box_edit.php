@@ -129,10 +129,15 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
             <input type="number" name="count" value="<?= (int) ($content['count'] ?? 5) ?>" min="1" max="20" required>
             <?= $err('count') ?>
         </label>
-        <label class="check">
-            <input type="checkbox" name="show_excerpts" value="1"<?= (int) ($content['show_excerpts'] ?? 1) === 1 ? ' checked' : '' ?>>
-            <span><?= e(t('box_blog_excerpts')) ?></span>
-        </label>
+        <fieldset>
+            <legend><?= e(t('box_blog_text')) ?></legend>
+            <?php $blogText = \Angelma\Repos\Boxes::blogText($content); ?>
+            <?php foreach (\Angelma\Repos\Boxes::BLOG_TEXTS as $choice): ?>
+                <label class="check"><input type="radio" name="text" value="<?= e($choice) ?>"<?= $blogText === $choice ? ' checked' : '' ?>>
+                    <span><?= e(t('box_blog_text_' . $choice)) ?></span></label>
+            <?php endforeach ?>
+            <?= $err('text') ?>
+        </fieldset>
     <?php endif ?>
 
     <?php if ($box['type'] === 'embed'): ?>

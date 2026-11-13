@@ -198,7 +198,7 @@ Content JSON per type:
 |---|---|
 | text | `markdown` |
 | image | `image_id`, `alt`, `caption` (may be empty), `fit` (`cover` or `contain`, used only when height is fixed) |
-| blog | `blog_id`, `count` (number of newest posts to show, default 5), `show_excerpts` (1 or 0) |
+| blog | `blog_id`, `count` (number of newest posts to show, default 5), `text` (`none`, `first` or `full`, default `first`; a box last saved before 1.4.5 has `show_excerpts` (1 or 0) instead, read as `first` or `none`) |
 | embed | `url` (a URL from a supported provider, section 6.6), or `html` (raw HTML, only administrators may set this) |
 | container | no fields: the box's content is the rows whose `parent_box_id` is the box's id (section 6.13) |
 
@@ -367,9 +367,10 @@ styled smaller. `alt` from the box, falling back to the image's own alt text.
 
 ### 6.5 Blog box
 Shows the `count` newest published posts of the blog: title linking to the post, date,
-author display name, and when `show_excerpts` is set, the first paragraph of the body as
-plain text. Below the list a link "All posts" to `/blog/{slug}`. If the blog has no
-published posts, show "No posts yet".
+author display name, and then, depending on `text`: nothing (`none`), the first paragraph
+of the body as plain text (`first`), or the whole body rendered as on the post page
+(`full`, since 1.4.5). Comments are only on the post page. Below the list a link "All
+posts" to `/blog/{slug}`. If the blog has no published posts, show "No posts yet".
 
 ### 6.6 Embed box
 The editor pastes a URL. The renderer recognises YouTube (`youtube.com/watch?v=`,
@@ -987,6 +988,15 @@ shorter.
 Done when: the README names no hosting company, and every statement in it about the
 installer, the requirements and the `.htaccess` rules matches the code.
 
+**11.6 Whole text in the blog box (1.4.5)**
+The blog box form offers three choices for the text under each title instead of the
+excerpt checkbox: titles only, the first paragraph, the whole text, per sections 4 and
+6.5. `Boxes::blogText()` reads the choice, also from boxes saved with `show_excerpts`.
+Done when: unit tests render the box with each choice and with both old values; on a
+copy, a box saved before the change still shows what it showed, the form opens with the
+matching choice, "the whole text" shows each post's full body with its links and
+headings on the public page, and a made-up value is refused.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1035,6 +1045,7 @@ Tick when done and committed.
 - [x] 11.3 HTML in text boxes
 - [x] 11.4 Save a box without leaving it
 - [x] 11.5 README for any host
+- [x] 11.6 Whole text in the blog box
 
 ---
 

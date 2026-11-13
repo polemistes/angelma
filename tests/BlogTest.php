@@ -8,17 +8,19 @@ use Angelma\App;
 use Angelma\Controllers\BlogController;
 use Angelma\HttpException;
 use Angelma\Repos\Blogs;
+use Angelma\Repos\Boxes;
 use Angelma\Repos\Posts;
 use Angelma\Request;
 
 final class BlogTest extends DbTestCase
 {
     private int $blogId;
+    private int $ownerId;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $owner = $this->makeUser('writer', 'editor');
+        $owner = $this->ownerId = $this->makeUser('writer', 'editor');
         $this->blogId = (new Blogs($this->db))->create(['slug' => 'news', 'title' => 'News & <Views>', 'owner_id' => $owner]);
         $posts = new Posts($this->db);
         for ($i = 1; $i <= 12; $i++) {
@@ -52,6 +54,50 @@ final class BlogTest extends DbTestCase
 
         $this->expectException(HttpException::class);
         $controller->index(new Request('GET', '/blog/news', ['page' => '3']), 'news');
+    }
+
+    public function testBlogBoxShowsTitlesFirstParagraphOrWholeText(): void
+    {
+        (new Posts($this->db))->create([
+            'blog_id' => $this->blogId, 'slug' => 'long', 'title' => 'Long post',
+            'body_markdown' => "Opening with a [link](/y).\n\n# Part two\n\nClosing <b>words</b>.", 'status' => 'published',
+            'comments_mode' => 'closed', 'author_id' => $this->ownerId, 'published_at' => '2026-10-20T10:00:00Z',
+        ]);
+        $box = fn (array $content): string => partial('box_blog', ['content' => ['blog_id' => $this->blogId, 'count' => 3] + $content]);
+
+        $none = $box(['text' => 'none']);
+        $this->assertSame(3, substr_count($none, 'class="blog-box-post"'));
+        $this->assertStringContainsString('href="/blog/news/long"', $none);
+        $this->assertStringNotContainsString('Opening', $none);
+
+        $first = $box(['text' => 'first']);
+        $this->assertStringContainsString('<p class="post-excerpt">Opening with a link.</p>', $first);
+        $this->assertStringNotContainsString('Closing', $first);
+        $this->assertStringNotContainsString('post-body', $first);
+
+        $full = $box(['text' => 'full']);
+        $this->assertSame(3, substr_count($full, 'class="prose post-body"'));
+        $this->assertStringContainsString('Opening with a <a href="/y">link</a>.', $full);
+        $this->assertStringContainsString('<h2>Part two</h2>', $full);
+        // Posts take no HTML: the tags are dropped, as on the post page.
+        $this->assertStringContainsString('<p>Closing words.</p>', $full);
+        $this->assertStringNotContainsString('post-excerpt', $full);
+        $this->assertStringContainsString('Body of <a href="/x">post 12</a> &amp; more', $full);
+        $this->assertStringNotContainsString('Draft', $full);
+    }
+
+    public function testBlogBoxReadsBoxesSavedBeforeTheTextChoice(): void
+    {
+        $this->assertSame('first', Boxes::blogText(['show_excerpts' => 1]));
+        $this->assertSame('none', Boxes::blogText(['show_excerpts' => 0]));
+        $this->assertSame('first', Boxes::blogText([]));
+        $this->assertSame('full', Boxes::blogText(['text' => 'full', 'show_excerpts' => 0]));
+        $this->assertSame('first', Boxes::blogText(['text' => 'everything']));
+
+        $old = partial('box_blog', ['content' => ['blog_id' => $this->blogId, 'count' => 2, 'show_excerpts' => 0]]);
+        $this->assertSame(2, substr_count($old, 'class="blog-box-post"'));
+        $this->assertStringNotContainsString('post-excerpt', $old);
+        $this->assertStringNotContainsString('post-body', $old);
     }
 
     public function testFeedIsValidRss(): void

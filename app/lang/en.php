@@ -402,8 +402,12 @@ return [
     'box_blog_choose' => 'Choose a blog',
     'box_blog_none' => 'There is no blog yet. Create one first.',
     'box_blog_count' => 'Number of newest posts to show (1 to 20)',
-    'box_blog_excerpts' => 'Show the first paragraph of each post',
+    'box_blog_text' => 'Under each title',
+    'box_blog_text_none' => 'Nothing, titles only',
+    'box_blog_text_first' => 'The first paragraph of the post',
+    'box_blog_text_full' => 'The whole text of the post',
     'box_error_blog' => 'Choose a blog.',
+    'box_error_blog_text' => 'Choose what to show under each title.',
     'box_error_count' => 'Enter a number from 1 to 20.',
 
     // Comments (public)

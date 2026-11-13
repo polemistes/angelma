@@ -16,6 +16,23 @@ final class Boxes extends Repo
      */
     public const MAX_DEPTH = 2;
 
+    /** What a blog box shows under each post title (PLAN.md section 6.5). */
+    public const BLOG_TEXTS = ['none', 'first', 'full'];
+
+    /**
+     * The `text` choice of a blog box. Boxes saved before 1.4.5 have `show_excerpts`
+     * (1 or 0) instead, which reads as `first` or `none`.
+     *
+     * @param array<string, mixed> $content
+     */
+    public static function blogText(array $content): string
+    {
+        if (in_array($content['text'] ?? null, self::BLOG_TEXTS, true)) {
+            return $content['text'];
+        }
+        return (int) ($content['show_excerpts'] ?? 1) === 1 ? 'first' : 'none';
+    }
+
     /** @return array<string, mixed>|null box with decoded content and its page_id */
     public function find(int $id): ?array
     {
