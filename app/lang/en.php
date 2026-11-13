@@ -27,6 +27,8 @@ return [
     'powered_by' => 'Powered by Angelma',
     'menu_login' => 'Log in',
     'menu_logout' => 'Log out',
+    'menu_admin' => 'Admin',
+    'menu_account' => 'Account',
 
     // Login
     'login_title' => 'Log in',

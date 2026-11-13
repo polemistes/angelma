@@ -198,6 +198,11 @@ img {
     .menu-user {
         margin-left: auto;
     }
+
+    /* Room for the admin link beside the button: the name is left out here. */
+    .site-menu .menu-name {
+        display: none;
+    }
 }
 
 /* Content and rows */

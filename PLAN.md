@@ -295,10 +295,12 @@ change data.
 Header with optional logo, site title (links to home) and tagline. Under it a menu bar
 with one item per page that has `show_in_menu` set, in `menu_order`, the current page
 marked. At the right end of the menu bar: "Log in" when logged out, or the display name
-with a logout button when logged in. Then the rows of the page. Then a footer with the
+with a logout button when logged in, with a link to the admin area in front of the name
+since 1.4.5 (section 6.17). Then the rows of the page. Then a footer with the
 footer Markdown and a small "Powered by Angelma" line.
 
-Below 700 px (1.4.1) the menu bar shows only a "Menu" button and the login link; the
+Below 700 px (1.4.1) the menu bar shows only a "Menu" button and the login link (when
+logged in, since 1.4.5: the admin link and the logout button, without the name); the
 button opens the pages as a full-width stacked list with the current page marked. With
 scripts off the list is shown stacked from the start.
 
@@ -545,6 +547,27 @@ database migrates on the next request. "Restore previous version" copies
 `data/updates/previous/` back the same way. When a preflight check fails, the screen
 shows the manual upload instructions instead of the button. Nothing ever updates
 unattended.
+
+### 6.17 Admin link and edit links on the site (1.4.5)
+Every logged-in user gets a link to the admin area in the menu bar, in front of their
+name: "Admin" to `/admin` for editors and administrators, "Account" to `/admin/account`
+for role `user`, whose only admin screen that is. Visitors get no such link.
+
+Editors and administrators also get a small "Edit" link in the top right corner of every
+box on a public page and of a post on its post page. Container boxes have none: they
+show nothing of their own, and the boxes inside have their links. The link on a box
+opens `/admin/boxes/{id}` with a `return` address, the public page at the box
+(`/about#box-12`); "Save and close" and "Cancel" then go back there instead of to the
+layout editor, "Save" keeps the address, and so does an image uploaded from the form.
+Only local addresses are accepted (`safe_return_path()`). The link on a post opens
+`/admin/posts/{id}`, which has "View post" for the way back. The links have fixed
+colours, like the maintenance bar, because they are tools for staff and not part of the
+design. The `id="box-…"` anchors and the links are only written for those who see the
+links; the page a visitor gets is unchanged.
+
+The setting `edit_links` ("Show Edit links on the site to editors and administrators"
+under Settings, on by default) turns the edit links off for everyone. The Admin link
+stays.
 
 ---
 
@@ -1011,8 +1034,8 @@ and an open post without comments with "No comments yet" and the form.
 **11.8 Admin link on the site (1.4.5)**
 The link in the menu bar per section 6.17.
 Done when: a unit test shows "Admin" to `/admin` for an editor and an administrator,
-"Account" to `/admin/account` for a `user`, and neither for a visitor; at 390 px the bar
-still holds the menu button, the link, the name and the logout button.
+"Account" to `/admin/account` for a `user`, and neither for a visitor; at 390 and 320 px
+the bar holds the menu button, the link and the logout button on one line.
 
 **11.9 Edit links on the site (1.4.5)**
 `edit_links()` in helpers.php, the links in `partials/rows.php` and `site/post.php`, the
@@ -1076,7 +1099,7 @@ Tick when done and committed.
 - [x] 11.5 README for any host
 - [x] 11.6 Whole text in the blog box
 - [x] 11.7 No comments section on closed posts without comments
-- [ ] 11.8 Admin link on the site
+- [x] 11.8 Admin link on the site
 - [ ] 11.9 Edit links on the site
 
 ---

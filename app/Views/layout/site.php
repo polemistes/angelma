@@ -54,6 +54,9 @@ $version = require \Angelma\App::$root . '/app/version.php';
         </ul>
         <div class="menu-user">
             <?php if ($frame['user'] !== null): ?>
+                <?php // The way into the admin area: all of it for editors, the account screen for users (PLAN.md section 6.17). ?>
+                <?php $staff = \Angelma\Auth::satisfies((string) ($frame['user']['role'] ?? ''), 'editor'); ?>
+                <a class="menu-admin" href="<?= e(url($staff ? '/admin' : '/admin/account')) ?>"><?= e(t($staff ? 'menu_admin' : 'menu_account')) ?></a>
                 <span class="menu-name"><?= e($frame['user']['display_name']) ?></span>
                 <form method="post" action="<?= e(url('/logout')) ?>">
                     <?= csrf_field() ?>
