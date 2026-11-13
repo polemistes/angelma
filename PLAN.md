@@ -3,7 +3,7 @@
 Angelma is a small content management system for simple websites. A site is a set of
 pages. Each page is a stack of rows, each row holds one or more boxes, and a box shows
 text, an image, a blog or an embedded video or map. The site owner uploads one archive to
-an ordinary shared web host (Domeneshop is the reference host), opens the site in a
+an ordinary shared web host (any host with PHP and Apache; Domeneshop was the first), opens the site in a
 browser, and finishes the setup there. No console, Composer or Node is needed on the host.
 
 This document is the complete specification and the step-by-step build order. It is
@@ -56,7 +56,7 @@ These were decided with the site owner and are not open for change.
 | Accounts | Administrators create users and set passwords. No self-registration. No email anywhere in version 1. |
 | Languages | English only. Strings in `app/lang/en.php` through the `t()` helper so a second language can be added later. |
 | Ordering | Rows, boxes and menu items are ordered with up and down buttons, not drag and drop. |
-| Hosting layout | The archive is extracted directly into the web root (Domeneshop's `www/` folder). Protected folders are blocked with `.htaccess`. |
+| Hosting layout | The archive is extracted directly into the web root (`www/`, `public_html/` or whatever the host calls it), or since 1.1.0 into a subfolder of it. Protected folders are blocked with `.htaccess`. |
 
 ---
 
@@ -844,7 +844,8 @@ built-in server there, run the installer, create a page with each box type, a bl
 and a comment. Fix anything that only shows up in the packaged copy (missing files,
 wrong paths). Write the install instructions in `README.md` for Domeneshop specifically:
 upload and extract the zip into `www/`, open the site, follow the installer, delete
-`install/`, make sure PHP 8.2 or newer is selected in the control panel.
+`install/`, make sure PHP 8.2 or newer is selected in the control panel. (Rewritten for
+any host in step 11.5.)
 Done when: the packaged copy installs and works without touching the console; the zip
 contains no `dev/`, `tests/`, `.git` or data files.
 
@@ -977,6 +978,15 @@ Done when: on a copy, "Save" on a text box stores the text and shows the form ag
 the message, "Save and close" returns to the box's row on the page, "Cancel" changes
 nothing, and a refused value still shows the form with its error.
 
+**11.5 README for any host (1.4.4)**
+`README.md` no longer describes one host. It lists the requirements, gives the install
+steps in terms every host has (the folder the site is served from, the file manager or
+FTP, the control panel), three common problems, and what a server of one's own needs,
+with or without `.htaccess`. Updating, the data folders and the usage notes are kept,
+shorter.
+Done when: the README names no hosting company, and every statement in it about the
+installer, the requirements and the `.htaccess` rules matches the code.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1024,6 +1034,7 @@ Tick when done and committed.
 - [x] 11.2 Stay on the page after moving a box
 - [x] 11.3 HTML in text boxes
 - [x] 11.4 Save a box without leaving it
+- [x] 11.5 README for any host
 
 ---
 
@@ -1060,5 +1071,5 @@ Behaviour
 Quality
 - [x] `vendor/bin/phpunit` passes.
 - [x] No interface string is hard-coded outside `app/lang/en.php`.
-- [x] `README.md` explains installation on Domeneshop in plain language.
+- [x] `README.md` explains installation in plain language, for any host since 1.4.4.
 - [x] `DECISIONS.md` lists every choice made outside this plan.

@@ -2,104 +2,112 @@
 
 Angelma is a small content management system for simple websites. A site is a set of
 pages; each page is a stack of rows, and each row holds boxes with text, an image, a blog
-or an embedded video or map. It runs on ordinary shared web hosting with PHP and SQLite,
-and needs no console, Composer or Node on the server.
+or an embedded video or map. It runs on ordinary web hosting with PHP and keeps its data
+in an SQLite file, so there is no database server to set up and nothing to run on a
+command line.
 
-To install, upload the release archive to your web host, extract it into the web root
-(or into a subfolder of it), open the site in a browser and follow the installer. The
-steps for Domeneshop are below; other hosts with Apache and PHP 8.2 or newer work the
-same way.
+## Requirements
 
-## Installing on Domeneshop
+- PHP 8.2 or newer with the extensions `pdo_sqlite`, `gd` and `mbstring`. Most web hosts
+  have these switched on.
+- Apache with `mod_rewrite`, or another web server that reads `.htaccess` files, such as
+  LiteSpeed. This is what nearly all shared hosting runs.
+- The folders `data` and `uploads` must be writable by PHP.
 
-You need the release file `angelma-<version>.zip`, your Domeneshop login, and an FTP
-program such as FileZilla (or the file manager in the control panel, if you prefer).
+The installer checks the PHP version, the extensions and the two folders, and shows what
+is missing. Three more PHP extensions are optional: `zip` for backups and one-click
+updates, `curl` for one-click updates, and `dom` for HTML in text boxes.
 
-1. **Choose PHP 8.2 or newer.** Log in to the Domeneshop control panel, open the web
-   hotel for your domain and set the PHP version to 8.2 or newer. Save.
+## Installing
 
-2. **Put the files in `www/`.** Your website lives in the folder called `www` on the web
-   hotel. It should be empty (remove any placeholder page that is there).
-   *Want the site in a subfolder instead, such as `https://www.example.no/club/`?* Then
-   create the folder `www/club/` and put the files there instead of directly in `www/`;
-   everywhere below, read `www/club/` for `www/` and add `/club` to the addresses.
-   - If you can extract zip files on the server (for example in the control panel's file
-     manager), upload the zip into `www/` and extract it there, so that `index.php`,
-     `app/`, `install/` and the other files end up directly inside `www/`.
-   - Otherwise, extract the zip on your own computer first. Then connect with your FTP
-     program (the FTP details are in the control panel) and upload **everything inside**
-     the extracted folder into `www/`. Make sure the hidden files called `.htaccess` are
-     uploaded too; in FileZilla, turn on *Server → Force showing hidden files*.
+1. **Download** `angelma-<version>.zip` from the
+   [latest release](https://github.com/polemistes/angelma/releases/latest).
+2. **Extract it into the folder your site is served from.** Hosts call this folder
+   `public_html`, `www`, `htdocs` or similar. Upload the zip and extract it with your
+   host's file manager, or extract it on your own computer and upload the contents by FTP
+   or SFTP. `index.php`, `app/`, `install/` and the other files must end up directly in
+   the folder, and the hidden `.htaccess` files must come along. For an address like
+   `https://example.com/club/`, put the files in a subfolder called `club` instead.
+3. **Open the site in a browser.** The installer starts by itself. It checks the server,
+   asks for a site title, page width and colour scheme, then for an administrator
+   username and a password of at least 10 characters, and creates the site.
+4. **Delete the `install` folder** when the installer says it is done.
+5. **Log in** at `/login`, for example `https://example.com/login`.
 
-3. **Run the installer.** Open your site's address in a browser, for example
-   `https://www.example.no/`. The installer starts by itself and walks you through four
-   short steps:
-   - *Requirements*: every line should be green. If a folder is "not writable", give the
-     folders `data` and `uploads` write permission in your FTP program (755 or 775).
-   - *Site*: the site title, the page width and a colour scheme. All can be changed later.
-   - *Administrator*: your username and a password of at least 10 characters.
-   - *Finish*: Angelma creates the database and a first home page.
+If something does not work:
 
-4. **Delete the `install` folder.** When the installer says it is done, delete the folder
-   `www/install` with your FTP program or the file manager. The site works without it,
-   and this keeps anyone from poking at the installer later.
+- **An error page, or a red line about PHP or an extension:** choose PHP 8.2 or newer,
+  and switch on the extension, in your host's control panel.
+- **A folder is "not writable":** give the folders `data` and `uploads` write permission
+  (usually 755 or 775) in the file manager or your FTP program.
+- **The front page works but other pages are "not found":** the `.htaccess` files are
+  missing or ignored. Upload them again with hidden files shown, or see below.
 
-5. **Log in.** Go to `https://www.example.no/login` (or use "Log in" at the right of the
-   menu). Under *Pages* you build pages from rows and boxes, under *Images* you upload
-   pictures, and under *Blogs* you write posts.
+### On your own server
 
-### Good to know
+With Apache, allow `.htaccess` files for the site folder (`AllowOverride All`), enable
+`mod_rewrite`, and `mod_headers` for the security headers, and let the web server user
+write to `data/` and `uploads/`.
 
-- **Containers:** a *Container* box holds rows of boxes of its own, so you can stack two or
-  more boxes beside a tall one. Add a container to a row, then add rows and boxes inside
-  it. Widths inside a container are shares of the container, and a container can hold
-  containers two levels deep.
-- **Workbench and moving boxes:** the *Workbench* button on the Pages screen opens a
-  hidden page for boxes that are not on any page. Build and preview boxes and containers
-  there, then use *Move…* on any box to put it in a row on any page, or pick it from
-  "move here from the workbench" in a row. Deleting a container asks whether to keep its
-  boxes; kept boxes go to the workbench.
-- **HTML in text boxes:** text boxes are written in Markdown, and you can mix in HTML
-  where Markdown falls short. To make a link open in a new tab, write
-  `<a href="https://www.example.no/" target="_blank">link text</a>`. Tables, coloured or
-  centred text (`<div style="text-align: center">`) and similar work too. Scripts and
-  other parts that could harm visitors are removed when the page is shown.
-- **Who can do what:** editors manage all content, that is pages, images, blogs and
-  comments. Administrators also manage users, settings, the menu and backups, and only
-  they may paste raw HTML into an embed box.
-- **Updating:** *Update* in the admin area checks GitHub for a new release and installs it
-  with one click. The previous version is kept and can be restored from the same screen.
-  If the server cannot do this by itself, upload the files of the new version over the old
-  ones, keeping your `data` and `uploads` folders, and open the site: Angelma updates its
-  database by itself. Delete the `install` folder again afterwards.
-- **Maintenance mode:** under *Settings* you can show visitors a notice while you work on
-  the site. Logged-in editors and administrators still see the site as usual.
-- **Page order:** the *Pages* list shows the pages in menu order. Administrators use the
-  arrows in the list to move a page up or down; the same table is also under *Settings*,
-  where pages can be hidden from the menu.
-- **Backups:** *Backup* in the admin area downloads a zip with the database and all
-  uploaded images. To restore, put `data/angelma.sqlite` and the `uploads` folder from the
-  zip back in place by FTP.
-- **Your data** is in `www/data/` (the database and settings) and `www/uploads/` (images).
-  These folders are protected from the web; never delete them.
-- **Links in your texts:** write links to your own pages starting with a slash, like
-  `[About us](/about)`. Angelma adds the subfolder if the site lives in one, so the links
-  keep working if you move the site.
-- **Building the site on your own computer first:** you can install Angelma on your own
-  computer (with Apache, or with `dev/server.sh` from the source code), build the site
-  there, and then copy the whole folder, including `data/` and `uploads/`, to the web
-  hotel by FTP. Stop the local server while copying, leave out `data/sessions/*` and
-  `data/error.log`, delete `install/` on the web hotel, and make `data/`,
-  `data/sessions/` and `uploads/` writable there. The site may be in a different
-  subfolder (or none) on your computer than on the web hotel.
-- **Moving or reinstalling:** the installer only runs while `data/installed.lock` does not
-  exist. To start over completely, delete everything in `data/` except `.htaccess` and
-  the `sessions` folder, and everything in `uploads/` except `.htaccess` and `index.html`.
+Servers that do not read `.htaccess` files, such as nginx, need the rules of the three
+`.htaccess` files (in the site folder, `data/` and `uploads/`) in their own
+configuration: block `app/`, `data/`, `vendor/` and the listed file types, never run
+scripts from `uploads/`, and send every request that is not a file under `assets/`,
+`uploads/` or `install/` to `index.php`.
+
+## Updating
+
+*Update* in the admin area checks GitHub for a new release and installs it with one
+click. The previous version is kept and can be restored from the same screen.
+
+If the server cannot do this by itself, upload the files of the new version over the old
+ones, keeping your `data` and `uploads` folders, and open the site: the database updates
+itself. Delete the `install` folder again afterwards.
+
+## Your data
+
+Everything you make is in two folders: `data/` holds the database and settings, and
+`uploads/` holds the images. Both are protected from the web. Never delete them.
+
+- **Backup:** *Backup* in the admin area downloads a zip with the database and all
+  images. To restore, put `data/angelma.sqlite` and the `uploads` folder from the zip
+  back in place.
+- **Moving the site:** copy the whole site folder, including `data/` and `uploads/`, to
+  the new place, and make `data/`, `data/sessions/` and `uploads/` writable there. Leave
+  out `data/sessions/*` and `data/error.log`. The new place may be a different host,
+  folder or subfolder. A site built on your own computer goes online the same way.
+- **Starting over:** the installer only runs while `data/installed.lock` does not exist.
+  Delete everything in `data/` except `.htaccess` and the `sessions` folder, and
+  everything in `uploads/` except `.htaccess` and `index.html`.
+
+## Using Angelma
+
+Under *Pages* you build pages from rows and boxes, under *Images* you upload pictures,
+and under *Blogs* you write posts.
+
+- **Text** is written in Markdown. Text boxes also take HTML where Markdown falls short:
+  `<a href="https://example.com/" target="_blank">link text</a>` opens a link in a new
+  tab, and tables or `<div style="text-align: center">` work too. Scripts and other parts
+  that could harm visitors are removed when the page is shown.
+- **Links to your own pages** start with a slash, like `[About us](/about)`. They keep
+  working if the site moves into or out of a subfolder.
+- **Containers:** a *Container* box holds rows of boxes of its own, so you can stack
+  boxes beside a tall one. Containers can be nested two levels deep.
+- **Workbench:** a hidden page for boxes that are not on any page. Build and preview
+  boxes there, then use *Move…* on any box to put it in a row on any page.
+- **Roles:** editors manage pages, images, blogs and comments. Administrators also manage
+  users, settings, the menu and backups, and only they may paste raw HTML into an embed
+  box.
+- **Menu:** administrators order the pages with the arrows in the *Pages* list, and hide
+  pages from the menu under *Settings*.
+- **Maintenance mode:** a switch under *Settings* shows visitors a notice while you work.
+  Logged-in editors and administrators still see the site.
 
 ## Development
 
-Requirements: PHP 8.2 or newer with `pdo_sqlite`, `gd` and `mbstring`, and Composer.
-`vendor/` is committed, so `composer install` is only needed after changing dependencies.
+Requirements: PHP 8.2 or newer with `pdo_sqlite`, `gd`, `mbstring` and `dom`, and
+Composer. `vendor/` is committed, so `composer install` is only needed after changing
+dependencies.
 
 ```
 dev/server.sh          # local server on http://localhost:8080 (emulates .htaccess)
