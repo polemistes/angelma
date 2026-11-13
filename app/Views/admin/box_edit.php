@@ -9,17 +9,22 @@
  * @var int $width
  * @var list<int> $widths
  * @var array<string, string> $errors
+ * @var string $return where "Save and close" and "Cancel" lead when the form was opened
+ *                     from the public site (PLAN.md section 6.17), or ''
  */
 use Angelma\Auth;
 use Angelma\Controllers\Admin\BoxesController;
 
 $err = static fn (string $name): string => partial('field_error', ['errors' => $errors, 'name' => $name]);
-$back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
+$back = $return !== '' ? url($return) : url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
 ?>
 <p class="muted"><?= e(t('box_on_page', ['name' => (string) $page['name']])) ?></p>
 
 <form method="post" action="<?= e(url('/admin/boxes/' . $box['id'])) ?>" class="form panel box-form">
     <?= csrf_field() ?>
+    <?php if ($return !== ''): ?>
+        <input type="hidden" name="return" value="<?= e($return) ?>">
+    <?php endif ?>
 
     <div class="field-row">
         <label>
@@ -168,6 +173,9 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
     <form method="post" action="<?= e(url('/admin/images')) ?>" enctype="multipart/form-data" class="form panel">
         <?= csrf_field() ?>
         <input type="hidden" name="box_id" value="<?= (int) $box['id'] ?>">
+        <?php if ($return !== ''): ?>
+            <input type="hidden" name="return" value="<?= e($return) ?>">
+        <?php endif ?>
         <h2><?= e(t('box_image_upload')) ?></h2>
         <label>
             <span><?= e(t('image_files')) ?></span>

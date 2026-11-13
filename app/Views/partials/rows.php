@@ -7,6 +7,9 @@
  * @var array<int, list<array<string, mixed>>> $rowsByParent all rows of the page by parent box id
  * @var array<int, list<array<string, mixed>>> $boxes boxes grouped by row id
  */
+// "Edit" links for editors (PLAN.md section 6.17). A container shows nothing of its own.
+$editLinks = edit_links();
+$here = \Angelma\App::$request?->path ?? '/';
 ?>
 <?php foreach ($rows as $row): ?>
     <?php
@@ -19,7 +22,11 @@
     <div class="row cols-<?= (int) $sum ?> align-<?= e($row['alignment']) ?>">
         <?php foreach ($rowBoxes as $box): ?>
             <?php $height = $box['height'] !== null ? (int) $box['height'] : 0; ?>
-            <div class="box box-<?= e($box['type']) ?> w-<?= (int) $box['width'] ?><?= $height > 0 ? ' fixed' : '' ?>"<?= $height > 0 ? ' style="--h:' . $height . 'px"' : '' ?>>
+            <?php $edit = $editLinks && $box['type'] !== 'container'; ?>
+            <div class="box box-<?= e($box['type']) ?> w-<?= (int) $box['width'] ?><?= $height > 0 ? ' fixed' : '' ?>"<?= $edit ? ' id="box-' . (int) $box['id'] . '"' : '' ?><?= $height > 0 ? ' style="--h:' . $height . 'px"' : '' ?>>
+                <?php if ($edit): ?>
+                    <a class="edit-link" href="<?= e(url('/admin/boxes/' . (int) $box['id'], ['return' => $here . '#box-' . (int) $box['id']])) ?>"><?= e(t('edit')) ?></a>
+                <?php endif ?>
                 <?= partial('box_' . $box['type'], [
                     'box' => $box,
                     'content' => $box['content'],

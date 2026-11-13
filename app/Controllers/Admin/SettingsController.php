@@ -47,6 +47,7 @@ final class SettingsController
             'timezone' => $request->str('timezone'),
             'date_format' => $request->str('date_format'),
             'moderate_anonymous' => $request->bool('moderate_anonymous') ? '1' : '0',
+            'edit_links' => $request->bool('edit_links') ? '1' : '0',
             'maintenance' => $request->bool('maintenance') ? '1' : '0',
             'maintenance_message' => trim($request->input('maintenance_message')),
         ];

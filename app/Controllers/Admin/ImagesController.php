@@ -76,22 +76,24 @@ final class ImagesController
     private function uploadForBox(Request $request, int $boxId): Response
     {
         $box = BoxesController::load($boxId);
+        // Back to the box form, which keeps its way back to the public page (section 6.17).
+        $form = BoxesController::formPath($boxId, BoxesController::returnPath($request));
         $files = self::uploadedFiles($request->files['images'] ?? null);
         if ($box['type'] !== 'image' || $files === []) {
             flash('error', t('image_error_no_file'));
-            return redirect('/admin/boxes/' . $boxId);
+            return redirect($form);
         }
         try {
             $image = self::storeOne($files[0]);
         } catch (ImageException $e) {
             flash('error', t('image_upload_failed', ['name' => (string) ($files[0]['name'] ?? ''), 'reason' => $e->getMessage()]));
-            return redirect('/admin/boxes/' . $boxId);
+            return redirect($form);
         }
         $content = $box['content'];
         $content['image_id'] = (int) $image['id'];
         (new Boxes())->update($boxId, (int) $box['width'], $box['height'] === null ? null : (int) $box['height'], $content);
         flash('success', t('image_uploaded_into_box', ['name' => (string) $image['original_name']]));
-        return redirect('/admin/boxes/' . $boxId);
+        return redirect($form);
     }
 
     public function alt(Request $request, int $id): Response

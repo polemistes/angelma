@@ -14,6 +14,9 @@
 $postPath = '/blog/' . $blog['slug'] . '/' . $post['slug'];
 ?>
 <article class="post">
+    <?php if (edit_links()): ?>
+        <a class="edit-link" href="<?= e(url('/admin/posts/' . (int) $post['id'])) ?>"><?= e(t('edit')) ?></a>
+    <?php endif ?>
     <p class="post-blog"><a href="<?= e(url('/blog/' . $blog['slug'])) ?>"><?= e($blog['title']) ?></a></p>
     <h1><?= e($post['title']) ?></h1>
     <p class="post-meta"><?= partial('post_meta', ['post' => $post]) ?></p>

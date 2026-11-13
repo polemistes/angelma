@@ -78,7 +78,22 @@ final class BoxesController
     public function edit(Request $request, int $id): Response
     {
         $box = self::load($id);
-        return $this->form($box, $box['content'], (string) ($box['height'] ?? ''), (int) $box['width']);
+        return $this->form($box, $box['content'], (string) ($box['height'] ?? ''), (int) $box['width'], [], 200, self::returnPath($request));
+    }
+
+    /**
+     * Where the form goes back to when it was opened from an "Edit" link on the public
+     * site (PLAN.md section 6.17): a local address, or '' for the layout editor.
+     */
+    public static function returnPath(Request $request): string
+    {
+        return safe_return_path($request->isPost() ? $request->str('return') : $request->query('return'), '');
+    }
+
+    /** Address of the box form, keeping the return address. */
+    public static function formPath(int $id, string $return): string
+    {
+        return '/admin/boxes/' . $id . ($return !== '' ? '?' . http_build_query(['return' => $return]) : '');
     }
 
     public function update(Request $request, int $id): Response
@@ -86,6 +101,7 @@ final class BoxesController
         $box = self::load($id);
         $boxes = new Boxes();
         $errors = [];
+        $return = self::returnPath($request);
 
         $width = $request->int('width');
         $free = 12 - $boxes->widthSum((int) $box['row_id'], $id);
@@ -170,17 +186,17 @@ final class BoxesController
         }
 
         if ($errors !== []) {
-            return $this->form($box, $content, $heightText, $width, $errors, 422);
+            return $this->form($box, $content, $heightText, $width, $errors, 422, $return);
         }
 
         $boxes->update($id, $width, $height, $content);
         (new Pages())->touch((int) $box['page_id']);
         flash('success', t('box_saved'));
         if ($request->bool('close')) {
-            return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+            return $return !== '' ? redirect($return) : RowsController::back((int) $box['page_id'], (int) $box['row_id']);
         }
         // "Save" keeps the editor in the box, so a long text can be saved along the way.
-        return redirect('/admin/boxes/' . $id);
+        return redirect(self::formPath($id, $return));
     }
 
     /**
@@ -200,7 +216,7 @@ final class BoxesController
      * @param array<string, mixed> $content
      * @param array<string, string> $errors
      */
-    private function form(array $box, array $content, string $height, int $width, array $errors = [], int $status = 200): Response
+    private function form(array $box, array $content, string $height, int $width, array $errors = [], int $status = 200, string $return = ''): Response
     {
         $page = (new Pages())->find((int) $box['page_id']);
         $free = 12 - (new Boxes())->widthSum((int) $box['row_id'], (int) $box['id']);
@@ -224,6 +240,7 @@ final class BoxesController
             'width' => $width,
             'widths' => array_values(array_filter(Boxes::WIDTHS, static fn (int $w): bool => $w <= $free)),
             'errors' => $errors,
+            'return' => $return,
         ], $status);
     }
 

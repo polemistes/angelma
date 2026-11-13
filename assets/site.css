@@ -247,6 +247,7 @@ img {
 /* Boxes */
 
 .box {
+    position: relative;
     min-width: 0;
     padding: var(--pad);
     background: var(--box-bg);
@@ -597,6 +598,7 @@ pre {
 }
 
 .post {
+    position: relative;
     max-width: 46rem;
 }
 
@@ -768,6 +770,34 @@ pre {
 }
 
 /* Bar shown to logged-in editors while maintenance mode is on (PLAN.md section 6.15). */
+
+/* "Edit" links for editors and administrators, in the corner of a box or a post
+   (PLAN.md section 6.17). Fixed colours, like the maintenance bar: they are tools for
+   staff, not part of the design. */
+.edit-link {
+    position: absolute;
+    top: .15rem;
+    right: .15rem;
+    z-index: 2;
+    padding: 0 .55rem;
+    border-radius: 1rem;
+    background: rgba(31, 41, 55, .8);
+    color: #fff;
+    font-size: .75rem;
+    line-height: 1.6;
+    text-decoration: none;
+}
+
+.edit-link:hover,
+.edit-link:focus {
+    background: #b4531d;
+    color: #fff;
+}
+
+.post > .edit-link {
+    top: 0;
+    right: 0;
+}
 
 .maintenance-bar {
     margin: 0;

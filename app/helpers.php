@@ -82,6 +82,15 @@ function safe_return_path(string $path, string $fallback = '/'): string
     return $path;
 }
 
+/**
+ * Does the public site show "Edit" links to the current user? Editors and administrators
+ * get them unless the `edit_links` setting is off (PLAN.md section 6.17).
+ */
+function edit_links(): bool
+{
+    return App::setting('edit_links') === '1' && Auth::can('editor');
+}
+
 /** Stop the request with an HTTP error status. */
 function abort(int $status): never
 {

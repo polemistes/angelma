@@ -182,6 +182,10 @@ $pageCount = count($pages);
             <input type="checkbox" name="moderate_anonymous" value="1"<?= $values['moderate_anonymous'] === '1' ? ' checked' : '' ?>>
             <span><?= e(t('settings_moderate')) ?></span>
         </label>
+        <label class="check">
+            <input type="checkbox" name="edit_links" value="1"<?= ($values['edit_links'] ?? '1') === '1' ? ' checked' : '' ?>>
+            <span><?= e(t('settings_edit_links')) ?></span>
+        </label>
     </section>
 
     <section class="panel" id="maintenance">

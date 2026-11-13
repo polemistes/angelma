@@ -161,6 +161,7 @@ All tables have an integer primary key `id`. Timestamps are stored as UTC ISO 86
 | footer_markdown | footer text | empty |
 | home_page_id | id of the home page | set by installer |
 | moderate_anonymous | 1 if anonymous comments wait for approval | 1 |
+| edit_links | 1 if editors and administrators get "Edit" links on the public site (section 6.17, 1.4.5) | 1 |
 | timezone | PHP timezone name for displaying dates | `Europe/Oslo` |
 | date_format | PHP date format for posts and comments | `j F Y` |
 | workbench_page_id | id of the workbench page (section 6.14), empty until first use | empty |
@@ -264,7 +265,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/pages/{id}/rows` | POST: add row |
 | `/admin/rows/{id}/move`, `/admin/rows/{id}/delete`, `/admin/rows/{id}/alignment` | POST |
 | `/admin/rows/{id}/boxes` | POST: add box of a given type and width |
-| `/admin/boxes/{id}` | edit box (type-specific form). Since 1.4.4 the form has three buttons: "Save" saves and stays in the form, "Save and close" (`close=1`) saves and returns to the page at the box's row, "Cancel" returns without saving |
+| `/admin/boxes/{id}` | edit box (type-specific form). Since 1.4.4 the form has three buttons: "Save" saves and stays in the form, "Save and close" (`close=1`) saves and returns to the page at the box's row, "Cancel" returns without saving. Since 1.4.5 a `return` address (`?return=`, local addresses only) sends "Save and close" and "Cancel" there instead of to the page's layout (section 6.17) |
 | `/admin/boxes/{id}/move`, `/admin/boxes/{id}/delete` | POST |
 | `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
 | `/admin/boxes/{id}/move-to` | GET: choose where to move a box; POST: move it (1.3.0) |
@@ -565,9 +566,9 @@ colours, like the maintenance bar, because they are tools for staff and not part
 design. The `id="box-…"` anchors and the links are only written for those who see the
 links; the page a visitor gets is unchanged.
 
-The setting `edit_links` ("Show Edit links on the site to editors and administrators"
-under Settings, on by default) turns the edit links off for everyone. The Admin link
-stays.
+The setting `edit_links` (the checkbox 'Editors and administrators get an "Edit" link on
+every box and post on the site' under Settings, on by default) turns the edit links off
+for everyone. The Admin link stays.
 
 ---
 
@@ -1100,7 +1101,7 @@ Tick when done and committed.
 - [x] 11.6 Whole text in the blog box
 - [x] 11.7 No comments section on closed posts without comments
 - [x] 11.8 Admin link on the site
-- [ ] 11.9 Edit links on the site
+- [x] 11.9 Edit links on the site
 
 ---
 

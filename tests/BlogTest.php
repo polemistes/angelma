@@ -41,6 +41,7 @@ final class BlogTest extends DbTestCase
     protected function tearDown(): void
     {
         Auth::reset();
+        App::forgetSettings();
         App::$request = null;
         parent::tearDown();
     }
@@ -136,6 +137,21 @@ final class BlogTest extends DbTestCase
         $posts->update((int) $posts->findBySlug($this->blogId, 'p4')['id'], ['comments_mode' => 'anyone']);
         $this->assertStringContainsString('No comments yet.', $page('p4'));
         $this->assertStringContainsString('id="comment-form"', $page('p4'));
+    }
+
+    public function testPostPageHasAnEditLinkForEditors(): void
+    {
+        $id = (int) (new Posts($this->db))->findBySlug($this->blogId, 'p1')['id'];
+        $link = '<a class="edit-link" href="/admin/posts/' . $id . '">Edit</a>';
+        $page = static fn (): string => (new BlogController())->post(new Request('GET', '/blog/news/p1'), 'news', 'p1')->body;
+
+        $this->assertStringNotContainsString('edit-link', $page());
+        Auth::setUser((new \Angelma\Repos\Users($this->db))->find($this->ownerId));
+        $this->assertStringContainsString($link, $page());
+
+        (new \Angelma\Repos\Settings($this->db))->set('edit_links', '0');
+        App::forgetSettings();
+        $this->assertStringNotContainsString('edit-link', $page());
     }
 
     public function testFeedIsValidRss(): void

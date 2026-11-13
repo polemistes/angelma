@@ -29,6 +29,7 @@ final class App
         'maintenance_message' => '',
         'update_check' => '',
         'moderate_anonymous' => '1',
+        'edit_links' => '1',
         'timezone' => 'Europe/Oslo',
         'date_format' => 'j F Y',
     ];
