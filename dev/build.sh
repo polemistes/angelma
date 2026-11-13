@@ -10,7 +10,15 @@ cd "$(dirname "$0")/.."
 VERSION=$(php -r 'echo require "app/version.php";')
 OUT="dist/angelma-$VERSION.zip"
 
-restore() { composer install --quiet; }
+# Afterwards the development packages come back. Composer also writes the commit it ran
+# on into vendor/composer/installed.php, which is committed like the rest of vendor/, so
+# every build would leave that file modified and dev/release.sh would refuse the next
+# release. Nothing reads the value, so the committed file is put back; the zip keeps
+# the one Composer wrote for the build.
+restore() {
+    composer install --quiet
+    git checkout -q -- vendor/composer/installed.php 2>/dev/null || true
+}
 trap restore EXIT
 
 composer install --no-dev --optimize-autoloader --quiet

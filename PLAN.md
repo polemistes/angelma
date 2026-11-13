@@ -643,6 +643,7 @@ dev/reset.sh           # removes data/angelma.sqlite, data/config.php, data/inst
 dev/build.sh           # composer install --no-dev, then zips everything except
                        # dev/ tests/ data/* uploads/* .git .gitignore phpunit.xml
                        # into dist/angelma-<version>.zip, then composer install (with dev)
+                       # and puts back the committed vendor/composer/installed.php
 vendor/bin/phpunit     # tests
 ```
 
