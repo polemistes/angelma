@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.5
+- A blog box can show the whole text of each post, not only the title or the first paragraph. Choose under "Under each title" in the box.
+
 ## 1.4.4
 - The box editor has two save buttons: "Save" keeps you in the box, "Save and close" returns to the page.
 
