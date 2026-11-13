@@ -245,6 +245,7 @@ return [
     'box_move_width_hint' => 'Must fit in the free columns of the row you choose.',
     'box_move_button' => 'Move',
     'box_moved' => 'The box was moved.',
+    'box_moved_to' => 'The box was moved to "{page}".',
     'box_error_move_target' => 'Choose where to move the box.',
     'box_error_move_inside_self' => 'A container cannot be moved into itself.',
     'box_move_from_workbench' => 'Or move here from the workbench',

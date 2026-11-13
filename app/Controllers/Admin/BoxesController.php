@@ -42,7 +42,9 @@ final class BoxesController
                 flash('error', $error);
                 return RowsController::back($pageId, $rowId);
             }
-            return $this->performMove($box, $row, (int) $box['width']);
+            // The editor asked for the box from this page, so this page is where they stay.
+            $this->performMove($box, $row, (int) $box['width']);
+            return RowsController::back($pageId, $rowId);
         }
         $type = $request->str('type');
         $width = $request->int('width');
@@ -240,7 +242,8 @@ final class BoxesController
             // A new row at the end of the page: always fits, always depth 0.
             $page = PagesController::load((int) $m[1]);
             $rowId = (new Rows())->create((int) $page['id'], 'left');
-            return $this->performMove($box, (array) (new Rows())->find($rowId), $width);
+            $this->performMove($box, (array) (new Rows())->find($rowId), $width);
+            return self::backToSource($box);
         }
         if (!preg_match('/^row:(\d+)$/', $target, $m)) {
             return $this->moveView($box, $target, $width, t('box_error_move_target'), 422);
@@ -250,7 +253,19 @@ final class BoxesController
         if ($error !== null) {
             return $this->moveView($box, $target, $width, $error, 422);
         }
-        return $this->performMove($box, $row, $width);
+        $this->performMove($box, $row, $width);
+        return self::backToSource($box);
+    }
+
+    /**
+     * After "Move…" the editor stays on the page the box left, at the row it was in
+     * (PLAN.md section 6.14), so they can go on working there.
+     *
+     * @param array<string, mixed> $box the box as it was before the move
+     */
+    private static function backToSource(array $box): Response
+    {
+        return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
     }
 
     /**
@@ -281,17 +296,20 @@ final class BoxesController
     }
 
     /**
+     * Move the box and say so. The message names the target page when it is another
+     * page, since the editor does not end up there.
+     *
      * @param array<string, mixed> $box
      * @param array<string, mixed> $row the target row
      */
-    private function performMove(array $box, array $row, int $width): Response
+    private function performMove(array $box, array $row, int $width): void
     {
         (new Boxes())->moveTo((int) $box['id'], (int) $row['id'], $width);
         $pages = new Pages();
         $pages->touch((int) $box['page_id']);
         $pages->touch((int) $row['page_id']);
-        flash('success', t('box_moved'));
-        return RowsController::back((int) $row['page_id'], (int) $row['id']);
+        $target = (int) $row['page_id'] !== (int) $box['page_id'] ? $pages->find((int) $row['page_id']) : null;
+        flash('success', $target === null ? t('box_moved') : t('box_moved_to', ['page' => (string) $target['name']]));
     }
 
     /**

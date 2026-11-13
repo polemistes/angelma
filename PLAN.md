@@ -451,6 +451,10 @@ the end of the target row, and the page id of every row inside it is updated. Ea
 row's "Add box" form also offers "move a box here from the workbench" when the workbench
 has boxes.
 
+After a move the editor stays where they were working (1.4.3): "Move…" returns to the
+page the box was on, at the row it left, and the message names the page the box went to;
+"move here from the workbench" stays on the page it was used on.
+
 Deleting a container opens a confirmation screen with two choices: delete it with its
 boxes, or delete the container but keep its boxes, which moves every box directly inside
 it to its own new row on the workbench (nested containers as whole units). Other boxes
@@ -907,6 +911,13 @@ stacks the pages full width with the current one marked, with scripts off the li
 shown stacked, and at 1100 px nothing has changed; `app/version.php` is `1.4.1`, tagged
 `v1.4.1`.
 
+**11.2 Stay on the page after moving a box (1.4.3)**
+"Move…" returns to the page the box left instead of the page it went to, per section
+6.14.
+Done when: on a copy, moving a box and a container to another page returns to the row
+they left with a message naming the target page, a move within the page says only that
+the box was moved, and "move here from the workbench" stays on the page it was used on.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -951,6 +962,7 @@ Tick when done and committed.
 - [x] 10.2 Release tooling
 - [x] 10.3 Updater
 - [x] 11.1 Menu button on narrow screens
+- [x] 11.2 Stay on the page after moving a box
 
 ---
 
