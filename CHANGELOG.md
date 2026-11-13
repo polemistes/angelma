@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.2
+- Admin: the buttons at the top of the blog and post screens have a gap below them, and the three blog buttons share one style, so they no longer look like tabs.
+
 ## 1.4.1
 - On narrow screens the menu bar shows a "Menu" button that opens the pages as a list, instead of wrapping the links.
 
