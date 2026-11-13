@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.4
+- The box editor has two save buttons: "Save" keeps you in the box, "Save and close" returns to the page.
+
 ## 1.4.3
 - Text boxes accept HTML next to Markdown, for example `<a href="https://..." target="_blank">` for a link that opens in a new tab. Scripts and other unsafe parts are removed when the page is shown.
 - After "Move…" you stay on the page the box was moved from, and the message says where it went.
