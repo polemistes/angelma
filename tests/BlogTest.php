@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Angelma\Tests;
 
 use Angelma\App;
+use Angelma\Auth;
 use Angelma\Controllers\BlogController;
 use Angelma\HttpException;
 use Angelma\Repos\Blogs;
 use Angelma\Repos\Boxes;
+use Angelma\Repos\Comments;
 use Angelma\Repos\Posts;
 use Angelma\Request;
 
@@ -38,6 +40,7 @@ final class BlogTest extends DbTestCase
 
     protected function tearDown(): void
     {
+        Auth::reset();
         App::$request = null;
         parent::tearDown();
     }
@@ -98,6 +101,41 @@ final class BlogTest extends DbTestCase
         $this->assertSame(2, substr_count($old, 'class="blog-box-post"'));
         $this->assertStringNotContainsString('post-excerpt', $old);
         $this->assertStringNotContainsString('post-body', $old);
+    }
+
+    public function testClosedPostWithoutCommentsSaysNothingAboutComments(): void
+    {
+        $posts = new Posts($this->db);
+        $comments = new Comments($this->db);
+        $controller = new BlogController();
+        $page = static fn (string $slug): string => $controller->post(new Request('GET', '/blog/news/' . $slug), 'news', $slug)->body;
+        $comment = fn (string $slug, string $status): int => $comments->create([
+            'post_id' => (int) $posts->findBySlug($this->blogId, $slug)['id'], 'user_id' => null,
+            'author_name' => 'Vera', 'body' => "Remark on $slug", 'status' => $status, 'ip_hash' => 'x',
+        ]);
+
+        // Closed and nothing to show: no comments section at all.
+        $this->assertStringContainsString('Body of', $page('p1'));
+        $this->assertStringNotContainsString('id="comments"', $page('p1'));
+        $this->assertStringNotContainsString('Comments are closed', $page('p1'));
+
+        // Closed with a comment: the comment, and the note that there will be no more.
+        $comment('p2', 'approved');
+        $this->assertStringContainsString('id="comments"', $page('p2'));
+        $this->assertStringContainsString('Remark on p2', $page('p2'));
+        $this->assertStringContainsString('Comments are closed', $page('p2'));
+
+        // Closed with only a waiting comment: nothing for visitors, the section for an editor.
+        $comment('p3', 'pending');
+        $this->assertStringNotContainsString('id="comments"', $page('p3'));
+        Auth::setUser((new \Angelma\Repos\Users($this->db))->find($this->ownerId));
+        $this->assertStringContainsString('Remark on p3', $page('p3'));
+        Auth::setUser(null);
+
+        // Open and empty: the section invites the first comment.
+        $posts->update((int) $posts->findBySlug($this->blogId, 'p4')['id'], ['comments_mode' => 'anyone']);
+        $this->assertStringContainsString('No comments yet.', $page('p4'));
+        $this->assertStringContainsString('id="comment-form"', $page('p4'));
     }
 
     public function testFeedIsValidRss(): void

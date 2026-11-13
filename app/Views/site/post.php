@@ -20,6 +20,12 @@ $postPath = '/blog/' . $blog['slug'] . '/' . $post['slug'];
     <div class="prose post-body"><?= raw(\Angelma\Markdown::render((string) $post['body_markdown'])) ?></div>
 </article>
 
+<?php
+// Nothing to read and nothing to write: say nothing about comments (PLAN.md section 6.7).
+if ($comments === [] && $post['comments_mode'] === 'closed') {
+    return;
+}
+?>
 <section class="comments" id="comments">
     <h2><?= e(t('comments_title')) ?></h2>
     <?php if ($comments === []): ?>

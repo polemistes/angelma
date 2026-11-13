@@ -390,6 +390,10 @@ title, date, author, rendered body, then comments, then the comment form if allo
 | users | text "Log in to comment" with link | form |
 | anyone | form with a name field | form |
 
+Since 1.4.5 a post whose comments are closed and that has no comments to show the viewer
+says nothing about comments: no heading, no "No comments yet", no "Comments are closed".
+A closed post with comments still shows them, followed by "Comments are closed".
+
 Anonymous comments are `pending` when `moderate_anonymous` is set, otherwise `approved`.
 Comments from logged-in users are always `approved`. Only approved comments are shown.
 The post author and administrators see pending comments on the post page, marked, with
@@ -997,6 +1001,31 @@ copy, a box saved before the change still shows what it showed, the form opens w
 matching choice, "the whole text" shows each post's full body with its links and
 headings on the public page, and a made-up value is refused.
 
+**11.7 No comments section on closed posts without comments (1.4.5)**
+`site/post.php` leaves the comments section out per section 6.7.
+Done when: a unit test shows a closed post without comments with no comments section, a
+closed post with a comment with the comment and "Comments are closed", a closed post
+with only a waiting comment with no section for a visitor and the section for an editor,
+and an open post without comments with "No comments yet" and the form.
+
+**11.8 Admin link on the site (1.4.5)**
+The link in the menu bar per section 6.17.
+Done when: a unit test shows "Admin" to `/admin` for an editor and an administrator,
+"Account" to `/admin/account` for a `user`, and neither for a visitor; at 390 px the bar
+still holds the menu button, the link, the name and the logout button.
+
+**11.9 Edit links on the site (1.4.5)**
+`edit_links()` in helpers.php, the links in `partials/rows.php` and `site/post.php`, the
+`return` address of the box form, the `edit_links` setting and its checkbox, per sections
+4, 5 and 6.17.
+Done when: unit tests show the links for an editor and none for a `user`, a visitor or
+with the setting off, none on a container, and the box form returning to a given local
+address but not to an outside one; on a copy, "Edit" on a box of a public page opens the
+form, "Save and close" and "Cancel" return to the page at the box, "Save" stays and
+still returns afterwards, an image uploaded in between keeps the address, "Edit" on a
+post opens the post form, and switching the setting off removes the links but not the
+Admin link.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1046,6 +1075,9 @@ Tick when done and committed.
 - [x] 11.4 Save a box without leaving it
 - [x] 11.5 README for any host
 - [x] 11.6 Whole text in the blog box
+- [x] 11.7 No comments section on closed posts without comments
+- [ ] 11.8 Admin link on the site
+- [ ] 11.9 Edit links on the site
 
 ---
 
