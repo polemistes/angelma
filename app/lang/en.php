@@ -129,6 +129,7 @@ return [
 
     // Account
     'save' => 'Save',
+    'save_and_close' => 'Save and close',
     'cancel' => 'Cancel',
     'account_username' => 'Username: {username}',
     'account_change_password' => 'Change password',

@@ -264,7 +264,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/pages/{id}/rows` | POST: add row |
 | `/admin/rows/{id}/move`, `/admin/rows/{id}/delete`, `/admin/rows/{id}/alignment` | POST |
 | `/admin/rows/{id}/boxes` | POST: add box of a given type and width |
-| `/admin/boxes/{id}` | edit box (type-specific form) |
+| `/admin/boxes/{id}` | edit box (type-specific form). Since 1.4.4 the form has three buttons: "Save" saves and stays in the form, "Save and close" (`close=1`) saves and returns to the page at the box's row, "Cancel" returns without saving |
 | `/admin/boxes/{id}/move`, `/admin/boxes/{id}/delete` | POST |
 | `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
 | `/admin/boxes/{id}/move-to` | GET: choose where to move a box; POST: move it (1.3.0) |
@@ -970,6 +970,13 @@ page and in the live preview, a script and an `onclick` in the same text are gon
 editor may save it and a `user` may not, and an editor still gets 403 for raw HTML in an
 embed box.
 
+**11.4 Save a box without leaving it (1.4.4)**
+The box form's "Save" stays in the form and a new "Save and close" returns to the page,
+per the `/admin/boxes/{id}` row of section 5.
+Done when: on a copy, "Save" on a text box stores the text and shows the form again with
+the message, "Save and close" returns to the box's row on the page, "Cancel" changes
+nothing, and a refused value still shows the form with its error.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1016,6 +1023,7 @@ Tick when done and committed.
 - [x] 11.1 Menu button on narrow screens
 - [x] 11.2 Stay on the page after moving a box
 - [x] 11.3 HTML in text boxes
+- [x] 11.4 Save a box without leaving it
 
 ---
 

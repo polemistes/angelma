@@ -171,7 +171,11 @@ final class BoxesController
         $boxes->update($id, $width, $height, $content);
         (new Pages())->touch((int) $box['page_id']);
         flash('success', t('box_saved'));
-        return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+        if ($request->bool('close')) {
+            return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
+        }
+        // "Save" keeps the editor in the box, so a long text can be saved along the way.
+        return redirect('/admin/boxes/' . $id);
     }
 
     /**

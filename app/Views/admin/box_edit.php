@@ -151,8 +151,10 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         <?php endif ?>
     <?php endif ?>
 
+    <?php // "Save" stays in the box, "Save and close" returns to the page (PLAN.md section 5). ?>
     <p class="actions">
         <button type="submit" class="button"><?= e(t('save')) ?></button>
+        <button type="submit" name="close" value="1" class="button secondary"><?= e(t('save_and_close')) ?></button>
         <a class="button secondary" href="<?= e($back) ?>"><?= e(t('cancel')) ?></a>
     </p>
 </form>
