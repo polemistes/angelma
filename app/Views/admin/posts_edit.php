@@ -12,7 +12,7 @@ use Angelma\Repos\Posts;
 $err = static fn (string $name): string => partial('field_error', ['errors' => $errors, 'name' => $name]);
 $action = $post === null ? '/admin/blogs/' . $blog['id'] . '/posts/new' : '/admin/posts/' . $post['id'];
 ?>
-<p class="actions">
+<p class="actions page-actions">
     <a class="button secondary" href="<?= e(url('/admin/blogs/' . $blog['id'])) ?>"><?= e(t('post_back_to_blog', ['blog' => (string) $blog['title']])) ?></a>
     <?php if ($post !== null && $post['status'] === 'published'): ?>
         <a class="button secondary" href="<?= e(url('/blog/' . $blog['slug'] . '/' . $post['slug'])) ?>"><?= e(t('post_view')) ?></a>

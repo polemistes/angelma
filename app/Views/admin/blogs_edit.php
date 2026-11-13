@@ -6,8 +6,8 @@
  * @var list<array<string, mixed>> $posts
  */
 ?>
-<p class="actions">
-    <a class="button" href="<?= e(url('/admin/blogs/' . $blog['id'] . '/posts/new')) ?>"><?= e(t('post_new')) ?></a>
+<p class="actions page-actions">
+    <a class="button secondary" href="<?= e(url('/admin/blogs/' . $blog['id'] . '/posts/new')) ?>"><?= e(t('post_new')) ?></a>
     <a class="button secondary" href="<?= e(url('/blog/' . $blog['slug'])) ?>"><?= e(t('blog_view')) ?></a>
     <a class="button secondary" href="<?= e(url('/admin/blogs')) ?>"><?= e(t('blog_back_to_list')) ?></a>
 </p>

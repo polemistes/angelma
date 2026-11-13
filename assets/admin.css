@@ -196,6 +196,8 @@ button.button {
 .button[disabled] { opacity: .45; cursor: default; }
 
 .actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin: 0; }
+/* A row of buttons at the top of a screen, kept apart from the panel below it. */
+.actions.page-actions { margin-bottom: 1.25rem; }
 form.inline { display: inline; margin: 0; }
 
 /* Tables */
