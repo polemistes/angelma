@@ -21,15 +21,26 @@ use League\CommonMark\Parser\MarkdownParser;
  * between h2 and h4 (h1 belongs to the page), and links to other sites get
  * rel="noopener". Links and images starting with / point into the site, so they get
  * the subfolder in front when the site lives in one (write [About](/about)).
+ *
+ * Text boxes may also hold HTML (PLAN.md section 6.3). For them the HTML is let through
+ * and the whole result goes through the Html filter, which applies the same rules.
  */
 final class Markdown
 {
-    private static ?MarkdownConverter $converter = null;
+    /** @var array<int, MarkdownConverter> the converter that strips HTML (0) and the one that lets it through (1) */
+    private static array $converters = [];
 
-    public static function render(string $markdown): string
+    /**
+     * @param bool $allowHtml keep the harmless part of HTML written in the text, for text
+     *                        boxes only; without PHP's dom extension it is stripped anyway
+     */
+    public static function render(string $markdown, bool $allowHtml = false): string
     {
         if (trim($markdown) === '') {
             return '';
+        }
+        if ($allowHtml && Html::available()) {
+            return Html::clean((string) self::converter(true)->convert($markdown));
         }
         return (string) self::converter()->convert($markdown);
     }
@@ -61,19 +72,22 @@ final class Markdown
         return '';
     }
 
-    private static function converter(): MarkdownConverter
+    private static function converter(bool $allowHtml = false): MarkdownConverter
     {
-        if (self::$converter === null) {
+        if (!isset(self::$converters[(int) $allowHtml])) {
             $environment = new Environment([
-                'html_input' => 'strip',
+                'html_input' => $allowHtml ? 'allow' : 'strip',
                 'allow_unsafe_links' => false,
                 'max_nesting_level' => 50,
             ]);
             $environment->addExtension(new CommonMarkCoreExtension());
-            $environment->addEventListener(DocumentParsedEvent::class, [self::class, 'adjust']);
-            self::$converter = new MarkdownConverter($environment);
+            if (!$allowHtml) {
+                // With HTML allowed, the Html filter makes these adjustments for the whole result.
+                $environment->addEventListener(DocumentParsedEvent::class, [self::class, 'adjust']);
+            }
+            self::$converters[(int) $allowHtml] = new MarkdownConverter($environment);
         }
-        return self::$converter;
+        return self::$converters[(int) $allowHtml];
     }
 
     /** @internal Event listener: clamp heading levels, fix site links, mark external links. */
@@ -84,22 +98,11 @@ final class Markdown
                 $node->setLevel(max(2, min(4, $node->getLevel())));
             } elseif ($node instanceof Link || $node instanceof Image) {
                 $url = $node->getUrl();
-                if (App::$base !== '' && str_starts_with($url, '/') && !str_starts_with($url, '//')) {
-                    $node->setUrl(App::$base . $url);
-                } elseif ($node instanceof Link && self::isExternal($url)) {
+                $node->setUrl(Html::siteUrl($url));
+                if ($node instanceof Link && Html::isExternal($url)) {
                     $node->data->set('attributes/rel', 'noopener');
                 }
             }
         }
-    }
-
-    private static function isExternal(string $url): bool
-    {
-        $host = parse_url($url, PHP_URL_HOST);
-        if (!is_string($host) || $host === '') {
-            return false;
-        }
-        $own = (string) parse_url(App::$request?->origin() ?? '', PHP_URL_HOST);
-        return strcasecmp($host, $own) !== 0;
     }
 }

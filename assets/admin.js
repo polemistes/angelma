@@ -68,7 +68,8 @@
     });
 
     // Live Markdown preview: a textarea with data-preview-target posts its text to
-    // /admin/preview 500 ms after the last keystroke and shows the result.
+    // /admin/preview 500 ms after the last keystroke and shows the result. With
+    // data-preview-html the text may hold HTML too (text boxes).
     document.querySelectorAll('textarea[data-preview-target]').forEach(function (area) {
         var target = document.getElementById(area.getAttribute('data-preview-target'));
         var timer = null;
@@ -82,6 +83,9 @@
                 var mine = ++sequence;
                 var body = new FormData();
                 body.append('markdown', area.value);
+                if (area.hasAttribute('data-preview-html')) {
+                    body.append('html', '1');
+                }
                 body.append('_csrf', csrfToken());
                 fetch(basePath() + '/admin/preview', { method: 'POST', body: body, credentials: 'same-origin' })
                     .then(function (response) {

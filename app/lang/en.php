@@ -273,6 +273,7 @@ return [
     'box_error_height' => 'Enter a height between {min} and {max}, or leave it empty.',
     'box_markdown' => 'Text',
     'markdown_hint' => 'Markdown: # Heading, **bold**, *italic*, [link](https://...), - list item, > quote.',
+    'box_html_hint' => 'HTML works too, for example <a href="https://..." target="_blank">link</a> to open a link in a new tab. Scripts and other unsafe parts are removed.',
     'preview' => 'Preview',
     'box_error_markdown_long' => 'The text can have at most {max} characters.',
     'box_saved' => 'The box was saved.',

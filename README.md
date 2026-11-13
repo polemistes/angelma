@@ -59,6 +59,11 @@ program such as FileZilla (or the file manager in the control panel, if you pref
   there, then use *Move…* on any box to put it in a row on any page, or pick it from
   "move here from the workbench" in a row. Deleting a container asks whether to keep its
   boxes; kept boxes go to the workbench.
+- **HTML in text boxes:** text boxes are written in Markdown, and you can mix in HTML
+  where Markdown falls short. To make a link open in a new tab, write
+  `<a href="https://www.example.no/" target="_blank">link text</a>`. Tables, coloured or
+  centred text (`<div style="text-align: center">`) and similar work too. Scripts and
+  other parts that could harm visitors are removed when the page is shown.
 - **Who can do what:** editors manage all content, that is pages, images, blogs and
   comments. Administrators also manage users, settings, the menu and backups, and only
   they may paste raw HTML into an embed box.

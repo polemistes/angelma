@@ -174,11 +174,14 @@ final class BoxesController
         return RowsController::back((int) $box['page_id'], (int) $box['row_id']);
     }
 
-    /** Render Markdown for the live preview in the text box form (admin.js). */
+    /**
+     * Render Markdown for the live preview (admin.js). The text box form sends `html=1`,
+     * since text boxes may hold HTML (PLAN.md section 6.3); posts and the footer do not.
+     */
     public function preview(Request $request): Response
     {
         Auth::requireRole('editor');
-        return new Response(Markdown::render($request->input('markdown')), 200, [
+        return new Response(Markdown::render($request->input('markdown'), $request->bool('html')), 200, [
             'Content-Type' => 'text/html; charset=utf-8',
         ]);
     }

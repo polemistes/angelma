@@ -26,6 +26,25 @@ final class MarkdownTest extends TestCase
         $this->assertStringNotContainsString('<iframe', $html);
     }
 
+    public function testTextBoxesKeepHarmlessHtml(): void
+    {
+        $html = Markdown::render("# Big\n\nA [md](https://example.com/a) link and <a href=\"/about\" target=\"_blank\">one in a new tab</a>.<script>alert(1)</script>\n\n<div onclick=\"x()\" style=\"text-align:center\">\n\n**bold** inside\n\n</div>", true);
+        $this->assertStringContainsString('<h2>Big</h2>', $html);
+        $this->assertStringContainsString('<a href="https://example.com/a" rel="noopener">md</a>', $html);
+        $this->assertStringContainsString('<a href="/about" target="_blank">one in a new tab</a>', $html);
+        $this->assertStringContainsString('<div style="text-align: center">', $html);
+        $this->assertStringContainsString('<strong>bold</strong> inside', $html);
+        $this->assertStringNotContainsString('script', $html);
+        $this->assertStringNotContainsString('onclick', $html);
+        // Everything Markdown itself makes comes through the filter unchanged in meaning.
+        $html = Markdown::render("**b** *i* `c`\n\n- a\n- b\n\n1. one\n\n> quote\n\n---\n\n```\ncode <b>\n```\n\n![alt](https://example.com/i.png)", true);
+        foreach (['<strong>b</strong>', '<em>i</em>', '<code>c</code>', "<ul>\n<li>a</li>", "<ol>\n<li>one</li>", '<blockquote>', '<hr>', '<pre><code>code &lt;b&gt;', '<img src="https://example.com/i.png" alt="alt">'] as $needle) {
+            $this->assertStringContainsString($needle, $html);
+        }
+        // Only where it is asked for: every other text still has its HTML stripped.
+        $this->assertStringNotContainsString('target', Markdown::render('<a href="/about" target="_blank">x</a>'));
+    }
+
     public function testUnsafeLinksAreRemoved(): void
     {
         $html = Markdown::render('[x](javascript:alert(1)) ![y](data:text/html;base64,AAAA)');

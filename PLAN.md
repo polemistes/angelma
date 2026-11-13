@@ -46,11 +46,11 @@ These were decided with the site owner and are not open for change.
 
 | Topic | Decision |
 |---|---|
-| Runtime | PHP 8.2 or newer. Required extensions: `pdo_sqlite`, `gd`, `mbstring`, `json`, `session`. Optional: `pdo_mysql`, `zip`. |
+| Runtime | PHP 8.2 or newer. Required extensions: `pdo_sqlite`, `gd`, `mbstring`, `json`, `session`. Optional: `pdo_mysql`, `zip`, and since 1.4.3 `dom` (HTML in text boxes, section 6.3). |
 | Framework | None. Hand-written front controller and router. |
 | Database | SQLite through PDO. The SQL is written to be standard so MySQL can be added later. All driver-specific SQL lives in `app/Db.php` only. |
 | Templates | Plain PHP files under `app/Views`. |
-| Text format | Markdown, rendered server-side with `league/commonmark`. HTML in Markdown is stripped. |
+| Text format | Markdown, rendered server-side with `league/commonmark`. HTML in Markdown is stripped, except in text boxes, where the owner asked for it in 1.4.3: there it is kept and filtered (section 6.3). |
 | Composer | Only `league/commonmark` in production, `phpunit/phpunit` in development. `vendor/` is committed to the repository so the archive is complete and the host never runs Composer. |
 | JavaScript | Small plain scripts, no libraries, no bundler. Used in the admin: Markdown preview, image picker, confirmation dialogs. Since 1.4.1 the public site has one small script too, `assets/site.js`, for the menu button on narrow screens; without it the menu is simply shown. |
 | Accounts | Administrators create users and set passwords. No self-registration. No email anywhere in version 1. |
@@ -74,6 +74,7 @@ angelma/                      repository root = web root after extraction
     Db.php                    PDO wrapper, migration runner
     Auth.php                  login, logout, current user, roles, CSRF, rate limiting
     Markdown.php
+    Html.php                  the filter for HTML in text boxes (section 6.3)
     Images.php                upload validation, re-encoding, resizing
     Schemes.php               built-in colour schemes and the custom one
     Controllers/
@@ -268,7 +269,7 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/boxes/{id}/rows` | POST: add row inside a container box (1.2.0) |
 | `/admin/boxes/{id}/move-to` | GET: choose where to move a box; POST: move it (1.3.0) |
 | `/admin/boxes/{id}/delete` | also GET since 1.3.0: the confirmation screen with the keep-boxes choice for a container; POST with `keep=1` keeps the boxes |
-| `/admin/preview` | POST Markdown, returns rendered HTML (used by admin.js) |
+| `/admin/preview` | POST Markdown, returns rendered HTML (used by admin.js); with `html=1` HTML is kept and filtered as in a text box |
 | `/admin/images` | library with upload form, delete, edit alt text |
 | `/admin/images/picker` | small list used inside the image box form |
 | `/admin/blogs`, `/admin/blogs/{id}` | list and edit blogs, list posts |
@@ -319,8 +320,44 @@ scripts off the list is shown stacked from the start.
 ### 6.3 Text box
 Markdown rendered to HTML. Supported: headings (h2 to h4 inside a box, h1 is rendered as
 h2 so the page keeps one h1), paragraphs, bold, italic, links, ordered and unordered
-lists, blockquotes, horizontal rules, inline code and code blocks, images by URL. Raw HTML
-is stripped. Links to other sites get `rel="noopener"`.
+lists, blockquotes, horizontal rules, inline code and code blocks, images by URL. Links to
+other sites get `rel="noopener"`.
+
+Since 1.4.3 the text may also hold HTML, because Markdown cannot say that a link opens in
+a new tab: `<a href="https://..." target="_blank">`. The rendered text goes through
+`Angelma\Html`, which parses it and writes it out again from scratch with only what is
+on its lists, every text and attribute value escaped:
+
+- Elements: `a`, `img`, `p`, `br`, `hr`, `div`, `span`, `h2` to `h4`, lists (`ul`, `ol`,
+  `li`, `dl`, `dt`, `dd`), `blockquote`, `pre`, `code`, the text-level elements (`em`,
+  `strong`, `b`, `i`, `u`, `s`, `del`, `ins`, `mark`, `small`, `sub`, `sup`, `kbd`,
+  `samp`, `var`, `abbr`, `cite`, `q`, `time`, `wbr`), `figure`, `figcaption`, `details`,
+  `summary` and tables (`table`, `caption`, `colgroup`, `col`, `thead`, `tbody`, `tfoot`,
+  `tr`, `th`, `td`).
+- Attributes: `class`, `id`, `title`, `lang`, `dir` and `style` on every element; `href`,
+  `target` (`_blank`, `_self`, `_parent`, `_top`) and `rel` on links; `src`, `alt`,
+  `width`, `height` and `loading` on images; `start`, `reversed`, `type`, `value` on
+  lists; `colspan`, `rowspan`, `scope`, `span` in tables; `datetime` on `time`; `open` on
+  `details`. Event handlers (`onclick` and the like) are never on the list.
+- Addresses in `href` and `src`: without a scheme, or `http`, `https`, and for links
+  `mailto` and `tel`; images also the `data:image` types Markdown allows. `javascript:`
+  and the like are dropped, also when written with entities, spaces or control characters.
+- `style`: only properties for text, colours, sizes, spacing, borders and float, with
+  plain values; `position`, anything with `url()` and everything else is dropped.
+
+`script`, `style`, frames, `object`, `embed`, audio, video, `canvas`, SVG, MathML,
+`template`, `noscript`, `textarea` and `select` are left out with everything inside them.
+Any other element is left out but the text inside it is kept. The rules Markdown has
+apply to the HTML too: `h1` becomes `h2`, `h5` and `h6` become `h4`, addresses starting
+with `/` get the site's subfolder, links to other sites get `rel="noopener"`. Every
+element is closed in the output, and list items and table parts are written only in their
+place, so a forgotten or extra tag cannot disturb the page around the box.
+
+The filter needs PHP's `dom` extension: on PHP 8.4 and newer it uses `Dom\HTMLDocument`,
+the parser browsers use, on 8.2 and 8.3 `DOMDocument`. Without the extension HTML is
+stripped as before. Blog posts, the footer, the maintenance notice and release notes
+still have their HTML stripped. Editors may write HTML in text boxes (section 7); the
+filter is what keeps raw HTML, which is output unchanged, with administrators.
 
 ### 6.4 Image box
 The image fills the box width. Without a fixed height, the height follows the image's
@@ -524,13 +561,15 @@ stay as information shown in lists, but nothing is enforced on them.
 | Upload images, edit alt text, delete unused images | yes | yes | no | no |
 | Create, edit and delete blogs and posts | yes | yes | no | no |
 | Approve or delete comments | yes | yes | no | no |
+| HTML in text boxes, filtered (section 6.3, 1.4.3) | yes | yes | no | no |
 | Raw HTML in embed boxes | yes | no | no | no |
 | Users, settings, backup | yes | no | no | no |
 | Change own password and display name | yes | yes | yes | no |
 
 Rules are enforced in the controllers through `Auth::requireRole('editor')` (admin
 satisfies every role requirement). Raw HTML stays with administrators because it is about
-what visitors' browsers run, not about who made the box. A user with role `user` who
+what visitors' browsers run, not about who made the box. The HTML editors write in text
+boxes is filtered so that it cannot run anything. A user with role `user` who
 opens `/admin` is sent to `/admin/account`, the only admin screen they may use. The last
 active administrator cannot be deactivated, deleted or demoted.
 
@@ -918,6 +957,18 @@ Done when: on a copy, moving a box and a container to another page returns to th
 they left with a message naming the target page, a move within the page says only that
 the box was moved, and "move here from the workbench" stays on the page it was used on.
 
+**11.3 HTML in text boxes (1.4.3)**
+`Angelma\Html` and the `$allowHtml` argument of `Markdown::render()`, used by the text
+box, its preview and `/admin/preview` with `html=1`; the hint under the text field; `dom`
+among the optional extensions of the installer, per section 6.3.
+Done when: unit tests run the filter with both parsers over links with a target, scripts,
+event handlers, disguised `javascript:` addresses, a list of known tricks, unclosed and
+extra tags, misplaced list items and cells, the style list, headings, non-ASCII text and
+the subfolder; on a copy a text box with a `target="_blank"` link shows it on the public
+page and in the live preview, a script and an `onclick` in the same text are gone, an
+editor may save it and a `user` may not, and an editor still gets 403 for raw HTML in an
+embed box.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -963,6 +1014,7 @@ Tick when done and committed.
 - [x] 10.3 Updater
 - [x] 11.1 Menu button on narrow screens
 - [x] 11.2 Stay on the page after moving a box
+- [x] 11.3 HTML in text boxes
 
 ---
 

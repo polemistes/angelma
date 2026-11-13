@@ -50,13 +50,16 @@ $back = url('/admin/pages/' . $page['id']) . '#row-' . (int) $box['row_id'];
         <div class="markdown-editor">
             <label>
                 <span><?= e(t('box_markdown')) ?></span>
-                <textarea name="markdown" id="markdown" rows="18" data-preview-target="markdown-preview"><?= e($content['markdown'] ?? '') ?></textarea>
+                <textarea name="markdown" id="markdown" rows="18" data-preview-target="markdown-preview" data-preview-html><?= e($content['markdown'] ?? '') ?></textarea>
                 <span class="hint"><?= e(t('markdown_hint')) ?></span>
+                <?php if (\Angelma\Html::available()): ?>
+                    <span class="hint"><?= e(t('box_html_hint')) ?></span>
+                <?php endif ?>
                 <?= $err('markdown') ?>
             </label>
             <div class="field">
                 <span><?= e(t('preview')) ?></span>
-                <div class="preview prose" id="markdown-preview" aria-live="polite"><?= raw(\Angelma\Markdown::render((string) ($content['markdown'] ?? ''))) ?></div>
+                <div class="preview prose" id="markdown-preview" aria-live="polite"><?= raw(\Angelma\Markdown::render((string) ($content['markdown'] ?? ''), true)) ?></div>
             </div>
         </div>
     <?php endif ?>

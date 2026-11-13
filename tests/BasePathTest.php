@@ -60,6 +60,14 @@ final class BasePathTest extends TestCase
         $this->assertStringContainsString('href="//cdn.example.com/x"', $html);
         $this->assertStringContainsString('href="page"', $html);
 
+        // With HTML allowed (text boxes) the subfolder is added once, to Markdown and HTML links alike.
+        $html = Markdown::render('[About](/about) ![Pic](/uploads/a.jpg) <a href="/contact" target="_blank">Contact</a> <img src="/uploads/b.jpg">', true);
+        $this->assertStringContainsString('href="/site/about"', $html);
+        $this->assertStringContainsString('src="/site/uploads/a.jpg"', $html);
+        $this->assertStringContainsString('href="/site/contact"', $html);
+        $this->assertStringContainsString('src="/site/uploads/b.jpg"', $html);
+        $this->assertStringNotContainsString('/site/site', $html);
+
         App::$base = '';
         $this->assertStringContainsString('href="/about"', Markdown::render('[About](/about)'));
     }
