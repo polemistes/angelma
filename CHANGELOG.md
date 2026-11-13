@@ -4,6 +4,9 @@ Each version's section is the text of its GitHub release (`dev/release.sh`).
 
 ## 1.4.5
 - A blog box can show the whole text of each post, not only the title or the first paragraph. Choose under "Under each title" in the box.
+- Editors and administrators get an "Edit" link on every box and post on the site. "Save and close" brings you back to the page. The links can be switched off under Settings.
+- Logged-in users get a link to the admin area in the menu bar: "Admin" for editors and administrators, "Account" for other users.
+- A post with comments closed and no comments no longer mentions comments at all.
 
 ## 1.4.4
 - The box editor has two save buttons: "Save" keeps you in the box, "Save and close" returns to the page.
