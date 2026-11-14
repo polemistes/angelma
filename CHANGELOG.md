@@ -2,6 +2,10 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.6
+- Text and blog boxes with a fixed height can scroll instead of cutting off what does not fit. In a blog box only the posts scroll; the title and "All posts" stay in place.
+- Containers can have a fixed height too, and their boxes then scroll inside it. On phones the height is dropped.
+
 ## 1.4.5
 - A blog box can show the whole text of each post, not only the title or the first paragraph. Choose under "Under each title" in the box.
 - Editors and administrators get an "Edit" link on every box and post on the site. "Save and close" brings you back to the page. The links can be switched off under Settings.

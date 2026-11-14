@@ -111,8 +111,8 @@ final class BoxesController
             $errors['width'] = t('box_error_too_wide', ['width' => $width, 'free' => $free]);
         }
 
-        // A container has no fixed height of its own (PLAN.md section 6.13).
-        $heightText = $box['type'] === 'container' ? '' : $request->str('height');
+        // Since 1.4.6 a container may have a fixed height too; it then scrolls (section 6.13).
+        $heightText = $request->str('height');
         $height = null;
         if ($heightText !== '') {
             if (!preg_match('/^\d+$/', $heightText) || (int) $heightText < self::MIN_HEIGHT || (int) $heightText > self::MAX_HEIGHT) {
@@ -123,6 +123,10 @@ final class BoxesController
         }
 
         $content = $box['content'];
+        if (in_array($box['type'], Boxes::SCROLL_TYPES, true)) {
+            // Scroll inside a fixed height instead of cutting off (PLAN.md section 6.2).
+            $content['scroll'] = $request->bool('scroll') ? 1 : 0;
+        }
         switch ($box['type']) {
             case 'text':
                 $content['markdown'] = $request->input('markdown');

@@ -23,7 +23,7 @@ $here = \Angelma\App::$request?->path ?? '/';
         <?php foreach ($rowBoxes as $box): ?>
             <?php $height = $box['height'] !== null ? (int) $box['height'] : 0; ?>
             <?php $edit = $editLinks && $box['type'] !== 'container'; ?>
-            <div class="box box-<?= e($box['type']) ?> w-<?= (int) $box['width'] ?><?= $height > 0 ? ' fixed' : '' ?>"<?= $edit ? ' id="box-' . (int) $box['id'] . '"' : '' ?><?= $height > 0 ? ' style="--h:' . $height . 'px"' : '' ?>>
+            <div class="box box-<?= e($box['type']) ?> w-<?= (int) $box['width'] ?><?= $height > 0 ? ' fixed' : '' ?><?= \Angelma\Repos\Boxes::scrolls($box) ? ' scroll' : '' ?>"<?= $edit ? ' id="box-' . (int) $box['id'] . '"' : '' ?><?= $height > 0 ? ' style="--h:' . $height . 'px"' : '' ?>>
                 <?php if ($edit): ?>
                     <a class="edit-link" href="<?= e(url('/admin/boxes/' . (int) $box['id'], ['return' => $here . '#box-' . (int) $box['id']])) ?>"><?= e(t('edit')) ?></a>
                 <?php endif ?>

@@ -16,6 +16,26 @@ final class Boxes extends Repo
      */
     public const MAX_DEPTH = 2;
 
+    /** Box types whose fixed height can scroll instead of cutting off (PLAN.md section 6.2). */
+    public const SCROLL_TYPES = ['text', 'blog'];
+
+    /**
+     * Does the box scroll inside its fixed height? Text and blog boxes do when `scroll`
+     * is set; a container with a fixed height always does (section 6.13).
+     *
+     * @param array<string, mixed> $box with decoded content
+     */
+    public static function scrolls(array $box): bool
+    {
+        if ($box['height'] === null || (int) $box['height'] <= 0) {
+            return false;
+        }
+        if ($box['type'] === 'container') {
+            return true;
+        }
+        return in_array($box['type'], self::SCROLL_TYPES, true) && (int) ($box['content']['scroll'] ?? 0) === 1;
+    }
+
     /** What a blog box shows under each post title (PLAN.md section 6.5). */
     public const BLOG_TEXTS = ['none', 'first', 'full'];
 

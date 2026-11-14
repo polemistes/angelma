@@ -36,16 +36,24 @@ $back = $return !== '' ? url($return) : url('/admin/pages/' . $page['id']) . '#r
             </select>
             <?= $err('width') ?>
         </label>
-        <?php if ($box['type'] !== 'container'): ?>
-            <label>
-                <span><?= e(t('box_height')) ?></span>
-                <input type="number" name="height" value="<?= e($height) ?>" min="<?= BoxesController::MIN_HEIGHT ?>"
-                       max="<?= BoxesController::MAX_HEIGHT ?>" placeholder="<?= e(t('box_height_auto')) ?>">
-                <span class="hint"><?= e(t('box_height_hint')) ?></span>
-                <?= $err('height') ?>
-            </label>
-        <?php endif ?>
+        <label>
+            <span><?= e(t('box_height')) ?></span>
+            <input type="number" name="height" value="<?= e($height) ?>" min="<?= BoxesController::MIN_HEIGHT ?>"
+                   max="<?= BoxesController::MAX_HEIGHT ?>" placeholder="<?= e(t('box_height_auto')) ?>">
+            <span class="hint"><?= e(t($box['type'] === 'container' ? 'box_height_hint_container' : 'box_height_hint')) ?></span>
+            <?= $err('height') ?>
+        </label>
     </div>
+
+    <?php if (in_array($box['type'], \Angelma\Repos\Boxes::SCROLL_TYPES, true)): ?>
+        <fieldset>
+            <label class="check">
+                <input type="checkbox" name="scroll" value="1"<?= (int) ($content['scroll'] ?? 0) === 1 ? ' checked' : '' ?>>
+                <span><?= e(t('box_scroll')) ?></span>
+            </label>
+            <span class="hint"><?= e(t('box_scroll_hint_' . $box['type'])) ?></span>
+        </fieldset>
+    <?php endif ?>
 
     <?php if ($box['type'] === 'container'): ?>
         <p class="hint"><?= e(t('box_container_edit_hint')) ?></p>

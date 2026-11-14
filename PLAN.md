@@ -197,11 +197,11 @@ Content JSON per type:
 
 | type | fields |
 |---|---|
-| text | `markdown` |
+| text | `markdown`, `scroll` (1 or 0, since 1.4.6, section 6.2; missing means 0) |
 | image | `image_id`, `alt`, `caption` (may be empty), `fit` (`cover` or `contain`, used only when height is fixed) |
-| blog | `blog_id`, `count` (number of newest posts to show, default 5), `text` (`none`, `first` or `full`, default `first`; a box last saved before 1.4.5 has `show_excerpts` (1 or 0) instead, read as `first` or `none`) |
+| blog | `blog_id`, `count` (number of newest posts to show, default 5), `text` (`none`, `first` or `full`, default `first`; a box last saved before 1.4.5 has `show_excerpts` (1 or 0) instead, read as `first` or `none`), `scroll` (as for text) |
 | embed | `url` (a URL from a supported provider, section 6.6), or `html` (raw HTML, only administrators may set this) |
-| container | no fields: the box's content is the rows whose `parent_box_id` is the box's id (section 6.13) |
+| container | no fields: the box's content is the rows whose `parent_box_id` is the box's id (section 6.13); since 1.4.6 it may have a `height`, and then always scrolls |
 
 The sum of widths in a row may not exceed 12. The admin validates this.
 
@@ -318,6 +318,13 @@ scripts off the list is shown stacked from the start.
   are kept on narrow screens for image boxes and dropped for text boxes.
 - A box with fixed `height` gets that height in pixels and `overflow: hidden` for text and
   blog boxes.
+- Since 1.4.6 a text or blog box with a fixed height can scroll instead (`scroll` in its
+  content, the checkbox "Scroll inside the box when the content is taller than the fixed
+  height", off by default). The inside scrolls, not the box: the whole text of a text
+  box, only the list of posts of a blog box, so the blog title and "All posts" stay in
+  place, and so does the "Edit" link (6.17). Text boxes still drop their height below
+  700 px; a scrolling blog box keeps it there but is never taller than 67% of the
+  screen. Image and embed boxes fill their height and have no such choice.
 - Boxes have the scheme's box background and border. Padding is consistent for all types.
 
 ### 6.3 Text box
@@ -468,7 +475,9 @@ strips and columns is possible.
   the same alignment setting as a page row.
 - The container draws nothing: no background, border or padding. A container holding one
   full-width box therefore looks exactly like that box on its own.
-- Containers have no fixed height; the boxes inside keep their own.
+- Until 1.4.5 containers had no fixed height. Since 1.4.6 a container may have one, and
+  then always scrolls (cutting off whole boxes is never wanted). Below 700 px the height
+  is dropped and the boxes stack in the page. The boxes inside keep their own heights.
 - Containers can be nested, but at most two deep: a container in a page row may hold
   containers, and those may not. The server refuses deeper nesting with a message.
 - Deleting a container deletes its rows and boxes, recursively. Deleting a row or a page
@@ -1050,6 +1059,16 @@ still returns afterwards, an image uploaded in between keeps the address, "Edit"
 post opens the post form, and switching the setting off removes the links but not the
 Admin link.
 
+**11.10 Scrolling boxes (1.4.6)**
+`Boxes::scrolls()`, the `scroll` checkbox for text and blog boxes, the height field for
+containers, the `scroll` class in `partials/rows.php` and its styles, per sections 4,
+6.2 and 6.13.
+Done when: unit tests cover which boxes scroll, the classes on the public page, saving
+the checkbox, no checkbox on image boxes and containers, and a container's height; on a
+copy, at 1200 px a blog box of 10 posts, a long text box and a container of four boxes
+beside an image scroll inside their height with "All posts" inside the frame, and at
+390 px the blog box still scrolls while the text box and the container show everything.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1102,6 +1121,7 @@ Tick when done and committed.
 - [x] 11.7 No comments section on closed posts without comments
 - [x] 11.8 Admin link on the site
 - [x] 11.9 Edit links on the site
+- [x] 11.10 Scrolling boxes
 
 ---
 

@@ -264,6 +264,31 @@ img {
     overflow: hidden;
 }
 
+/* Scrolling boxes (1.4.6, PLAN.md section 6.2): the inside scrolls, not the box, so
+   the frame, the blog title, "All posts" and the Edit link stay in place. */
+.box-text.scroll,
+.box-blog.scroll,
+.box-blog.scroll > .blog-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.box-blog.scroll > .blog-box {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.box-text.scroll > .prose,
+.box-blog.scroll .blog-box-posts {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.box-container.scroll {
+    overflow-y: auto;
+}
+
 /* A container box draws nothing of its own: the rows inside it are the content
    (PLAN.md section 6.13). Its last row drops its margin so the container is no taller
    than its rows. */
@@ -392,6 +417,17 @@ pre {
 
     .box-text.fixed {
         height: auto;
+    }
+
+    /* A scrolling blog box is never taller than two thirds of the screen, so the page
+       can still be scrolled past it; a container drops its height and its boxes stack. */
+    .box-blog.scroll {
+        max-height: 67vh;
+    }
+
+    .box-container.fixed {
+        height: auto;
+        overflow: visible;
     }
 
     .site-title {

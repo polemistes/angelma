@@ -233,7 +233,7 @@ return [
     'box_delete_empty' => 'Delete the container',
     'box_deleted_kept' => 'The container was deleted. {count} boxes were moved to the workbench.',
     'box_error_container_depth' => 'Containers can be nested only two deep. Add this container to a row higher up.',
-    'box_container_edit_hint' => 'A container holds rows of boxes, like a page, and has only a width of its own. Widths inside it are shares of the container. Its rows and boxes are edited on the page.',
+    'box_container_edit_hint' => 'A container holds rows of boxes, like a page, and has only a width and a height of its own. Widths inside it are shares of the container. Its rows and boxes are edited on the page.',
 
     // Moving boxes
     'box_move' => 'Move…',
@@ -273,6 +273,11 @@ return [
     'box_height' => 'Fixed height in pixels',
     'box_height_auto' => 'Automatic',
     'box_height_hint' => 'Leave empty to let the height follow the content.',
+    'box_height_hint_container' => 'Leave empty to let the height follow the boxes inside. With a height, the boxes inside scroll. On phones the height is dropped and the boxes stack in the page.',
+    'box_scroll' => 'Scroll inside the box when the content is taller than the fixed height',
+    'box_scroll_hint_text' => 'Without this, text that does not fit is cut off. Only matters with a fixed height. On phones text boxes follow their content anyway.',
+    'box_scroll_hint_blog' => 'Without this, posts that do not fit are cut off. The blog title and "All posts" stay in place; only the posts scroll. Only matters with a fixed height.',
+    'box_scrolls' => 'scrolls',
     'box_error_height' => 'Enter a height between {min} and {max}, or leave it empty.',
     'box_markdown' => 'Text',
     'markdown_hint' => 'Markdown: # Heading, **bold**, *italic*, [link](https://...), - list item, > quote.',

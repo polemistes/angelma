@@ -70,7 +70,7 @@ $types = $depth < Boxes::MAX_DEPTH ? Boxes::TYPES : array_values(array_diff(Boxe
                 <div class="layout-box w-<?= (int) $box['width'] ?><?= $isContainer ? ' is-container' : '' ?>" id="box-<?= (int) $box['id'] ?>"<?= $j === 0 && $start > 1 ? ' style="grid-column:' . (int) $start . ' / span ' . (int) $box['width'] . '"' : '' ?>>
                     <div class="box-head">
                         <strong><?= e(t('box_type_' . $box['type'])) ?></strong>
-                        <span class="muted small"><?= e(t('box_width_of', ['width' => (int) $box['width']])) ?><?php if ($box['height'] !== null): ?>, <?= e(t('box_height_value', ['height' => (int) $box['height']])) ?><?php endif ?></span>
+                        <span class="muted small"><?= e(t('box_width_of', ['width' => (int) $box['width']])) ?><?php if ($box['height'] !== null): ?>, <?= e(t('box_height_value', ['height' => (int) $box['height']])) ?><?php if (\Angelma\Repos\Boxes::scrolls($box)): ?>, <?= e(t('box_scrolls')) ?><?php endif ?><?php endif ?></span>
                     </div>
                     <?php if ($isContainer): ?>
                         <div class="container-rows">
