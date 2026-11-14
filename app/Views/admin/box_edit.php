@@ -66,7 +66,7 @@ $back = $return !== '' ? url($return) : url('/admin/pages/' . $page['id']) . '#r
                 <textarea name="markdown" id="markdown" rows="18" data-preview-target="markdown-preview" data-preview-html><?= e($content['markdown'] ?? '') ?></textarea>
                 <span class="hint"><?= e(t('markdown_hint')) ?></span>
                 <?php if (\Angelma\Html::available()): ?>
-                    <span class="hint"><?= e(t('box_html_hint')) ?></span>
+                    <span class="hint"><?= e(t('html_hint')) ?></span>
                 <?php endif ?>
                 <?= $err('markdown') ?>
             </label>

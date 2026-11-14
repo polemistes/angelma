@@ -6,6 +6,7 @@ namespace Angelma\Tests;
 
 use Angelma\App;
 use Angelma\Auth;
+use Angelma\Controllers\Admin\PostsController;
 use Angelma\Controllers\BlogController;
 use Angelma\HttpException;
 use Angelma\Repos\Blogs;
@@ -83,8 +84,8 @@ final class BlogTest extends DbTestCase
         $this->assertSame(3, substr_count($full, 'class="prose post-body"'));
         $this->assertStringContainsString('Opening with a <a href="/y">link</a>.', $full);
         $this->assertStringContainsString('<h2>Part two</h2>', $full);
-        // Posts take no HTML: the tags are dropped, as on the post page.
-        $this->assertStringContainsString('<p>Closing words.</p>', $full);
+        // Posts take HTML since 1.4.8, filtered as in a text box, as on the post page.
+        $this->assertStringContainsString('<p>Closing <b>words</b>.</p>', $full);
         $this->assertStringNotContainsString('post-excerpt', $full);
         $this->assertStringContainsString('Body of <a href="/x">post 12</a> &amp; more', $full);
         $this->assertStringNotContainsString('Draft', $full);
@@ -152,6 +153,52 @@ final class BlogTest extends DbTestCase
         (new \Angelma\Repos\Settings($this->db))->set('edit_links', '0');
         App::forgetSettings();
         $this->assertStringNotContainsString('edit-link', $page());
+    }
+
+    public function testPostsTakeFilteredHtml(): void
+    {
+        (new Posts($this->db))->create([
+            'blog_id' => $this->blogId, 'slug' => 'html', 'title' => 'With HTML',
+            'body_markdown' => "Read <a href=\"/about\" target=\"_blank\" onclick=\"steal()\">this <em>page</em></a> first.\n\n"
+                . "<script>alert(1)</script>\n\n<table><tr><td style=\"color: red; position: fixed\">Cell</td></tr></table>\n\n"
+                . "<a href=\"javascript:alert(2)\">bad</a>",
+            'status' => 'published', 'comments_mode' => 'closed', 'author_id' => $this->ownerId,
+            'published_at' => '2026-10-20T10:00:00Z',
+        ]);
+        (new Comments($this->db))->create([
+            'post_id' => (int) (new Posts($this->db))->findBySlug($this->blogId, 'html')['id'], 'user_id' => null,
+            'author_name' => 'Vera', 'body' => '<b>Bold</b> remark', 'status' => 'approved', 'ip_hash' => 'x',
+        ]);
+        $page = (new BlogController())->post(new Request('GET', '/blog/news/html'), 'news', 'html')->body;
+        $this->assertStringContainsString('&lt;b&gt;Bold&lt;/b&gt; remark', $page, 'comments still take no HTML');
+        $this->assertStringContainsString('<a href="/about" target="_blank">this <em>page</em></a>', $page);
+        $this->assertStringContainsString('<td style="color: red">Cell</td>', $page);
+        $this->assertStringNotContainsString('steal()', $page);
+        $this->assertStringNotContainsString('alert', $page);
+        $this->assertStringContainsString('>bad</a>', $page);
+
+        // The feed has the same HTML, with addresses made absolute for feed readers.
+        $feed = (new BlogController())->feed(new Request('GET', '/blog/news/feed'), 'news')->body;
+        $item = (string) simplexml_load_string($feed)->channel->item[0]->description;
+        $this->assertStringContainsString('<a href="https://example.com/about" target="_blank">this <em>page</em></a>', $item);
+        $this->assertStringNotContainsString('alert', $item);
+
+        // Excerpts are plain text: the tags are left out, their text kept.
+        $index = (new BlogController())->index(new Request('GET', '/blog/news'), 'news')->body;
+        $this->assertStringContainsString('<p class="post-excerpt">Read this page first.</p>', $index);
+    }
+
+    public function testPostFormPreviewsHtml(): void
+    {
+        Auth::setUser((new \Angelma\Repos\Users($this->db))->find($this->ownerId));
+        $id = (int) (new Posts($this->db))->create([
+            'blog_id' => $this->blogId, 'slug' => 'form', 'title' => 'Form', 'body_markdown' => 'A <u>marked</u> word',
+            'status' => 'draft', 'comments_mode' => 'closed', 'author_id' => $this->ownerId, 'published_at' => null,
+        ]);
+        $form = (new PostsController())->edit(new Request('GET', "/admin/posts/$id"), $id)->body;
+        $this->assertStringContainsString('data-preview-target="post-preview" data-preview-html', $form);
+        $this->assertStringContainsString('HTML works too', $form);
+        $this->assertStringContainsString('<p>A <u>marked</u> word</p>', $form);
     }
 
     public function testFeedIsValidRss(): void

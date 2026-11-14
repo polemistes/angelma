@@ -13,6 +13,7 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Link;
 use League\CommonMark\MarkdownConverter;
 use League\CommonMark\Node\Block\Paragraph;
 use League\CommonMark\Node\Inline\Newline;
+use League\CommonMark\Node\RawMarkupContainerInterface;
 use League\CommonMark\Node\StringContainerInterface;
 use League\CommonMark\Parser\MarkdownParser;
 
@@ -22,8 +23,9 @@ use League\CommonMark\Parser\MarkdownParser;
  * rel="noopener". Links and images starting with / point into the site, so they get
  * the subfolder in front when the site lives in one (write [About](/about)).
  *
- * Text boxes may also hold HTML (PLAN.md section 6.3). For them the HTML is let through
- * and the whole result goes through the Html filter, which applies the same rules.
+ * Text boxes and, since 1.4.8, blog posts may also hold HTML (PLAN.md section 6.3). For
+ * them the HTML is let through and the whole result goes through the Html filter, which
+ * applies the same rules.
  */
 final class Markdown
 {
@@ -32,7 +34,7 @@ final class Markdown
 
     /**
      * @param bool $allowHtml keep the harmless part of HTML written in the text, for text
-     *                        boxes only; without PHP's dom extension it is stripped anyway
+     *                        boxes and blog posts; without PHP's dom extension it is stripped anyway
      */
     public static function render(string $markdown, bool $allowHtml = false): string
     {
@@ -45,7 +47,11 @@ final class Markdown
         return (string) self::converter()->convert($markdown);
     }
 
-    /** The first paragraph of a Markdown text as plain text, for excerpts. */
+    /**
+     * The first paragraph of a Markdown text as plain text, for excerpts. HTML tags in it
+     * are left out and the text inside them kept; a paragraph written wholly in HTML is
+     * an HTML block, not a paragraph, and is passed over.
+     */
     public static function firstParagraph(string $markdown, int $maxLength = 300): string
     {
         $document = (new MarkdownParser(self::converter()->getEnvironment()))->parse($markdown);
@@ -55,7 +61,7 @@ final class Markdown
                 foreach ($node->iterator() as $inline) {
                     if ($inline instanceof Newline) {
                         $text .= ' ';
-                    } elseif ($inline instanceof StringContainerInterface) {
+                    } elseif ($inline instanceof StringContainerInterface && !$inline instanceof RawMarkupContainerInterface) {
                         $text .= $inline->getLiteral();
                     }
                 }

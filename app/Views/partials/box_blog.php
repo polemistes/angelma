@@ -22,7 +22,7 @@ $text = \Angelma\Repos\Boxes::blogText($content);
                 <li>
                     <a class="blog-box-post" href="<?= e(url('/blog/' . $blog['slug'] . '/' . $post['slug'])) ?>"><?= e($post['title']) ?></a>
                     <span class="post-meta"><?= partial('post_meta', ['post' => $post]) ?></span>
-                    <?php if ($text === 'full' && ($body = \Angelma\Markdown::render((string) $post['body_markdown'])) !== ''): ?>
+                    <?php if ($text === 'full' && ($body = \Angelma\Markdown::render((string) $post['body_markdown'], true)) !== ''): ?>
                         <div class="prose post-body"><?= raw($body) ?></div>
                     <?php elseif ($text === 'first' && ($excerpt = \Angelma\Markdown::firstParagraph((string) $post['body_markdown'], 200)) !== ''): ?>
                         <p class="post-excerpt"><?= e($excerpt) ?></p>

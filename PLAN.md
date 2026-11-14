@@ -46,11 +46,11 @@ These were decided with the site owner and are not open for change.
 
 | Topic | Decision |
 |---|---|
-| Runtime | PHP 8.2 or newer. Required extensions: `pdo_sqlite`, `gd`, `mbstring`, `json`, `session`. Optional: `pdo_mysql`, `zip`, and since 1.4.3 `dom` (HTML in text boxes, section 6.3). |
+| Runtime | PHP 8.2 or newer. Required extensions: `pdo_sqlite`, `gd`, `mbstring`, `json`, `session`. Optional: `pdo_mysql`, `zip`, and since 1.4.3 `dom` (HTML in text boxes and, since 1.4.8, blog posts, section 6.3). |
 | Framework | None. Hand-written front controller and router. |
 | Database | SQLite through PDO. The SQL is written to be standard so MySQL can be added later. All driver-specific SQL lives in `app/Db.php` only. |
 | Templates | Plain PHP files under `app/Views`. |
-| Text format | Markdown, rendered server-side with `league/commonmark`. HTML in Markdown is stripped, except in text boxes, where the owner asked for it in 1.4.3: there it is kept and filtered (section 6.3). |
+| Text format | Markdown, rendered server-side with `league/commonmark`. HTML in Markdown is stripped, except in text boxes, where the owner asked for it in 1.4.3, and in blog posts since 1.4.8: there it is kept and filtered (section 6.3). |
 | Composer | Only `league/commonmark` in production, `phpunit/phpunit` in development. `vendor/` is committed to the repository so the archive is complete and the host never runs Composer. |
 | JavaScript | Small plain scripts, no libraries, no bundler. Used in the admin: Markdown preview, image picker, confirmation dialogs. Since 1.4.1 the public site has one small script too, `assets/site.js`, for the menu button on narrow screens; without it the menu is simply shown. |
 | Accounts | Administrators create users and set passwords. No self-registration. No email anywhere in version 1. |
@@ -74,7 +74,7 @@ angelma/                      repository root = web root after extraction
     Db.php                    PDO wrapper, migration runner
     Auth.php                  login, logout, current user, roles, CSRF, rate limiting
     Markdown.php
-    Html.php                  the filter for HTML in text boxes (section 6.3)
+    Html.php                  the filter for HTML in text boxes and posts (section 6.3)
     Images.php                upload validation, re-encoding, resizing
     Schemes.php               built-in colour schemes and the custom one
     Controllers/
@@ -371,9 +371,17 @@ place, so a forgotten or extra tag cannot disturb the page around the box.
 
 The filter needs PHP's `dom` extension: on PHP 8.4 and newer it uses `Dom\HTMLDocument`,
 the parser browsers use, on 8.2 and 8.3 `DOMDocument`. Without the extension HTML is
-stripped as before. Blog posts, the footer, the maintenance notice and release notes
-still have their HTML stripped. Editors may write HTML in text boxes (section 7); the
-filter is what keeps raw HTML, which is output unchanged, with administrators.
+stripped as before. Editors may write HTML in text boxes (section 7); the filter is what
+keeps raw HTML, which is output unchanged, with administrators.
+
+Since 1.4.8 blog posts take the same HTML through the same filter, wherever a post's
+body is shown: the post page, a blog box showing the whole text, the RSS feed, and the
+live preview in the post form, which has the same HTML hint as the text box. Excerpts
+(the blog index, a blog box showing the first paragraph, the page description) stay
+plain text: tags in the first paragraph are left out and their text kept, and a
+paragraph written wholly in HTML is passed over, since it is an HTML block and not a
+Markdown paragraph. The footer, the maintenance notice, release notes and comments still
+have their HTML stripped.
 
 ### 6.4 Image box
 The image fills the box width. Without a fixed height, the height follows the image's
@@ -385,7 +393,7 @@ styled smaller. `alt` from the box, falling back to the image's own alt text.
 Shows the `count` newest published posts of the blog: title linking to the post, date,
 author display name, and then, depending on `text`: nothing (`none`), the first paragraph
 of the body as plain text (`first`), or the whole body rendered as on the post page
-(`full`, since 1.4.5). Comments are only on the post page. Below the list a link "All
+(`full`, since 1.4.5), with its HTML since 1.4.8 (section 6.3). Comments are only on the post page. Below the list a link "All
 posts" to `/blog/{slug}`. If the blog has no published posts, show "No posts yet".
 
 ### 6.6 Embed box
@@ -633,7 +641,7 @@ stay as information shown in lists, but nothing is enforced on them.
 | Upload images, edit alt text, delete unused images | yes | yes | no | no |
 | Create, edit and delete blogs and posts | yes | yes | no | no |
 | Approve or delete comments | yes | yes | no | no |
-| HTML in text boxes, filtered (section 6.3, 1.4.3) | yes | yes | no | no |
+| HTML in text boxes (1.4.3) and blog posts (1.4.8), filtered (section 6.3) | yes | yes | no | no |
 | Raw HTML in embed boxes | yes | no | no | no |
 | Users, settings, backup | yes | no | no | no |
 | Change own password and display name | yes | yes | yes | no |
@@ -1127,6 +1135,17 @@ CSP, a folder without an index file gives 404 while its files are served, a PHP 
 runs, hidden files and `.json` give 403 while `.well-known` is served, a folder named
 `admin` changes nothing, and `data/`, `app/` and top-level files are refused as before.
 
+**11.13 HTML in blog posts (1.4.8)**
+`Markdown::render()` with `$allowHtml` for the post body on the post page, in a blog box
+showing the whole text, in the feed and in the post form's preview (`data-preview-html`),
+the HTML hint under the post body, and `Markdown::firstParagraph()` leaving tags out of
+excerpts, per section 6.3.
+Done when: unit tests show a post with a `target="_blank"` link, a table and a styled
+cell keeping them on the post page, in a blog box and in the feed (with absolute
+addresses), a script, an `onclick`, a `javascript:` address and `position` gone, the
+excerpt as plain text without tags, and the post form with the hint and the HTML
+preview; comments still take no HTML.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1182,6 +1201,7 @@ Tick when done and committed.
 - [x] 11.10 Scrolling boxes
 - [x] 11.11 Links without underline
 - [x] 11.12 Folders of your own
+- [x] 11.13 HTML in blog posts
 
 ---
 

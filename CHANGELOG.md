@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.8
+- Blog posts accept the same HTML as text boxes, for example `<a href="https://..." target="_blank">` for a link that opens in a new tab, or a table. It shows on the post page, in blog boxes and in the feed. Scripts and other unsafe parts are removed.
+
 ## 1.4.7
 - Links on the site are no longer underlined. They show an underline when pointed at or reached with the keyboard.
 - Web pages of your own can live in folders next to Angelma's: a folder `mine` with an `index.html` shows at `/mine/`, and the other files in it at their own addresses. A page cannot take the name of such a folder. Updates leave these folders alone; Backup does not include them.

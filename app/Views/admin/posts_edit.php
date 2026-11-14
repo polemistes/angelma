@@ -36,13 +36,16 @@ $action = $post === null ? '/admin/blogs/' . $blog['id'] . '/posts/new' : '/admi
     <div class="markdown-editor">
         <label>
             <span><?= e(t('post_field_body')) ?></span>
-            <textarea name="body_markdown" rows="20" data-preview-target="post-preview"><?= e($input['body_markdown']) ?></textarea>
+            <textarea name="body_markdown" rows="20" data-preview-target="post-preview" data-preview-html><?= e($input['body_markdown']) ?></textarea>
             <span class="hint"><?= e(t('markdown_hint')) ?></span>
+            <?php if (\Angelma\Html::available()): ?>
+                <span class="hint"><?= e(t('html_hint')) ?></span>
+            <?php endif ?>
             <?= $err('body_markdown') ?>
         </label>
         <div class="field">
             <span><?= e(t('preview')) ?></span>
-            <div class="preview prose" id="post-preview" aria-live="polite"><?= raw(\Angelma\Markdown::render((string) $input['body_markdown'])) ?></div>
+            <div class="preview prose" id="post-preview" aria-live="polite"><?= raw(\Angelma\Markdown::render((string) $input['body_markdown'], true)) ?></div>
         </div>
     </div>
 

@@ -72,5 +72,9 @@ final class MarkdownTest extends TestCase
         $this->assertSame('Intro with link and code.', Markdown::firstParagraph("# Head\n\nIntro *with* [link](/x) and `code`.\n\nSecond."));
         $this->assertSame('', Markdown::firstParagraph("# Only a heading"));
         $this->assertSame('abcd…', Markdown::firstParagraph('abcdefghij', 5));
+        // HTML in the paragraph: the tags are left out and their text kept.
+        $this->assertSame('Read this site now.', Markdown::firstParagraph("Read <a href=\"https://x.org\" target=\"_blank\">this <b>site</b></a> now."));
+        // A paragraph written wholly in HTML is an HTML block and is passed over.
+        $this->assertSame('Markdown paragraph.', Markdown::firstParagraph("<p>All in HTML.</p>\n\nMarkdown paragraph."));
     }
 }

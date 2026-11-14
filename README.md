@@ -16,7 +16,7 @@ command line.
 
 The installer checks the PHP version, the extensions and the two folders, and shows what
 is missing. Three more PHP extensions are optional: `zip` for backups and one-click
-updates, `curl` for one-click updates, and `dom` for HTML in text boxes.
+updates, `curl` for one-click updates, and `dom` for HTML in text boxes and blog posts.
 
 ## Installing
 
@@ -85,10 +85,10 @@ Everything you make is in two folders: `data/` holds the database and settings, 
 Under *Pages* you build pages from rows and boxes, under *Images* you upload pictures,
 and under *Blogs* you write posts.
 
-- **Text** is written in Markdown. Text boxes also take HTML where Markdown falls short:
-  `<a href="https://example.com/" target="_blank">link text</a>` opens a link in a new
-  tab, and tables or `<div style="text-align: center">` work too. Scripts and other parts
-  that could harm visitors are removed when the page is shown.
+- **Text** is written in Markdown. Text boxes and blog posts also take HTML where
+  Markdown falls short: `<a href="https://example.com/" target="_blank">link text</a>`
+  opens a link in a new tab, and tables or `<div style="text-align: center">` work too.
+  Scripts and other parts that could harm visitors are removed when the page is shown.
 - **Links to your own pages** start with a slash, like `[About us](/about)`. They keep
   working if the site moves into or out of a subfolder.
 - **Containers:** a *Container* box holds rows of boxes of its own, so you can stack

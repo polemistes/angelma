@@ -215,7 +215,7 @@ final class BlogController
                 . '<guid isPermaLink="true">' . $x($link) . "</guid>\n"
                 . '<pubDate>' . $rssDate($post['published_at']) . "</pubDate>\n"
                 . '<dc:creator>' . $x((string) $post['author_name']) . "</dc:creator>\n"
-                . '<description>' . $x(self::absoluteLinks(Markdown::render((string) $post['body_markdown']))) . "</description>\n"
+                . '<description>' . $x(self::absoluteLinks(Markdown::render((string) $post['body_markdown'], true))) . "</description>\n"
                 . "</item>\n";
         }
         $xml .= "</channel>\n</rss>\n";
