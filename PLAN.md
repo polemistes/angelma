@@ -305,6 +305,10 @@ logged in, since 1.4.5: the admin link and the logout button, without the name);
 button opens the pages as a full-width stacked list with the current page marked. With
 scripts off the list is shown stacked from the start.
 
+Since 1.4.7 links on the public site are not underlined: they are told apart by the
+scheme's link colour and get an underline on hover and keyboard focus. The admin area
+keeps its own link style.
+
 `<title>` is `{page title} - {site title}`, or just the site title on the home page.
 `<meta name="description">` from the page when set.
 
@@ -1069,6 +1073,12 @@ copy, at 1200 px a blog box of 10 posts, a long text box and a container of four
 beside an image scroll inside their height with "All posts" inside the frame, and at
 390 px the blog box still scrolls while the text box and the container show everything.
 
+**11.11 Links without underline (1.4.7)**
+The link rules in `site.css`, per section 6.1.
+Done when: on a copy, no link on the home page, a page with blog boxes or a post page is
+underlined at rest (measured in the browser), and links in text, the footer and blog
+boxes are underlined on hover; buttons, the menu and the Edit links look as before.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1122,6 +1132,7 @@ Tick when done and committed.
 - [x] 11.8 Admin link on the site
 - [x] 11.9 Edit links on the site
 - [x] 11.10 Scrolling boxes
+- [x] 11.11 Links without underline
 
 ---
 

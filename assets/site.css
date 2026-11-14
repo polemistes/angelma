@@ -26,13 +26,24 @@ body {
     font: 1.0625rem/1.6 var(--font);
 }
 
+/* Links are told apart by colour; the underline appears on hover and keyboard focus
+   (1.4.7, PLAN.md section 6.1). Links with a class of their own (buttons, the menu,
+   the Edit links) style their hover themselves. */
 a {
     color: var(--link);
+    text-decoration: none;
 }
 
 a:hover,
 a:focus {
     color: var(--link-hover);
+}
+
+a:not([class]):hover,
+a:not([class]):focus-visible,
+a.blog-box-post:hover,
+a.blog-box-post:focus-visible {
+    text-decoration: underline;
 }
 
 img {
@@ -146,6 +157,10 @@ img {
     background: none;
     font: inherit;
     cursor: pointer;
+}
+
+.site-menu button:hover,
+.site-menu button:focus-visible {
     text-decoration: underline;
 }
 

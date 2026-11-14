@@ -2,6 +2,9 @@
 
 Each version's section is the text of its GitHub release (`dev/release.sh`).
 
+## 1.4.7
+- Links on the site are no longer underlined. They show an underline when pointed at or reached with the keyboard.
+
 ## 1.4.6
 - Text and blog boxes with a fixed height can scroll instead of cutting off what does not fit. In a blog box only the posts scroll; the title and "All posts" stay in place.
 - Containers can have a fixed height too, and their boxes then scroll inside it. On phones the height is dropped.
