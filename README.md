@@ -102,6 +102,13 @@ and under *Blogs* you write posts.
   pages from the menu under *Settings*.
 - **Maintenance mode:** a switch under *Settings* shows visitors a notice while you work.
   Logged-in editors and administrators still see the site.
+- **Pages of your own:** a folder you put in the site folder, next to `assets` and
+  `uploads`, is served as it is: `mine/index.html` shows at `/mine/` and
+  `mine/other.html` at `/mine/other.html`. A page cannot take the name of such a folder.
+  Hidden files and files ending in `.md`, `.json`, `.xml`, `.sqlite`, `.lock`, `.sh` or
+  `.dist` are not served, and folders named `admin`, `blog`, `login` or `logout` are
+  ignored. Updates leave these folders alone, but *Backup* does not include them, so keep
+  your own copy.
 
 ## Development
 

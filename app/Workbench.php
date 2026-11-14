@@ -27,7 +27,7 @@ final class Workbench
         }
         $id = $pages->create([
             'slug' => slugify('workbench', static fn (string $s): bool => $pages->slugTaken($s)
-                || in_array($s, Pages::RESERVED, true)),
+                || Pages::reserved($s)),
             'name' => t('workbench_name'),
             'title' => t('workbench_name'),
             'meta_description' => '',

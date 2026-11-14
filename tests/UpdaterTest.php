@@ -50,6 +50,7 @@ final class UpdaterTest extends TestCase
             'data/config.php' => 'secret',
             'data/sessions/.gitkeep' => '',
             'uploads/photo.jpg' => 'jpeg',
+            'mine/index.html' => 'my own page',
         ]);
     }
 
@@ -165,6 +166,7 @@ final class UpdaterTest extends TestCase
         $this->assertSame('secret', file_get_contents("$site/data/config.php"), 'data is never touched');
         $this->assertFileDoesNotExist("$site/data/.htaccess");
         $this->assertSame('jpeg', file_get_contents("$site/uploads/photo.jpg"));
+        $this->assertSame('my own page', file_get_contents("$site/mine/index.html"), 'folders of your own are kept');
         $this->assertDirectoryDoesNotExist("$site/install", 'a deleted installer stays deleted');
         $this->assertFileDoesNotExist("$site/data/updating.lock");
         $this->assertSame(2, $summary['removed']);
@@ -203,5 +205,7 @@ final class UpdaterTest extends TestCase
         $this->assertFileDoesNotExist("$site/app/New.php");
         $this->assertSame('old css', file_get_contents("$site/assets/site.css"));
         $this->assertSame('secret', file_get_contents("$site/data/config.php"));
+        $this->assertSame('my own page', file_get_contents("$site/mine/index.html"));
+        $this->assertDirectoryDoesNotExist("$site/data/updates/previous/mine", 'not part of the code backup');
     }
 }

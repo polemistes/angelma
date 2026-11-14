@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Angelma\Repos;
 
+use Angelma\App;
 use Angelma\Workbench;
 
 final class Pages extends Repo
@@ -14,6 +15,18 @@ final class Pages extends Repo
     public const RESERVED = [
         'admin', 'blog', 'login', 'logout', 'install', 'uploads', 'assets', 'data', 'app', 'vendor', 'dev', 'tests',
     ];
+
+    /** Whether a page may not use the slug: Angelma uses it, or a folder has it (section 6.18). */
+    public static function reserved(string $slug): bool
+    {
+        return in_array($slug, self::RESERVED, true) || self::isFolder($slug);
+    }
+
+    /** Whether a folder of this name is in the site folder; the web server serves its address. */
+    public static function isFolder(string $slug): bool
+    {
+        return $slug !== '' && !str_contains($slug, '/') && App::$root !== '' && is_dir(App::$root . '/' . $slug);
+    }
 
     /** @return array<string, mixed>|null */
     public function findBySlug(string $slug): ?array

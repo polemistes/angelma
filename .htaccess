@@ -14,15 +14,23 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Protected folders and file types.
+    # Protected folders, hidden files and folders (except .well-known) and file types.
     RewriteRule ^(app|data|vendor|dev|tests)(/|$) - [F,L]
+    RewriteRule (^|/)\.(?!well-known(/|$)) - [F,L]
     RewriteRule (^|/)composer\.[^/]*$ - [F,L]
     RewriteRule \.(sqlite|lock|md|json|sh|xml|dist)$ - [F,L]
 
-    # Existing files under assets/, uploads/, install/ and robots.txt are served directly.
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
-    RewriteRule ^((assets|uploads|install)(/|$)|robots\.txt$) - [L]
+    # Angelma's own addresses, even when a folder of the same name exists.
+    RewriteRule ^(admin|blog|login|logout)(/|$) index.php [L,QSA]
+
+    # Served directly: existing files inside a folder (assets/, uploads/, install/ and
+    # folders of your own), existing folders with an index file, and robots.txt.
+    # Other files at the top level, and folders without an index file, are not.
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^([^/]+/.|robots\.txt$) - [L]
+    RewriteCond %{REQUEST_FILENAME}/index.html -f [OR]
+    RewriteCond %{REQUEST_FILENAME}/index.php -f
+    RewriteRule ^. - [L]
 
     # Everything else goes to the front controller.
     RewriteRule ^index\.php$ - [L]
@@ -33,8 +41,10 @@
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    # PHP sends the Content-Security-Policy for pages (App::CSP); static files get the same here.
-    <FilesMatch "\.(css|js|png|jpe?g|gif|webp|svg|ico|txt|html)$">
+    # PHP sends the Content-Security-Policy for pages (App::CSP); static files get the same
+    # here. Not HTML files: Angelma's own are empty, and pages in folders of your own keep
+    # their own scripts and styles (PLAN.md section 6.18).
+    <FilesMatch "\.(css|js|png|jpe?g|gif|webp|svg|ico|txt)$">
         Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://www.openstreetmap.org; style-src 'self' 'unsafe-inline'; script-src 'self'"
     </FilesMatch>
 </IfModule>

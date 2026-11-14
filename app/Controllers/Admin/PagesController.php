@@ -137,11 +137,13 @@ final class PagesController
         if ($data['slug'] === '') {
             // Not typed: derive from the name and make it unique.
             $data['slug'] = slugify($data['name'], static fn (string $s): bool => $pages->slugTaken($s, $id)
-                || in_array($s, Pages::RESERVED, true));
+                || Pages::reserved($s));
         } else {
             $data['slug'] = slugify($data['slug']);
             if (in_array($data['slug'], Pages::RESERVED, true)) {
                 $errors['slug'] = t('page_error_slug_reserved', ['slug' => $data['slug']]);
+            } elseif (Pages::isFolder($data['slug'])) {
+                $errors['slug'] = t('page_error_slug_folder', ['slug' => $data['slug']]);
             } elseif ($pages->slugTaken($data['slug'], $id)) {
                 $errors['slug'] = t('page_error_slug_taken', ['slug' => $data['slug']]);
             }

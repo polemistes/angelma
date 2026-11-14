@@ -172,6 +172,7 @@ return [
     'page_error_title' => 'The title can have at most 150 characters.',
     'page_error_meta' => 'The description can have at most 300 characters.',
     'page_error_slug_reserved' => 'The address "{slug}" is reserved. Choose another.',
+    'page_error_slug_folder' => 'The address "{slug}" belongs to a folder on the server. Choose another.',
     'page_error_slug_taken' => 'Another page already uses the address "{slug}".',
     'page_created' => 'The page was created. Add rows and boxes below.',
     'page_saved' => 'The page settings were saved.',

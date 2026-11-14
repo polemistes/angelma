@@ -252,6 +252,7 @@ Public:
 | `/blog/{blog-slug}/{post-slug}/comment` | POST target for new comments |
 | `/login`, `/logout` | login form (GET and POST), logout (POST only) |
 | `/uploads/...`, `/assets/...` | static files served by Apache directly |
+| `/{folder}/...` | files in folders of your own, served directly (1.4.7, section 6.18) |
 | `/install/` | the installer, only until `data/installed.lock` exists |
 
 Admin, all under `/admin`, all require login, role checks per section 7:
@@ -283,7 +284,8 @@ Admin, all under `/admin`, all require login, role checks per section 7:
 | `/admin/account` | change own password and display name |
 
 Reserved first path segments that a page slug may not use: `admin`, `blog`, `login`,
-`logout`, `install`, `uploads`, `assets`, `data`, `app`, `vendor`, `dev`, `tests`.
+`logout`, `install`, `uploads`, `assets`, `data`, `app`, `vendor`, `dev`, `tests`, and
+since 1.4.7 the name of any folder in the site folder (section 6.18).
 
 Every state-changing action is a POST with a CSRF token. There are no GET actions that
 change data.
@@ -583,6 +585,34 @@ The setting `edit_links` (the checkbox 'Editors and administrators get an "Edit"
 every box and post on the site' under Settings, on by default) turns the edit links off
 for everyone. The Admin link stays.
 
+### 6.18 Folders of your own (1.4.7)
+The owner may put folders of their own in the site folder, next to `assets/` and
+`uploads/`, for web pages Angelma does not make: `mine/index.html` is then shown at
+`/mine/` and `mine/other.html` at `/mine/other.html`. The web server serves them directly
+(section 8): every existing file inside a folder, and every existing folder that has an
+`index.html` or `index.php`. A folder without an index file is never listed; its address
+gives Angelma's 404, while the files in it are still served. Files at the top level are
+still not served, except `robots.txt`.
+
+So that Angelma stays safe and keeps working:
+
+- The protected folders (`app`, `data`, `vendor`, `dev`, `tests`), hidden files and
+  folders (a name starting with a dot, except `.well-known`) and the protected file types
+  give 403 in every folder.
+- `admin`, `blog`, `login` and `logout` always go to Angelma, even when a folder of that
+  name exists.
+- A folder owns the address of its name. The page form refuses a slug that is the name
+  of a folder in the site folder, and a slug made from a page name goes around it, as
+  around a reserved one (`Pages::reserved()`). A page that had the address before the
+  folder came is hidden by the folder once the folder has an index file.
+- PHP files in such folders run as ordinary PHP.
+- The folders get the security headers of section 8 except the Content-Security-Policy,
+  so a page of one's own keeps its own scripts and styles.
+- The updater never touches them: it replaces only `vendor/`, `app/`, `assets/`,
+  `install/` and the top-level files, and "Restore previous version" does the same. The
+  backup does not contain them, and maintenance mode does not cover them. They are the
+  owner's own files, and the owner keeps a copy.
+
 ---
 
 ## 7. Roles and permissions
@@ -623,8 +653,12 @@ active administrator cannot be deactivated, deleted or demoted.
 
 - `RewriteEngine On`; requests for existing files and directories under `assets/`,
   `uploads/`, `install/` are served directly; everything else goes to `index.php`.
+  Since 1.4.7: existing files inside any folder, existing folders with an `index.html`
+  or `index.php`, and `robots.txt` are served directly, so folders of your own work
+  (section 6.18); `admin`, `blog`, `login` and `logout` always go to `index.php`.
 - Block `app/`, `data/`, `vendor/`, `dev/`, `tests/` and any file ending in `.sqlite`,
-  `.lock`, `.md`, `.json`, `.sh`, `.xml`, `.dist`, `composer.*` with a 403.
+  `.lock`, `.md`, `.json`, `.sh`, `.xml`, `.dist`, `composer.*` with a 403. Since 1.4.7
+  also hidden files and folders, except `.well-known`.
 - Security headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`,
   `Referrer-Policy: strict-origin-when-cross-origin`.
 
@@ -639,7 +673,9 @@ PHP sets the Content-Security-Policy header from `bootstrap.php`:
 `default-src 'self'; img-src 'self' data: https:; frame-src https://www.youtube.com
 https://player.vimeo.com https://www.google.com https://www.openstreetmap.org;
 style-src 'self' 'unsafe-inline'; script-src 'self'`. The scheme `<style>` block is why
-`unsafe-inline` is needed for styles; scripts never are inline.
+`unsafe-inline` is needed for styles; scripts never are inline. `.htaccess` sends the
+same header for static CSS, JavaScript, images and text files; since 1.4.7 not for HTML
+files, so pages in folders of your own keep their own scripts (section 6.18).
 
 `dev/router.php` reproduces the rewrite and blocking rules for the built-in server so
 local behaviour matches Apache.
@@ -1079,6 +1115,18 @@ Done when: on a copy, no link on the home page, a page with blog boxes or a post
 underlined at rest (measured in the browser), and links in text, the footer and blog
 boxes are underlined on hover; buttons, the menu and the Edit links look as before.
 
+**11.12 Folders of your own (1.4.7)**
+The rules in `.htaccess` and `dev/router.php`, `Pages::reserved()` and
+`Pages::isFolder()` for the page form and the workbench, and no CSP on static HTML, per
+sections 5, 6.18 and 8.
+Done when: unit tests show the page form refusing a folder's name, a slug made from a
+page name going around it, and the updater and its restore keeping a folder of one's
+own; on the dev server, at the root and with `ANGELMA_BASE`, a folder with an
+`index.html` answers at `/mine` (redirect), `/mine/` and `/mine/other.html` without the
+CSP, a folder without an index file gives 404 while its files are served, a PHP file
+runs, hidden files and `.json` give 403 while `.well-known` is served, a folder named
+`admin` changes nothing, and `data/`, `app/` and top-level files are refused as before.
+
 ### Later, not in version 1
 MySQL driver option in the installer. Norwegian translation. Password reset by email with
 SMTP settings. A gallery box. Scheduled publishing. These are listed so they are not built
@@ -1133,6 +1181,7 @@ Tick when done and committed.
 - [x] 11.9 Edit links on the site
 - [x] 11.10 Scrolling boxes
 - [x] 11.11 Links without underline
+- [x] 11.12 Folders of your own
 
 ---
 
